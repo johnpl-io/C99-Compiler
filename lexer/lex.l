@@ -2,9 +2,12 @@
 
 %{
    #include "tokens-manual.h"
+   int lineno;
 %}
 
 %%
+\n                  {lineno++;}
+[ \n\t\r\v\f]+      { printf("white space"); }
 "auto"              { return AUTO; }
 "_Bool"             { return _BOOL; }
 "break"             { return BREAK; }
@@ -42,9 +45,55 @@
 "void"              { return VOID; }
 "volatile"          { return VOLATILE; }
 "while"             { return WHILE; }
+  
+"->"                { return INDSEL;  } 
+"++"                { return PLUSPLUS; }
+"--"                { return MINUSMINUS; }
+"<<"                { return SHL; }
+">>"                { return SHR; }
+"<="                { return LTEQ; }
+">="                { return GTEQ; }
+"=="                { return EQEQ; }
+"!="                { return NOTEQ; }
+"&&"                { return LOGAND; }
+"||"                { return LOGOR; }
+"..."               { return ELLIPSIS; }
+"*="                { return TIMESEQ; }
+"/="                { return DIVEQ; }
+"%="                { return MODEQ; }
+"+="                { return PLUSEQ; }
+"-="                { return MINUSEQ; }
+"<<="               { return SHLEQ; }
+">>="               { return SHREQ; }
+"&="                { return ANDEQ; }
+"|="                { return OREQ; }
+"^="                { return XOREQ; }
 
 
+"!"                 { return '!'; }
+"^"                 { return '^'; }
+"&"                 { return '&'; }
+"*"                 { return '*'; }
+"-"                 { return '-'; }
+"+"                 { return '+'; }              
+"="                 { return '='; }
+"~"                 { return '~'; }
+"|"                 { return '|'; }
+"."                 { return '.'; }
+"<"                 { return '<'; }
+">"                 { return '>'; }
+"/"                 { return '/'; }
+"?"                 { return '?'; }
+"("                 { return '('; }
+")"                 { return ')'; }
+"["                 { return '['; }
+"]"                 { return ']'; }
+","                 { return ','; }
+";"                 { return ';'; }
+":"                 { return ':'; }     
 
+
+[a-zA-Z0-9_]+       {return IDENT; /* put somewhere */ }
 %%
 int yywrap() {}
 int main() {

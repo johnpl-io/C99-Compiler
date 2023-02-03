@@ -351,8 +351,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 38
-#define YY_END_OF_BUFFER 39
+#define YY_NUM_RULES 81
+#define YY_END_OF_BUFFER 82
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -360,45 +360,51 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[178] =
+static const flex_int16_t yy_accept[225] =
     {   0,
-        0,    0,   39,   38,   38,   38,   38,   38,   38,   38,
-       38,   38,   38,   38,   38,   38,   38,   38,   38,   38,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,   10,
-        0,    0,    0,    0,    0,    0,   18,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,   16,    0,    0,   21,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    1,    0,    4,    5,    0,
-        0,    0,    0,   12,   13,    0,    0,   17,    0,   22,
+        0,    0,   82,   81,    2,    1,   62,   81,   64,   76,
+       77,   65,   67,   66,   71,   74,   80,   72,   68,   73,
+       75,   78,   79,   63,   80,   80,   80,   80,   80,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   80,
+       70,   69,    2,   48,   54,   49,   59,   52,   41,   55,
+       42,   56,   40,    0,   53,   80,   43,   45,   47,   46,
+       44,   61,   80,   80,   80,   80,   80,   80,   80,   80,
+       80,   12,   80,   80,   80,   80,   80,   80,   20,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   80,
+       60,   50,   51,   57,   58,   80,   80,   80,   80,   80,
 
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,   35,    0,    0,    2,    0,    0,    3,    7,
-        0,    0,    0,    0,   15,    0,    0,    0,    0,   26,
-        0,    0,    0,    0,    0,    0,   33,    0,    0,   37,
-        0,    0,    0,    0,   11,   14,   20,    0,    0,   25,
-       27,   28,   29,   30,   31,    0,    0,    0,    0,    0,
-        0,    9,    0,    0,   32,    0,    0,    6,    0,    8,
-       23,   24,   34,   36,    0,   19,    0
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   18,
+       80,   80,   23,   80,   80,   80,   80,   80,   80,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   80,
+       80,   80,    3,   80,    6,    7,   80,   80,   80,   80,
+       14,   15,   80,   80,   19,   80,   24,   80,   80,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   37,
+       80,   80,    4,   80,   80,    5,    9,   80,   80,   80,
+       80,   17,   80,   80,   80,   80,   28,   80,   80,   80,
+       80,   80,   80,   35,   80,   80,   39,   80,   80,   80,
+       80,   13,   16,   22,   80,   80,   27,   29,   30,   31,
+
+       32,   33,   80,   80,   80,   80,   80,   80,   11,   80,
+       80,   34,   80,   80,    8,   80,   10,   25,   26,   36,
+       38,   80,   21,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
+        2,    2,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    2,    3,    1,    1,    1,
-        1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    5,    1,    6,    7,    8,    9,
+        1,    2,    4,    1,    1,    1,    5,    6,    1,    7,
+        8,    9,   10,    1,   11,   12,   13,   14,   14,   14,
+       14,   14,   14,   14,   14,   14,   14,    1,    1,   15,
+       16,   17,   18,    1,   14,   19,   20,   14,   14,   14,
+       14,   14,   21,   14,   14,   14,   14,   14,   14,   14,
+       14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
+       22,    1,   23,   24,   25,    1,   26,   27,   28,   29,
 
-       10,   11,   12,   13,   14,    1,   15,   16,   17,   18,
-       19,   20,    1,   21,   22,   23,   24,   25,   26,   27,
-       28,   29,    1,    1,    1,    1,    1,    1,    1,    1,
+       30,   31,   32,   33,   34,   14,   35,   36,   37,   38,
+       39,   40,   14,   41,   42,   43,   44,   45,   46,   47,
+       48,   49,    1,   50,    1,   51,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -415,113 +421,142 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[30] =
+static const YY_CHAR yy_meta[52] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    2,    1,    1,    1,    1,    2,    2,
+        2,    1,    1,    1,    2,    2,    2,    2,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    1,
+        1
+    } ;
+
+static const flex_int16_t yy_base[226] =
+    {   0,
+        0,    0,  238,  239,   50,   52,  221,  220,   50,  239,
+      239,  219,   47,   48,  222,  217,    0,   45,  216,   51,
+      239,  239,  239,  215,   50,  186,  188,   46,   43,   39,
+       42,  189,   45,  188,  196,   54,  177,  186,  184,  189,
+       42,  239,   87,  239,  239,  239,  239,  239,  239,  239,
+      239,  239,  239,  209,  239,    0,  204,  239,  239,  239,
+      203,  239,  179,  178,  179,  172,  184,  171,  186,  173,
+      179,  165,  166,  163,  163,  166,  163,  160,    0,   48,
+      164,   61,  162,   62,   54,  166,  159,   64,   65,  164,
+      239,  239,  239,  239,  239,  158,  159,  169,  155,  167,
+
+      162,  150,   65,  164,  162,  158,  150,  156,  159,    0,
+      145,  149,    0,  150,  147,  137,  135,  137,  139,  146,
+      132,  130,  130,  142,  132,  136,  140,  142,  131,  130,
+      125,  132,    0,  128,    0,    0,  119,  127,  116,  123,
+        0,    0,  117,  114,    0,  118,    0,  113,  113,  112,
+      109,  121,  111,  115,  120,  119,  117,  107,  112,    0,
+      100,  112,    0,  105,  106,    0,    0,  101,  102,  107,
+       98,    0,  105,   91,   99,   94,    0,  102,   99,  101,
+       85,   94,   96,    0,   87,   90,    0,   93,   84,   77,
+       77,    0,    0,    0,   89,   90,    0,    0,    0,    0,
+
+        0,    0,   86,   86,   79,   67,   87,   82,    0,   69,
+       66,    0,   76,   72,    0,   55,    0,    0,    0,    0,
+        0,   26,    0,  239,   60
+    } ;
+
+static const flex_int16_t yy_def[226] =
+    {   0,
+      224,    1,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  225,  224,  224,  224,
+      224,  224,  224,  224,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  225,  224,  224,  224,  224,
+      224,  224,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      224,  224,  224,  224,  224,  225,  225,  225,  225,  225,
+
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,  225,  225,  225,  225,  225,  225,  225,
+      225,  225,  225,    0,  224
+    } ;
+
+static const flex_int16_t yy_nxt[291] =
+    {   0,
+        4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
+       14,   15,   16,   17,   18,   19,   20,   21,   17,   17,
+       17,   22,   23,   24,   25,   26,   27,   28,   29,   30,
+       31,   32,   17,   33,   17,   34,   17,   17,   17,   17,
+       35,   36,   37,   38,   39,   40,   17,   17,   17,   41,
+       42,   43,   43,   43,   43,   46,   49,   91,   51,   57,
+       58,   56,   50,   52,   53,   47,   60,   61,   63,   64,
+       65,   68,   71,  223,   73,   79,   74,   76,   69,  121,
+       77,   72,   80,  112,   70,   75,   83,   84,   43,   43,
+      113,   92,  115,  119,  122,  222,   85,  125,  127,   86,
+
+      128,  221,  116,  117,  220,  126,  137,  138,  219,  218,
+      120,  217,  216,  215,  214,  213,  212,  211,  210,  209,
+      208,  207,  206,  205,  204,  203,  202,  201,  200,  199,
+      198,  197,  196,  195,  194,  193,  192,  191,  190,  189,
+      188,  187,  186,  185,  184,  183,  182,  181,  180,  179,
+      178,  177,  176,  175,  174,  173,  172,  171,  170,  169,
+      168,  167,  166,  165,  164,  163,  162,  161,  160,  159,
+      158,  157,  156,  155,  154,  153,  152,  151,  150,  149,
+      148,  147,  146,  145,  144,  143,  142,  141,  140,  139,
+      136,  135,  134,  133,  132,  131,  130,  129,  124,  123,
+
+      118,  114,  111,  110,  109,  108,  107,  106,  105,  104,
+      103,  102,  101,  100,   99,   98,   97,   96,   95,   94,
+       93,   90,   89,   88,   87,   82,   81,   78,   67,   66,
+       62,   59,   55,   54,   48,   45,   44,  224,    3,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224
+    } ;
+
+static const flex_int16_t yy_chk[291] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1
-    } ;
-
-static const flex_int16_t yy_base[178] =
-    {   0,
-        0,    0,  186,  187,   28,  161,  163,   27,   24,   20,
-       23,  164,   26,  163,  171,   35,  152,  161,  159,  164,
-      157,  156,  157,  150,  162,  149,  164,  151,  157,  143,
-      144,  141,  141,  144,  141,  138,  187,   29,  142,   41,
-      140,   38,   35,  144,  137,   37,   41,  142,  136,  137,
-      147,  133,  145,  140,  128,   43,  142,  140,  136,  128,
-      134,  137,  187,  123,  127,  187,  128,  125,  115,  113,
-      115,  117,  124,  110,  108,  108,  120,  110,  114,  118,
-      120,  109,  108,  103,  110,  187,  106,  187,  187,   97,
-      105,   94,  101,  187,  187,   95,   92,  187,   96,  187,
-
-       91,   91,   90,   87,   99,   89,   93,   98,   97,   95,
-       85,   90,  187,   78,   90,  187,   83,   84,  187,  187,
-       79,   80,   85,   76,  187,   83,   69,   77,   72,  187,
-       80,   77,   79,   63,   72,   74,  187,   65,   68,  187,
-       71,   62,   55,   55,  187,  187,  187,   67,   68,  187,
-      187,  187,  187,  187,  187,   64,   64,   57,   45,   65,
-       60,  187,   48,   45,  187,   53,   50,  187,   33,  187,
-      187,  187,  187,  187,    7,  187,  187
-    } ;
-
-static const flex_int16_t yy_def[178] =
-    {   0,
-      177,    1,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,    0
-    } ;
-
-static const flex_int16_t yy_nxt[217] =
-    {   0,
-        4,    4,    4,    4,    5,    6,    7,    8,    9,   10,
-       11,   12,    4,   13,    4,   14,    4,    4,    4,    4,
-       15,   16,   17,   18,   19,   20,    4,    4,    4,   21,
-       22,   23,   26,   29,  176,   31,   37,   32,   34,   27,
-       74,   35,   30,   38,   65,   28,   33,   41,   42,   72,
-       78,   66,   68,  175,   80,   75,   81,   43,   79,  174,
-       44,  173,   69,   70,   90,   91,   73,  172,  171,  170,
-      169,  168,  167,  166,  165,  164,  163,  162,  161,  160,
-      159,  158,  157,  156,  155,  154,  153,  152,  151,  150,
-      149,  148,  147,  146,  145,  144,  143,  142,  141,  140,
-
-      139,  138,  137,  136,  135,  134,  133,  132,  131,  130,
-      129,  128,  127,  126,  125,  124,  123,  122,  121,  120,
-      119,  118,  117,  116,  115,  114,  113,  112,  111,  110,
-      109,  108,  107,  106,  105,  104,  103,  102,  101,  100,
-       99,   98,   97,   96,   95,   94,   93,   92,   89,   88,
-       87,   86,   85,   84,   83,   82,   77,   76,   71,   67,
-       64,   63,   62,   61,   60,   59,   58,   57,   56,   55,
-       54,   53,   52,   51,   50,   49,   48,   47,   46,   45,
-       40,   39,   36,   25,   24,  177,    3,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177
-    } ;
-
-static const flex_int16_t yy_chk[217] =
-    {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    5,
-        5,    5,    8,    9,  175,   10,   13,   10,   11,    8,
-       43,   11,    9,   13,   38,    8,   10,   16,   16,   42,
-       46,   38,   40,  169,   47,   43,   47,   16,   46,  167,
-       16,  166,   40,   40,   56,   56,   42,  164,  163,  161,
-      160,  159,  158,  157,  156,  149,  148,  144,  143,  142,
-      141,  139,  138,  136,  135,  134,  133,  132,  131,  129,
-      128,  127,  126,  124,  123,  122,  121,  118,  117,  115,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    5,    5,    6,    6,    9,   13,   41,   14,   18,
+       18,  225,   13,   14,   14,    9,   20,   20,   25,   25,
+       25,   28,   29,  222,   30,   33,   30,   31,   28,   85,
+       31,   29,   33,   80,   28,   30,   36,   36,   43,   43,
+       80,   41,   82,   84,   85,  216,   36,   88,   89,   36,
 
-      114,  112,  111,  110,  109,  108,  107,  106,  105,  104,
-      103,  102,  101,   99,   97,   96,   93,   92,   91,   90,
-       87,   85,   84,   83,   82,   81,   80,   79,   78,   77,
-       76,   75,   74,   73,   72,   71,   70,   69,   68,   67,
-       65,   64,   62,   61,   60,   59,   58,   57,   55,   54,
-       53,   52,   51,   50,   49,   48,   45,   44,   41,   39,
-       36,   35,   34,   33,   32,   31,   30,   29,   28,   27,
-       26,   25,   24,   23,   22,   21,   20,   19,   18,   17,
-       15,   14,   12,    7,    6,    3,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
+       89,  214,   82,   82,  213,   88,  103,  103,  211,  210,
+       84,  208,  207,  206,  205,  204,  203,  196,  195,  191,
+      190,  189,  188,  186,  185,  183,  182,  181,  180,  179,
+      178,  176,  175,  174,  173,  171,  170,  169,  168,  165,
+      164,  162,  161,  159,  158,  157,  156,  155,  154,  153,
+      152,  151,  150,  149,  148,  146,  144,  143,  140,  139,
+      138,  137,  134,  132,  131,  130,  129,  128,  127,  126,
+      125,  124,  123,  122,  121,  120,  119,  118,  117,  116,
+      115,  114,  112,  111,  109,  108,  107,  106,  105,  104,
+      102,  101,  100,   99,   98,   97,   96,   90,   87,   86,
 
-      177,  177,  177,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,  177,  177,  177,  177
+       83,   81,   78,   77,   76,   75,   74,   73,   72,   71,
+       70,   69,   68,   67,   66,   65,   64,   63,   61,   57,
+       54,   40,   39,   38,   37,   35,   34,   32,   27,   26,
+       24,   19,   16,   15,   12,    8,    7,    3,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224,
+      224,  224,  224,  224,  224,  224,  224,  224,  224,  224
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -541,8 +576,9 @@ char *yytext;
 #line 1 "lex.l"
 #line 4 "lex.l"
    #include "tokens-manual.h"
-#line 544 "lex.yy.c"
-#line 545 "lex.yy.c"
+   int lineno;
+#line 580 "lex.yy.c"
+#line 581 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -759,9 +795,9 @@ YY_DECL
 		}
 
 	{
-#line 7 "lex.l"
+#line 8 "lex.l"
 
-#line 764 "lex.yy.c"
+#line 800 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -788,13 +824,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 178 )
+				if ( yy_current_state >= 225 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 187 );
+		while ( yy_base[yy_current_state] != 239 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -819,196 +855,413 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
-YY_RULE_SETUP
-#line 8 "lex.l"
-{ return AUTO; }
-	YY_BREAK
-case 2:
+/* rule 1 can match eol */
 YY_RULE_SETUP
 #line 9 "lex.l"
-{ return _BOOL; }
+{lineno++;}
+	YY_BREAK
+case 2:
+/* rule 2 can match eol */
+YY_RULE_SETUP
+#line 10 "lex.l"
+{ printf("white space"); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 10 "lex.l"
-{ return BREAK; }
+#line 11 "lex.l"
+{ return AUTO; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 11 "lex.l"
-{ return CASE; }
+#line 12 "lex.l"
+{ return _BOOL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 12 "lex.l"
-{ return CHAR;}
+#line 13 "lex.l"
+{ return BREAK; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 13 "lex.l"
-{ return _COMPLEX; } 
+#line 14 "lex.l"
+{ return CASE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 14 "lex.l"
-{ return CONST;}
+#line 15 "lex.l"
+{ return CHAR; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 15 "lex.l"
-{ return CONTINUE; }
+#line 16 "lex.l"
+{ return _COMPLEX; } 
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 16 "lex.l"
-{ return DEFAULT; }
+#line 17 "lex.l"
+{ return CONST;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 17 "lex.l"
-{ return DO; }
+#line 18 "lex.l"
+{ return CONTINUE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 18 "lex.l"
-{ return DOUBLE; }
+#line 19 "lex.l"
+{ return DEFAULT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 19 "lex.l"
-{ return ELSE; }
+#line 20 "lex.l"
+{ return DO; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 20 "lex.l"
-{ return ENUM; }
+#line 21 "lex.l"
+{ return DOUBLE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 21 "lex.l"
-{ return EXTERN; }
+#line 22 "lex.l"
+{ return ELSE; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 22 "lex.l"
-{ return FLOAT; }
+#line 23 "lex.l"
+{ return ENUM; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 23 "lex.l"
-{ return FOR; }
+#line 24 "lex.l"
+{ return EXTERN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 24 "lex.l"
-{ return GOTO; }
+#line 25 "lex.l"
+{ return FLOAT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 25 "lex.l"
-{ return IF; }
+#line 26 "lex.l"
+{ return FOR; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 26 "lex.l"
-{ return _IMAGINARY; }
+#line 27 "lex.l"
+{ return GOTO; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 27 "lex.l"
-{ return INLINE; }
+#line 28 "lex.l"
+{ return IF; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 28 "lex.l"
-{ return INT; }
+#line 29 "lex.l"
+{ return _IMAGINARY; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 29 "lex.l"
-{ return LONG; }
+#line 30 "lex.l"
+{ return INLINE; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 30 "lex.l"
-{ return REGISTER; }
+#line 31 "lex.l"
+{ return INT; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 31 "lex.l"
-{ return RESTRICT; }
+#line 32 "lex.l"
+{ return LONG; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 32 "lex.l"
-{ return RETURN; }
+#line 33 "lex.l"
+{ return REGISTER; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 33 "lex.l"
-{ return SHORT; }
+#line 34 "lex.l"
+{ return RESTRICT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 34 "lex.l"
-{ return SIGNED; }
+#line 35 "lex.l"
+{ return RETURN; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 35 "lex.l"
-{ return SIZEOF; }
+#line 36 "lex.l"
+{ return SHORT; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 36 "lex.l"
-{ return STATIC; }
+#line 37 "lex.l"
+{ return SIGNED; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 37 "lex.l"
-{ return STRUCT; }
+#line 38 "lex.l"
+{ return SIZEOF; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 38 "lex.l"
-{ return SWITCH; }
+#line 39 "lex.l"
+{ return STATIC; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 39 "lex.l"
-{ return TYPEDEF; }
+#line 40 "lex.l"
+{ return STRUCT; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 40 "lex.l"
-{ return UNION; }
+#line 41 "lex.l"
+{ return SWITCH; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 41 "lex.l"
-{ return UNSIGNED; }
+#line 42 "lex.l"
+{ return TYPEDEF; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 42 "lex.l"
-{ return VOID; }
+#line 43 "lex.l"
+{ return UNION; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 43 "lex.l"
-{ return VOLATILE; }
+#line 44 "lex.l"
+{ return UNSIGNED; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 44 "lex.l"
-{ return WHILE; }
+#line 45 "lex.l"
+{ return VOID; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 46 "lex.l"
+{ return VOLATILE; }
+	YY_BREAK
+case 39:
+YY_RULE_SETUP
+#line 47 "lex.l"
+{ return WHILE; }
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 49 "lex.l"
+{ return INDSEL;  } 
+	YY_BREAK
+case 41:
+YY_RULE_SETUP
+#line 50 "lex.l"
+{ return PLUSPLUS; }
+	YY_BREAK
+case 42:
+YY_RULE_SETUP
+#line 51 "lex.l"
+{ return MINUSMINUS; }
+	YY_BREAK
+case 43:
+YY_RULE_SETUP
+#line 52 "lex.l"
+{ return SHL; }
+	YY_BREAK
+case 44:
+YY_RULE_SETUP
+#line 53 "lex.l"
+{ return SHR; }
+	YY_BREAK
+case 45:
+YY_RULE_SETUP
+#line 54 "lex.l"
+{ return LTEQ; }
+	YY_BREAK
+case 46:
+YY_RULE_SETUP
+#line 55 "lex.l"
+{ return GTEQ; }
+	YY_BREAK
+case 47:
+YY_RULE_SETUP
+#line 56 "lex.l"
+{ return EQEQ; }
+	YY_BREAK
+case 48:
+YY_RULE_SETUP
+#line 57 "lex.l"
+{ return NOTEQ; }
+	YY_BREAK
+case 49:
+YY_RULE_SETUP
+#line 58 "lex.l"
+{ return LOGAND; }
+	YY_BREAK
+case 50:
+YY_RULE_SETUP
+#line 59 "lex.l"
+{ return LOGOR; }
+	YY_BREAK
+case 51:
+YY_RULE_SETUP
+#line 60 "lex.l"
+{ return ELLIPSIS; }
+	YY_BREAK
+case 52:
+YY_RULE_SETUP
+#line 61 "lex.l"
+{ return TIMESEQ; }
+	YY_BREAK
+case 53:
+YY_RULE_SETUP
+#line 62 "lex.l"
+{ return DIVEQ; }
+	YY_BREAK
+case 54:
+YY_RULE_SETUP
+#line 63 "lex.l"
+{ return MODEQ; }
+	YY_BREAK
+case 55:
+YY_RULE_SETUP
+#line 64 "lex.l"
+{ return PLUSEQ; }
+	YY_BREAK
+case 56:
+YY_RULE_SETUP
+#line 65 "lex.l"
+{ return MINUSEQ; }
+	YY_BREAK
+case 57:
+YY_RULE_SETUP
+#line 66 "lex.l"
+{ return SHLEQ; }
+	YY_BREAK
+case 58:
+YY_RULE_SETUP
+#line 67 "lex.l"
+{ return SHREQ; }
+	YY_BREAK
+case 59:
+YY_RULE_SETUP
+#line 68 "lex.l"
+{ return ANDEQ; }
+	YY_BREAK
+case 60:
+YY_RULE_SETUP
+#line 69 "lex.l"
+{ return OREQ; }
+	YY_BREAK
+case 61:
+YY_RULE_SETUP
+#line 70 "lex.l"
+{ return XOREQ; }
+	YY_BREAK
+case 62:
+YY_RULE_SETUP
+#line 73 "lex.l"
+{ return '!'; }
+	YY_BREAK
+case 63:
+YY_RULE_SETUP
+#line 74 "lex.l"
+{ return '^'; }
+	YY_BREAK
+case 64:
+YY_RULE_SETUP
+#line 75 "lex.l"
+{ return '&'; }
+	YY_BREAK
+case 65:
+YY_RULE_SETUP
+#line 76 "lex.l"
+{ return '*'; }
+	YY_BREAK
+case 66:
+YY_RULE_SETUP
+#line 77 "lex.l"
+{ return '-'; }
+	YY_BREAK
+case 67:
+YY_RULE_SETUP
+#line 78 "lex.l"
+{ return '+'; }              
+	YY_BREAK
+case 68:
+YY_RULE_SETUP
+#line 79 "lex.l"
+{ return '='; }
+	YY_BREAK
+case 69:
+YY_RULE_SETUP
+#line 80 "lex.l"
+{ return '~'; }
+	YY_BREAK
+case 70:
+YY_RULE_SETUP
+#line 81 "lex.l"
+{ return '|'; }
+	YY_BREAK
+case 71:
+YY_RULE_SETUP
+#line 82 "lex.l"
+{ return '.'; }
+	YY_BREAK
+case 72:
+YY_RULE_SETUP
+#line 83 "lex.l"
+{ return '<'; }
+	YY_BREAK
+case 73:
+YY_RULE_SETUP
+#line 84 "lex.l"
+{ return '>'; }
+	YY_BREAK
+case 74:
+YY_RULE_SETUP
+#line 85 "lex.l"
+{ return '/'; }
+	YY_BREAK
+case 75:
+YY_RULE_SETUP
+#line 86 "lex.l"
+{ return '?'; }
+	YY_BREAK
+case 76:
+YY_RULE_SETUP
+#line 88 "lex.l"
+{ return '('; }
+	YY_BREAK
+case 77:
+YY_RULE_SETUP
+#line 89 "lex.l"
+{ return ')'; }
+	YY_BREAK
+case 78:
+YY_RULE_SETUP
+#line 90 "lex.l"
+{ return '['; }
+	YY_BREAK
+case 79:
+YY_RULE_SETUP
+#line 91 "lex.l"
+{ return ']'; }
+	YY_BREAK
+case 80:
+YY_RULE_SETUP
+#line 94 "lex.l"
+{return IDENT; /* put somewhere */ }
+	YY_BREAK
+case 81:
+YY_RULE_SETUP
+#line 95 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1011 "lex.yy.c"
+#line 1264 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1305,7 +1558,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 178 )
+			if ( yy_current_state >= 225 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1333,11 +1586,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 178 )
+		if ( yy_current_state >= 225 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 177);
+	yy_is_jam = (yy_current_state == 224);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2013,7 +2266,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 46 "lex.l"
+#line 95 "lex.l"
 
 int yywrap() {}
 int main() {

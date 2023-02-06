@@ -1,10 +1,13 @@
 
 
 %{
-    #include <stdlib.h>
-#include <stdio.h>
+   #include <stdlib.h>
+   #include <stdio.h>
    #include "tokens-manual.h"
+   int get_line_info();
+   int handle_error();
    int lineno;
+   char filename[255];
    struct yylval {
     char *string_literal;
     int long long integer;
@@ -43,8 +46,8 @@ ANYTHING                         [.]
     char *string_buf_ptr;
     int char_count; 
     
-
 \n                  { lineno++; }
+#[ ][0-9]+ { get_line_info(); }
 {DIGIT}                         { yylval.integer = atoi(yytext); yylval.type = "int"; return NUMBER; }
 {DIGIT}{LONG}                   { yylval.integer = atol(yytext); yylval.type = "int, long"; return NUMBER; }
 {DIGIT}{LONGLONG}               { yylval.integer = atoll(yytext); yylval.type = "int, longlong"; return NUMBER; }
@@ -170,7 +173,7 @@ ANYTHING                         [.]
 <str>\\\\ {   *string_buf_ptr++ = '\\'; }
 
 
-[ \n\t\r\v\f]+      { printf("white space"); }
+[ \t\r\v\f]+      { ; }
 "auto"              { return AUTO; }
 "_Bool"             { return _BOOL; }
 "break"             { return BREAK; }
@@ -260,6 +263,35 @@ ANYTHING                         [.]
 [_a-zA-Z][_a-zA-Z0-9]+       { yylval.string_literal = strdup(yytext); return IDENT; /* put somewhere */ }
 .                           { fprintf(stderr, "Error unrecognized token : %s\n", yytext); }
 %%
+int get_line_info(){
+    printf("got here at least");
+    char *curr = yytext;
+    lineno = 0;
+    // ignore anything thats not the line number
+    while (*curr < '0' || *curr > '9'){
+        curr++;
+    }
+    // get the line number
+    while (*curr >= '0' || *curr <= '9'){
+        lineno *= 10;
+        lineno += *curr;
+    }
+    // disregard characters until you get to beginning "
+    while (*curr != '"'){
+        curr++;
+    }
+    curr++;
+    // once " is reached, store filename until closing " is reached.
+    int i = 0;
+    while (*curr != '"'){
+        filename[i++] = *curr++;
+    }
+}
+// print filename, line number and the incorrect token
+int handle_error(){
+    fprintf(stderr, "Error in file %s on line number %d: %s\n", filename, lineno, yytext);
+}
+
 int yywrap() {}
 int main() {
     int t;

@@ -74,9 +74,9 @@ ANYTHING                         [.]
 {DIGITFLOAT}+{EXP}[Ff]          { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
 {DIGITFLOAT}+{EXP}[Ll]          { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
-{HEXDOTTEDDIGITS}{P}      { yylval.finteger = strtod(yytext, NULL); yylval.type = yytext; return NUMBER; }
-{HEXDOTTEDDIGITS}{P}[Ff]  { yylval.finteger = strtold(yytext, NULL); yylval.type = yytext; return NUMBER; }
-{HEXDOTTEDDIGITS}{P}[Ll] { yylval.finteger = strtold(yytext, NULL); yylval.type = yytext; return NUMBER; }
+{HEXDOTTEDDIGITS}{P}      { yylval.finteger = strtod(yytext, NULL); yylval.type = "int, unsigned longlong"; return NUMBER; }
+{HEXDOTTEDDIGITS}{P}[Ff]  { yylval.finteger = strtold(yytext, NULL); yylval.type = "int, unsigned longlong"; return NUMBER; }
+{HEXDOTTEDDIGITS}{P}[Ll] { yylval.finteger = strtold(yytext, NULL); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
 \'   {   char_count = 0; BEGIN(charseq); }
 <charseq>\'  { BEGIN(INITIAL); 
@@ -86,7 +86,7 @@ ANYTHING                         [.]
               if(char_count > 1) {
                 fprintf(stderr, "Error multibyte char only first value was used\n");
               }
-              printf("%d", charvalue); 
+              printf("%d", charvalue); //!!!!CHANGE TO RETURN AND SET YYVAL PROPERLY!!!
               }
 <charseq>{OCTESC} {
     int result;
@@ -109,6 +109,7 @@ ANYTHING                         [.]
     charvalue = result; 
     }
     char_count++;
+    
 }
 <charseq>\\a  {  if(char_count == 0) charvalue = '\a'; char_count++; }
 <charseq>\\b  {  if(char_count == 0) charvalue = '\b'; char_count++; }

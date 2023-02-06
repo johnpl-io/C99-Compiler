@@ -286,15 +286,14 @@ int get_line_info(){
     
 }
 // print filename, line number and the incorrect token
-int handle_error(){
-    fprintf(stderr, "Error in file %s on line number %d: %s\n", filename, lineno, yytext);
-}
+// int handle_error(){
+//     fprintf(stderr, "Error in file %s on line number %d: %s\n", filename, lineno, yytext);
+// }
 
 int yywrap() {}
 int main() {
     int t;
 while(t = yylex())  {
-  
     switch(t) 
     {
         case AUTO: printf("Auto %d\n", lineno); break;
@@ -307,12 +306,80 @@ while(t = yylex())  {
         case CONTINUE: printf("Continue\n"); break;
         case DEFAULT: printf("Default\n"); break;
         case DO: printf("Do\n"); break;
-        case : printf("\n"); break;
-        case : printf("\n"); break;
-        case : printf("\n"); break;
-        case : printf("\n"); break;
-        case : printf("\n"); break;
-        case : printf("\n"); break;
+        case DOUBLE: printf("Double\n"); break;
+        case ELSE: printf("Else\n"); break;
+        case ENUM: printf("Enum\n"); break;
+        case EXTERN: printf("Extern\n"); break;
+        case FLOAT: printf("Float\n"); break;
+        case FOR: printf("For\n"); break;
+        case GOTO: printf("Goto\n"); break;
+        case IF: printf("If\n"); break;
+        case _IMAGINARY: printf("_IMAGINARY\n"); break;
+        case INLINE: printf("Inline\n"); break;
+        case INT: printf("Int\n"); break;
+        case LONG: printf("Long\n"); break;
+        case REGISTER: printf("Register\n"); break;
+        case RESTRICT: printf("Restrict\n"); break;
+        case RETURN: printf("Return\n"); break;
+        case SHORT: printf("Short\n"); break;
+        case SIGNED: printf("Signed\n"); break;
+        case SIZEOF: printf("Sizeof\n"); break;
+        case STATIC: printf("Static\n"); break;
+        case STRUCT: printf("Struct\n"); break;
+        case SWITCH: printf("Switch\n"); break;
+        case TYPEDEF: printf("Typedef\n"); break;
+        case UNION: printf("Union\n"); break;
+        case UNSIGNED: printf("Unsigned\n"); break;
+        case VOID: printf("Void\n"); break;
+        case VOLATILE: printf("Volatile\n"); break;
+        case WHILE: printf("While\n"); break;
+        case INDSEL: printf("->\n"); break;
+        case PLUSPLUS: printf("++\n"); break;
+        case MINUSMINUS: printf("--\n"); break;
+        case SHL: printf("<<\n"); break;
+        case SHR: printf(">>\n"); break;
+        case LTEQ: printf("<=\n"); break;
+        case GTEQ: printf(">=\n"); break;
+        case EQEQ: printf("==\n"); break;
+        case NOTEQ: printf("!=\n"); break;
+        case LOGAND: printf("&&\n"); break;
+        case LOGOR: printf("||\n"); break;
+        case ELLIPSIS: printf("...\n"); break;
+        case TIMESEQ: printf("*=\n"); break;
+        case DIVEQ: printf("/=\n"); break;
+        case MODEQ: printf("\n"); break;
+        case PLUSEQ: printf("+=\n"); break;
+        case MINUSEQ: printf("-=\n"); break;
+        case SHLEQ: printf("<<=\n"); break;
+        case SHREQ: printf(">>=\n"); break;
+        case ANDEQ: printf("&=\n"); break;
+        case OREQ: printf("|=\n"); break;
+        case XOREQ: printf("^=\n"); break;
+        case '!': printf("!\n"); break;
+        case '^': printf("^\n"); break;
+        case '&': printf("&\n"); break;
+        case '*': printf("*\n"); break;
+        case '-': printf("-\n"); break;
+        case '+': printf("+\n"); break;
+        case '=': printf("=\n"); break;
+        case '~': printf("~\n"); break;
+        case '|': printf("|\n"); break;
+        case '.': printf(".\n"); break;
+        case '<': printf("<\n"); break;
+        case '>': printf(">\n"); break;
+        case '/': printf("/\n"); break;
+        case '?': printf("?\n"); break;
+        case '(': printf("(\n"); break;
+        case ')': printf(")\n"); break;
+        case '[': printf("[\n"); break;
+        case ']': printf("]\n"); break;
+        case ',': printf(",\n"); break;
+        case ';': printf(";\n"); break;
+        case ':': printf(":\n"); break;
+
+
+
+
         //we have to add the rest 
         default: printf("sussy\n");
     }

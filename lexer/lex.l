@@ -1,13 +1,15 @@
 
 
 %{
+    #include <stdlib.h>
+#include <stdio.h>
    #include "tokens-manual.h"
    int lineno;
    struct yylval {
     char *string_literal;
-    int integer;
+    int long long integer;
     char *type;
-    double finteger;
+    long double finteger;
    };
    struct yylval yylval;
         
@@ -44,25 +46,25 @@ ANYTHING                         [.]
 
 \n                  { lineno++; }
 {DIGIT}                         { yylval.integer = atoi(yytext); yylval.type = "int"; return NUMBER; }
-{DIGIT}{LONG}                   { yylval.integer = atoi(yytext); yylval.type = "int, long"; return NUMBER; }
-{DIGIT}{LONGLONG}               { yylval.integer = atoi(yytext); yylval.type = "int, longlong"; return NUMBER; }
-{DIGIT}{UNSIGNED}               { yylval.integer = atoi(yytext); yylval.type = "int, unsigned"; return NUMBER; }
-{DIGIT}{UNSIGNED}{LONG}         { yylval.integer = atoi(yytext); yylval.type = "int, unsigned long"; return NUMBER; }
-{DIGIT}{UNSIGNED}{LONGLONG}     { yylval.integer = atoi(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
+{DIGIT}{LONG}                   { yylval.integer = atol(yytext); yylval.type = "int, long"; return NUMBER; }
+{DIGIT}{LONGLONG}               { yylval.integer = atoll(yytext); yylval.type = "int, longlong"; return NUMBER; }
+{DIGIT}{UNSIGNED}               { yylval.integer = strtoul(yytext, NULL, 10); yylval.type = "int, unsigned"; return NUMBER; }
+{DIGIT}{UNSIGNED}{LONG}         { yylval.integer = strtoul(yytext, NULL, 10); yylval.type = "int, unsigned long"; return NUMBER; }
+{DIGIT}{UNSIGNED}{LONGLONG}     { yylval.integer = strtoull(yytext, NULL, 10); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
-{HEX}                           { yylval.integer = atoi(yytext);  yylval.type = "int"; return NUMBER; }
-{HEX}{LONG}                     { yylval.integer = atoi(yytext); yylval.type = "int, long"; return NUMBER; }
-{HEX}{LONGLONG}                 { yylval.integer = atoi(yytext); yylval.type = "int, longlong"; return NUMBER; }
-{HEX}{UNSIGNED}                 { yylval.integer = atoi(yytext); yylval.type = "int, unsigned"; return NUMBER; }
-{HEX}{UNSIGNED}{LONG}           { yylval.integer = atoi(yytext); yylval.type = "int, unsigned long"; return NUMBER; }
-{HEX}{UNSIGNED}{LONGLONG}       { yylval.integer = atoi(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
+{HEX}                           { yylval.integer = strtoul(yytext, NULL, 16);  yylval.type = "int"; return NUMBER; }
+{HEX}{LONG}                     { yylval.integer = strtoul(yytext, NULL, 16); yylval.type = "int, long"; return NUMBER; }
+{HEX}{LONGLONG}                 { yylval.integer = strtoull(yytext, NULL, 16); yylval.type = "int, longlong"; return NUMBER; }
+{HEX}{UNSIGNED}                 { yylval.integer = strtoul(yytext, NULL, 16); yylval.type = "int, unsigned"; return NUMBER; }
+{HEX}{UNSIGNED}{LONG}           { yylval.integer = strtoull(yytext, NULL, 16); yylval.type = "int, unsigned long"; return NUMBER; }
+{HEX}{UNSIGNED}{LONGLONG}       { yylval.integer = strtoull(yytext, NULL, 16); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
-{OCTAL}                         { yylval.integer = atoi(yytext); yylval.type = "int"; return NUMBER; }
-{OCTAL}{LONG}                   { yylval.integer = atoi(yytext); yylval.type = "int, long"; return NUMBER; }
-{OCTAL}{LONGLONG}               { yylval.integer = atoi(yytext); yylval.type = "int, longlong"; return NUMBER; }
-{OCTAL}{UNSIGNED}               { yylval.integer = atoi(yytext); yylval.type = "int, unsigned"; return NUMBER; }
-{OCTAL}{UNSIGNED}{LONG}         { yylval.integer = atoi(yytext); yylval.type = "int, unsigned long"; return NUMBER; }
-{OCTAL}{UNSIGNED}{LONGLONG}     { yylval.integer = atoi(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
+{OCTAL}                         { yylval.integer = strtoul(yytext, NULL, 8); yylval.type = "int"; return NUMBER; }
+{OCTAL}{LONG}                   { yylval.integer = strtoul(yytext, NULL, 8); yylval.type = "int, long"; return NUMBER; }
+{OCTAL}{LONGLONG}               { yylval.integer = strtoull(yytext, NULL, 8); yylval.type = "int, longlong"; return NUMBER; }
+{OCTAL}{UNSIGNED}               { yylval.integer = strtoull(yytext, NULL, 8); yylval.type = "int, unsigned"; return NUMBER; }
+{OCTAL}{UNSIGNED}{LONG}         { yylval.integer = strtoull(yytext, NULL, 8); yylval.type = "int, unsigned long"; return NUMBER; }
+{OCTAL}{UNSIGNED}{LONGLONG}     { yylval.integer = strtoull(yytext, NULL, 8); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
 {DOTTEDDIGITS}{EXP}?            { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
 {DOTTEDDIGITS}{EXP}?[Ff]        { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
@@ -72,16 +74,19 @@ ANYTHING                         [.]
 {DIGITFLOAT}+{EXP}[Ff]          { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
 {DIGITFLOAT}+{EXP}[Ll]          { yylval.finteger = atof(yytext); yylval.type = "int, unsigned longlong"; return NUMBER; }
 
-{HEXDOTTEDDIGITS}{P}      
-{HEXDOTTEDDIGITS}{P}[Ff]
-{HEXDOTTEDDIGITS}{P}[Ll]
+{HEXDOTTEDDIGITS}{P}      { yylval.finteger = strtod(yytext, NULL); yylval.type = yytext; return NUMBER; }
+{HEXDOTTEDDIGITS}{P}[Ff]  { yylval.finteger = strtold(yytext, NULL); yylval.type = yytext; return NUMBER; }
+{HEXDOTTEDDIGITS}{P}[Ll] { yylval.finteger = strtold(yytext, NULL); yylval.type = yytext; return NUMBER; }
 
 \'   {   char_count = 0; BEGIN(charseq); }
 <charseq>\'  { BEGIN(INITIAL); 
-              if(char_count != 1) {
+              if(char_count == 0) {
                 fprintf(stderr, "Error multibyte char only first value was used \n");
               }  
-              printf("%c", charvalue); 
+              if(char_count > 1) {
+                fprintf(stderr, "Error multibyte char only first value was used\n");
+              }
+              printf("%d", charvalue); 
               }
 <charseq>{OCTESC} {
     int result;
@@ -91,6 +96,9 @@ ANYTHING                         [.]
     charvalue = result; 
     }
     char_count++;
+}
+<charseq>\\[0-9]+ {
+    printf("invalid octal");
 }
 <charseq>{HEXESC} {
       int result;
@@ -146,6 +154,9 @@ ANYTHING                         [.]
 <str>{SCS} {
     *string_buf_ptr++ = yytext[0];
 }
+<str>(.|\n|\\|\") {
+    printf("Error Invalid sequence in string\n");
+}    
 <str>\\a  {  *string_buf_ptr++ = '\a';}
 <str>\\b  {   *string_buf_ptr++ = '\b';}
 <str>\\f  {   *string_buf_ptr++ = '\f'; }
@@ -187,7 +198,7 @@ ANYTHING                         [.]
 "short"             { return SHORT; }
 "signed"            { return SIGNED; }
 "sizeof"            { return SIZEOF; }
-￼
+
 
 "static"            { return STATIC; }
 "struct"            { return STRUCT; }
@@ -246,14 +257,20 @@ ANYTHING                         [.]
 ":"                 { return ':'; }     
 
 [_a-zA-Z][_a-zA-Z0-9]+       { yylval.string_literal = strdup(yytext); return IDENT; /* put somewhere */ }
-.                           { printf("Error unrecognized token\n"); }
+.                           { fprintf(stderr, "Error unrecognized token : %s\n", yytext); }
 %%
 int yywrap() {}
 int main() {
-int t = yylex();
-int x = 0;
-if(t && x == 0)
-{printf("%d %s %f %s\n", t, yylval.string_literal, yylval.finteger, yylval.type);
-    x++;
+    int t;
+while(t = yylex())  {
+    switch(t) 
+    {
+        case AUTO: printf("Auto\n"); break;
+        case _BOOL: printf("_BOOL\n"); break;
+        case BREAK: printf("Break \n"); break;
+        //we have to add the rest 
+        default: printf("sussy\n");
+    }
 }
+
 }

@@ -7,7 +7,7 @@
    int get_line_info();
    int handle_error();
    int lineno;
-   char filename[255];
+  
    struct yylval {
     char *string_literal;
     int long long integer;
@@ -40,14 +40,30 @@ SCS                              [^\n\\\"]{1}
 ANYTHING                         [.]
 %x charseq
 %x str
+%x filename
 %%
+    char filename_buf[256];
+    char *filename_buf_ptr;
     char string_buf[1024]; 
     char charvalue;
     char *string_buf_ptr;
     int char_count; 
-    
+    int count = 0;
 \n                  { lineno++; }
-#[ ][0-9]+ { get_line_info(); }
+"#"[ ][0-9]+" \""  {filename_buf_ptr = filename_buf; lineno = 0;  BEGIN(filename);  }
+
+
+<filename>\" { 
+    count++;
+    if(count == 1) {
+     *filename_buf_ptr = '\0'; printf("%s", filename_buf); 
+    }
+}
+<filename>\n {BEGIN(INITIAL); }
+<filename>. { *filename_buf_ptr++ = yytext[0];  }
+
+
+
 {DIGIT}                         { yylval.integer = atoi(yytext); yylval.type = "int"; return NUMBER; }
 {DIGIT}{LONG}                   { yylval.integer = atol(yytext); yylval.type = "int, long"; return NUMBER; }
 {DIGIT}{LONGLONG}               { yylval.integer = atoll(yytext); yylval.type = "int, longlong"; return NUMBER; }
@@ -141,7 +157,8 @@ ANYTHING                         [.]
 
 <str>\" {BEGIN(INITIAL); 
     *string_buf_ptr = '\0';
-    printf("%s\n", string_buf); }
+  printf("%s\n", string_buf);
+   }
 <str>{OCTESC} {
     int result;
     sscanf(yytext+1, "%o", &result);
@@ -265,27 +282,8 @@ ANYTHING                         [.]
 %%
 int get_line_info(){
     printf("got here at least");
-    char *curr = yytext;
     lineno = 0;
-    // ignore anything thats not the line number
-    while (*curr < '0' || *curr > '9'){
-        curr++;
-    }
-    // get the line number
-    while (*curr >= '0' || *curr <= '9'){
-        lineno *= 10;
-        lineno += *curr;
-    }
-    // disregard characters until you get to beginning "
-    while (*curr != '"'){
-        curr++;
-    }
-    curr++;
-    // once " is reached, store filename until closing " is reached.
-    int i = 0;
-    while (*curr != '"'){
-        filename[i++] = *curr++;
-    }
+    
 }
 // print filename, line number and the incorrect token
 int handle_error(){
@@ -296,11 +294,25 @@ int yywrap() {}
 int main() {
     int t;
 while(t = yylex())  {
+  
     switch(t) 
     {
-        case AUTO: printf("Auto\n"); break;
+        case AUTO: printf("Auto %d\n", lineno); break;
         case _BOOL: printf("_BOOL\n"); break;
         case BREAK: printf("Break \n"); break;
+        case CASE: printf("Case \n"); break;
+        case CHAR: printf("Char\n"); break;
+        case _COMPLEX: printf("_COMPLEX\n"); break;
+        case CONST: printf("Const\n"); break;
+        case CONTINUE: printf("Continue\n"); break;
+        case DEFAULT: printf("Default\n"); break;
+        case DO: printf("Do\n"); break;
+        case : printf("\n"); break;
+        case : printf("\n"); break;
+        case : printf("\n"); break;
+        case : printf("\n"); break;
+        case : printf("\n"); break;
+        case : printf("\n"); break;
         //we have to add the rest 
         default: printf("sussy\n");
     }

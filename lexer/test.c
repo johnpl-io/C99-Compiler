@@ -1,10 +1,5 @@
-#include <stdio.h>
+23;
+23;
+23;
 
-int main() {
-    int x = '\n'; 
-
-
-
-printf("%d", x);
-}
-
+1e1;

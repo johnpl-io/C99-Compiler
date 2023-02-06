@@ -187,6 +187,8 @@ ANYTHING                         [.]
 "short"             { return SHORT; }
 "signed"            { return SIGNED; }
 "sizeof"            { return SIZEOF; }
+￼
+
 "static"            { return STATIC; }
 "struct"            { return STRUCT; }
 "switch"            { return SWITCH; }

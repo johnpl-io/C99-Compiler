@@ -41,7 +41,7 @@
         
 %}
 
-DIGIT                            [[1-9]+[0-9]*]|"0" 
+DIGIT                            ([1-9]+[0-9]*)|("0")
 DIGITFLOAT                       [0-9]
 OCTAL                            0[0-7]+
 HEX                              0[xX][0-9|a-f|A-F]+
@@ -71,13 +71,13 @@ ANYTHING                         [.]
     int char_count; 
     int count = 0;
 \n                  { lineno++; }
-"#"[ ][0-9]+" \""  {filename_buf_ptr = filename_buf; lineno = 0;  BEGIN(filename);  }
+"#"[ ][0-9]+" \""  { count = 0; filename_buf_ptr = filename_buf; lineno = 0;  BEGIN(filename);  }
 
 
 <filename>\" { 
     count++;
     if(count == 1) {
-     *filename_buf_ptr = '\0'; printf("%s", filename_buf); 
+     *filename_buf_ptr = '\0'; 
     }
 }
 <filename>\n {BEGIN(INITIAL); }
@@ -117,6 +117,11 @@ ANYTHING                         [.]
 {HEXDOTTEDDIGITS}{P}      { yylval.num.fvalue = strtod(yytext, NULL); yylval.num.type = DOUBLEV; return NUMBER; }
 {HEXDOTTEDDIGITS}{P}[Ff]  { yylval.num.fvalue = strtold(yytext, NULL); yylval.num.type = FLOATV; return NUMBER; }
 {HEXDOTTEDDIGITS}{P}[Ll] { yylval.num.fvalue = strtold(yytext, NULL); yylval.num.type = DOUBLE_LONG; return NUMBER; }
+
+{HEX}{P}                 { yylval.num.fvalue = strtod(yytext, NULL); yylval.num.type = DOUBLEV; return NUMBER; }
+{HEX}{P}[Ff]             { yylval.num.fvalue = strtold(yytext, NULL); yylval.num.type = FLOATV; return NUMBER; }
+{HEX}{P}[Ll]            { yylval.num.fvalue = strtold(yytext, NULL); yylval.num.type = DOUBLE_LONG; return NUMBER; }
+
 
 \'   {   char_count = 0; BEGIN(charseq); }
 <charseq>\'  { BEGIN(INITIAL); 
@@ -430,6 +435,7 @@ while(t = yylex())  {
 
         } break;
         case CHARLIT: {
+            printf("\t CHARLIT \t");
           if(isprint(yylval.charlit)) {
             if(yylval.charlit == '\'' || yylval.charlit == '\'' || yylval.charlit == '\"' || yylval.charlit == '\\' ) {
                 printf("\\%c\n", yylval.charlit);

@@ -1,0 +1,5 @@
+as provided in the OUTPUTTEST file there is a small issue with string literal 
+one is we only look for two characters when a hex sequence arrives in a string. This can easily be fixed and we just interpreted how C handles hex in this manner
+incorrectly. 
+One issue that we are unsure to deal with is when a character follows a null-terminated character. such as \a\0\n. We use strdup in our lexer so we are not 
+sure how to ensure stuff after the \0 gets copied. 

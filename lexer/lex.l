@@ -126,39 +126,40 @@ ANYTHING                         [.]
 \'   {   char_count = 0; BEGIN(charseq); }
 <charseq>\'  { BEGIN(INITIAL); 
               if(char_count == 0) {
-                fprintf(stderr, "Error multibyte char onfdasdfly first value was used \n");
+                fprintf(stderr, "%s : %d Error multibyte char onfdasdfly first value was used \n", filename_buf, lineno);
               }  
               if(char_count > 1) {
-                fprintf(stderr, "Error multibyte char only first value was used\n");
+                fprintf(stderr, "  %s : %d Error multibyte char only first value was used\n", filename_buf, lineno);
               }
-              printf("%d", charvalue); //!!!!CHANGE TO RETURN AND SET YYVAL PROPERLY!!!
+             // printf("%d", charvalue); 
               yylval.charlit = charvalue;
               return CHARLIT;
               }
 <charseq>{OCTESC} {
     int result;
     if (char_count == 0) {
-    printf("GETTING OCTAL\n");
+   // printf("GETTING OCTAL\n");
     sscanf(yytext + 1, "%o", &result);
     charvalue = result; 
     }
     char_count++;
 }
 <charseq>\\[0-9]+ {
-    printf("invalid octal");
+    fprintf(stderr, "%s : %d invalid octal",filename_buf, lineno );
 }
 <charseq>{HEXESC} {
    
       int result;
       yytext[0] = '0';
     if (char_count == 0) {
-    printf("GETTING HEX\n");
+   //printf("GETTING HEX\n");
     sscanf(yytext, "%x", &result);
     charvalue = result; 
     }
     char_count++;
     
 }
+
 <charseq>\\a  {  if(char_count == 0) charvalue = '\a'; char_count++; }
 <charseq>\\b  {  if(char_count == 0) charvalue = '\b'; char_count++; }
 <charseq>\\f  {  if(char_count == 0) charvalue = '\f'; char_count++; }
@@ -173,21 +174,21 @@ ANYTHING                         [.]
 
     int result;
     if(char_count == 0) {
-        printf("GETTING SC \n"); 
+      //  printf("GETTING SC \n"); 
         charvalue = yytext[0];
     }
     char_count++;
 }
 
 <charseq>(.|\n|\\|\') {
-    printf("Error invalid value in char seq");
+    fprintf(stderr, "%s : %d Error invalid value in char sequence.\n", filename_buf, lineno);
 }    
 
 \"  {string_buf_ptr = string_buf; BEGIN(str);}
 
 <str>\" {BEGIN(INITIAL); 
     *string_buf_ptr = '\0';
-  printf("%s\n", string_buf);
+  //printf("%s\n", string_buf);
   string_buf_len = string_buf_ptr - string_buf;
   yylval.string_literal = strdup(string_buf);
   return STRING;
@@ -201,7 +202,7 @@ ANYTHING                         [.]
 <str>{HEXESC} {
     int result;
     yytext[0] = '0';
-    printf("GETTING HEX\n");
+   // printf("GETTING HEX\n");
     sscanf(yytext, "%x", &result);
     *string_buf_ptr++ = result;
 }
@@ -215,14 +216,15 @@ ANYTHING                         [.]
 <str>\\r  {   *string_buf_ptr++ = '\r'; }
 <str>\\t  {   *string_buf_ptr++ = '\t'; }
 <str>\\v  {   *string_buf_ptr++ = '\v'; }
-<str>\\\?  {   *string_buf_ptr++ = '\?'; printf("hi");}
+<str>\\\?  {   *string_buf_ptr++ = '\?';}
 <str>\\\"  {   *string_buf_ptr++ = '\"'; }
 <str>\\'  {   *string_buf_ptr++ = '\''; }
 <str>\\n  {   *string_buf_ptr++ = '\n'; }
 <str>\\\\ {   *string_buf_ptr++ = '\\'; }
 
 <str>(,|\n|\\|\") {
-    printf("Error Invalid sequence in string\n");
+    fprintf(stderr, "%s : %d Error Invalid sequence in string\n", filename_buf, lineno);
+    //should be a fatal error
 }   
 [ \t\r\v\f]+      { ; }
 "auto"              { return AUTO; }
@@ -307,6 +309,9 @@ ANYTHING                         [.]
 ")"                 { return ')'; }
 "["                 { return '['; }
 "]"                 { return ']'; }
+"{"                 { return '{'; }
+"}"                 { return '}'; }
+"%"                 { return '%'; }
 ","                 { return ','; }
 ";"                 { return ';'; }
 ":"                 { return ':'; }     
@@ -325,7 +330,7 @@ int get_line_info(){
 // }
 void charhelper(char val) {
     switch(val) {
-        case '\a': printf("\a"); break;
+        case '\a': printf("\\a"); break;
         case '\b': printf("\\b"); break;
         case '\f': printf("\\f"); break;
         case '\n': printf("\\n"); break;
@@ -422,6 +427,9 @@ while(t = yylex())  {
         case ',':               printf(",\n"); break;
         case ';':               printf(";\n"); break;
         case ':':               printf(":\n"); break;
+        case '{':               printf("{\n"); break;
+        case '}':               printf("{\n"); break;
+        case '%':               printf("{\n"); break;
         case IDENT:             printf("IDENT    %s\n", yylval.string_literal); break;
         case NUMBER:  printf("NUMBER:  "); switch(yylval.num.type) {
             case INT_SIGNED: printf(" \t INTEGER %d  \t INT\n", yylval.num.integer); break;
@@ -470,7 +478,7 @@ while(t = yylex())  {
 
 
         //we have to add the rest 
-        default: printf("sussy\n");
+        default: ;
     }
   
     

@@ -35,8 +35,9 @@
 
    typedef union yylval YYSTYPE;
    YYSTYPE yylval;
-char filename_buf[256];
-char *filename_buf_ptr;
+    char filename_buf[256];
+    char *filename_buf_ptr;
+    int string_buf_len = 0;
         
 %}
 
@@ -63,7 +64,7 @@ ANYTHING                         [.]
 %x str
 %x filename
 %%
-    
+
     char string_buf[1024]; 
     char charvalue;
     char *string_buf_ptr;
@@ -182,6 +183,9 @@ ANYTHING                         [.]
 <str>\" {BEGIN(INITIAL); 
     *string_buf_ptr = '\0';
   printf("%s\n", string_buf);
+  string_buf_len = string_buf_ptr - string_buf;
+  yylval.string_literal = strdup(string_buf);
+  return STRING;
    }
 <str>{OCTESC} {
     int result;
@@ -208,6 +212,7 @@ ANYTHING                         [.]
 <str>\\v  {   *string_buf_ptr++ = '\v'; }
 <str>\\\?  {   *string_buf_ptr++ = '\?'; printf("hi");}
 <str>\\\"  {   *string_buf_ptr++ = '\"'; }
+<str>\\'  {   *string_buf_ptr++ = '\''; }
 <str>\\n  {   *string_buf_ptr++ = '\n'; }
 <str>\\\\ {   *string_buf_ptr++ = '\\'; }
 
@@ -314,7 +319,16 @@ int get_line_info(){
 //     fprintf(stderr, "Error in file %s on line number %d: %s\n", filename, lineno, yytext);
 // }
 void charhelper(char val) {
-
+    switch(val) {
+        case '\a': printf("\a"); break;
+        case '\b': printf("\\b"); break;
+        case '\f': printf("\\f"); break;
+        case '\n': printf("\\n"); break;
+        case '\r': printf("\\r"); break;
+        case '\t': printf("\\t"); break;
+        case '\v': printf("\\v"); break;
+        default: printf("\\%03o", val);
+    }
 }
 int yywrap() {}
 int main() {
@@ -417,12 +431,35 @@ while(t = yylex())  {
         } break;
         case CHARLIT: {
           if(isprint(yylval.charlit)) {
-            printf("%c", yylval.charlit);
+            if(yylval.charlit == '\'' || yylval.charlit == '\'' || yylval.charlit == '\"' || yylval.charlit == '\\' ) {
+                printf("\\%c\n", yylval.charlit);
+            } else {
+            printf("%c\n", yylval.charlit); 
+            }
+          } else {
+            charhelper(yylval.charlit);
+            printf("\n");
           }
             
         } break;
 
-       
+       case STRING: { 
+        printf("\t STRING \t");
+        for(int i = 0; i < string_buf_len; i++) {
+                if(isprint(yylval.string_literal[i])) {
+            if(yylval.string_literal[i]== '\'' || yylval.string_literal[i] == '\'' || yylval.string_literal[i] == '\"' || yylval.string_literal[i] == '\\') {
+                printf("\\%c", yylval.string_literal[i]);
+            } else {
+            printf("%c", yylval.string_literal[i]); 
+            }
+          } else {
+            charhelper(yylval.string_literal[i]);
+        
+          }
+              
+        }
+        printf("\n");
+       } break;
 
 
 

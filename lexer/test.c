@@ -1,13 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-typedef union  {
-    char name[32];
-    int age;
-} YYSTYPE;
-
-YYSTYPE person;
+#include <string.h>
 
 int main() {
-int x =00008;
+char * test = "a\0\0";
+char * new = strdup(test);
+printf("%o", new[0]);
 
 }

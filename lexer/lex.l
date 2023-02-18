@@ -1,14 +1,15 @@
 
 
 %{
+ 
    #include <stdlib.h>
    #include <stdio.h>
-   #include "tokens-manual.h"
    #include <ctype.h>
+   #include "parser.tab.h"
    int get_line_info();
    int handle_error();
    int lineno;
-     enum type {
+   /*  enum type {
         INT_SIGNED,
         INT_LONG,
         INT_LONGLONG,
@@ -19,22 +20,26 @@
         DOUBLEV,
         DOUBLE_LONG,
     };
+    */
+/*    
        struct Num  {
     unsigned long long integer;
      long double fvalue;
      enum type type;
  
    };
+*/
+   /*
    union yylval {
     char *string_literal;
     char charlit;
     struct Num num;
    
-   };
+   }; */
  
 
-   typedef union yylval YYSTYPE;
-   YYSTYPE yylval;
+  /* typedef union yylval YYSTYPE;
+  */ extern YYSTYPE yylval; 
     char filename_buf[256];
     char *filename_buf_ptr;
     int string_buf_len = 0;
@@ -319,6 +324,7 @@ ANYTHING                         [.]
 [_A-Za-z][_a-zA-Z0-9]*      { yylval.string_literal = strdup(yytext); return IDENT; /* put somewhere */ }
 .                           { fprintf(stderr, "Error unrecognized token : %s\n", yytext); }
 %%
+
 int get_line_info(){
     printf("got here at least");
     lineno = 0;
@@ -341,6 +347,8 @@ void charhelper(char val) {
     }
 }
 int yywrap() {}
+
+/*
 int main() {
     int t;
 while(t = yylex())  {
@@ -485,3 +493,4 @@ while(t = yylex())  {
 }
 
 }
+*/

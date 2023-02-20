@@ -13,6 +13,7 @@ primary-expresion : ident
                     a+b 
                     a->ident + b->ident node
 
+
 struct *astnode newast(int nodetype, struct *astnode l, struct *astnode *r) {
     
 };

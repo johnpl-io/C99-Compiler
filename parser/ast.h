@@ -24,7 +24,7 @@ struct astnode_binop {
 struct astnode_tenop {
     int nodetype;
     int operator;
-struct astnode *left, *right;
+    struct astnode *left, *right;
 }
 
 struct astnode_num {

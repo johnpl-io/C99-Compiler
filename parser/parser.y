@@ -53,7 +53,11 @@
 // %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
-
+comma-expression: assignment-expression
+                    | comma-expression ',' assignment-expression
+                    ;
+expression: comma-expression
+            ;
 primary-expression: IDENT { }
                 |   NUMBER { $$ = newNum(AST_NODE_TYPE_NUM, $1);
                             struct astnode *astnode_test = $$;
@@ -83,7 +87,7 @@ unary-expression: postfix-expression
                 | PLUSPLUS   unary-expression
                 | MINUSMINUS unary-expression
                 | '-' cast-expression
-                | '+' cast-expression
+                | '+' cast-expression { printf("hi"); }
                 | '!' cast-expression 
                 | '~' cast-expression
                 | '&' cast-expression
@@ -97,8 +101,8 @@ mult-expression: cast-expression
                 | mult-expression '%' cast-expression
                 ;
 
-add-expression: mult-expression
-                | add-expression '+' mult-expression { }
+add-expression: mult-expression {}
+                | add-expression '+' mult-expression {fprintf(stderr, "hi");  }
                 | add-expression '-' mult-expression
                 ;
 
@@ -157,17 +161,14 @@ assignment-expression: conditional-expression
                         | unary-expression OREQ assignment-expression
                         ;
 
-comma-expression: assignment-expression
-                    | comma-expression ',' assignment-expression
-                    ;
-expression: comma-expression
-            ;
+
                         
                         
                     
 
 %%       
     int main() {
+        yydebug = 0;
         yyparse();
         return 1;
     }

@@ -5,6 +5,7 @@
    #include <stdlib.h>
    #include <stdio.h>
    #include <ctype.h>
+   #include "ast.h"
   int yylex();
   void yyerror (char const *s) {
    fprintf (stderr, "%s\n", s);
@@ -29,44 +30,46 @@
             DOUBLE_LONG,
         } type;
     } num;
+    struct astnode *astnode_p;
 }
 
 %token IDENT CHARLIT STRING <num.integer> NUMBER INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
-
-%left ','
-%right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
-%right '?' ':'
-%left LOGOR
-%left LOGAND
-%left '|'
-%left '^'
-%left '&'
-%left EQEQ NOTEQ
-%left '<' LTEQ '>' GTEQ
-%left SHL SHR
-%left '+' '-'
- // issue with this shit
-%left '*' '/' '%'
-%left '!' '~' SIZEOF MINUSMINUS PLUSPLUS
-%left '.' INDSEL '(' ')' '[' ']'
+%type <astnode_p> primary-expression
+// %left ','
+// %right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
+// %right '?' ':'
+// %left LOGOR
+// %left LOGAND
+// %left '|'
+// %left '^'
+// %left '&'
+// %left EQEQ NOTEQ
+// %left '<' LTEQ '>' GTEQ
+// %left SHL SHR
+// %left '+' '-'
+// %left '*' '/' '%'
+// %left '!' '~' SIZEOF MINUSMINUS PLUSPLUS
+// %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
 
 primary-expression: IDENT { }
-                |   NUMBER { int test = $1 + 1; printf("number %d", test); }
+                |   NUMBER { $$ = newNum(AST_NODE_TYPE_NUM, $1);
+                            struct astnode *astnode_test = $$;
+                             astwalk_impl(astnode_test, 0); }
                 |   STRING { }  
-                | '(' expression ')'      { fprintf(stderr, "expression\n"); }
+                | '(' expression ')'      {  }
                 ;
-function        () 
-postfix-expression: primary-expression
+
+postfix-expression: primary-expression {}
                 |   postfix-expression '[' expression ']' {  }
                 |   postfix-expression '.' IDENT { }
                 |   postfix-expression INDSEL IDENT
                 |   postfix-expression '(' expression-list ')' {}
-                |   postfix-expression '(' ')' {$1->nodetype = FUNCTION; }
-                |   postfix-expression PLUSPLUS
-                |   postfix-expression MINUSMINUS
+                |   postfix-expression '(' ')' { }
+                |   postfix-expression PLUSPLUS { }
+                |   postfix-expression MINUSMINUS { } 
                 ; // left out compound literals
 
 expression-list: assignment-expression
@@ -157,7 +160,6 @@ assignment-expression: conditional-expression
 comma-expression: assignment-expression
                     | comma-expression ',' assignment-expression
                     ;
-
 expression: comma-expression
             ;
                         

@@ -53,5 +53,6 @@ union {
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r);
 struct astnode *newNum(int nodetype, int num);
 struct astnode *newIdent(int nodetype, char *ident);
+void astwalk_impl(struct astnode *ast, int depth);
 
 

@@ -125,7 +125,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 14 "parser.y"
+#line 15 "parser.y"
 
     char *string_literal;
     char charlit;
@@ -144,8 +144,9 @@ union YYSTYPE
             DOUBLE_LONG,
         } type;
     } num;
+    struct astnode *astnode_p;
 
-#line 149 "parser.tab.h"
+#line 150 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -29,7 +29,8 @@ struct astnode *newIdent(int nodetype, char *ident) {
             a->binop.left = l;
             a->binop.right = r;
             break;
-    case AST_NODE_TYPE_TENOP:
+
+        case AST_NODE_TYPE_TENOP:
             a->tenop.left = l;
             a->tenop.right = r;
             break;
@@ -38,8 +39,6 @@ struct astnode *newIdent(int nodetype, char *ident) {
             a->unop.left = l;
             a->unop.right = r;
             break;
-
-
 
         // add more cases as needed for other node types
 
@@ -52,7 +51,7 @@ return a;
 
 
 }
-static void astwalk_impl(struct astnode *ast, int depth) {
+void astwalk_impl(struct astnode *ast, int depth) {
     if (!ast) {
         return;
     }
@@ -87,11 +86,3 @@ static void astwalk_impl(struct astnode *ast, int depth) {
     }
 }
 
-
-int main() {
-    struct astnode *a = newNum( AST_NODE_TYPE_NUM,2);
-    struct astnode *b = newNum( AST_NODE_TYPE_NUM,1);
-    struct astnode *plus = newast(AST_NODE_TYPE_BINOP, a, b);
-    plus->binop.operator = '+';
-   astwalk_impl(plus, 0);
-}

@@ -4,6 +4,7 @@ enum AstNodeType {
     AST_NODE_TYPE_UNOP,
     AST_NODE_TYPE_NUM,
     AST_NODE_TYPE_IDENT,
+    AST_NODE_TYPE_STRING,
     // add more types as needed
 };
 

@@ -33,9 +33,10 @@
     struct astnode *astnode_p;
 }
 
-%token IDENT CHARLIT STRING <num.integer> NUMBER INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
+%token <ident> IDENT <charlit> CHARLIT STRING <num.integer> NUMBER INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
-%type <astnode_p> primary-expression
+%type <astnode_p> primary-expression 
+%type <astnode_p> expression postfix-expression
 // %left ','
 // %right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
 // %right '?' ':'
@@ -53,21 +54,22 @@
 // %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
-comma-expression: assignment-expression
-                    | comma-expression ',' assignment-expression
+
+expression: assignment-expression { }
+                    | expression ',' assignment-expression {  }
+                    | expression ';' { }
                     ;
-expression: comma-expression
-            ;
-primary-expression: IDENT { }
+
+primary-expression: IDENT {  $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
                 |   NUMBER { $$ = newNum(AST_NODE_TYPE_NUM, $1);
                             struct astnode *astnode_test = $$;
                              astwalk_impl(astnode_test, 0); }
-                |   STRING { }  
-                | '(' expression ')'      {  }
+                |   STRING { $$ = newIdent(AST_TYPE_STRING, $1);  }  
+                | '(' expression ')'      { $$ = $2;  }
                 ;
 
-postfix-expression: primary-expression {}
-                |   postfix-expression '[' expression ']' {  }
+postfix-expression: primary-expression { $$ = $1; }
+                |   postfix-expression '[' expression ']' {   }
                 |   postfix-expression '.' IDENT { }
                 |   postfix-expression INDSEL IDENT
                 |   postfix-expression '(' expression-list ')' {}

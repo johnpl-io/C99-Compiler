@@ -32,7 +32,7 @@ struct astnode_binop {
 struct astnode_tenop {
     int nodetype;
     int operator;
-    struct astnode *left, *right;
+    struct astnode *left, *middle, *right;
 };
 
 struct astnode_num {
@@ -64,5 +64,5 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
 struct astnode *newNum(int nodetype, int num);
 struct astnode *newIdent(int nodetype, char *ident);
 void astwalk_impl(struct astnode *ast, int depth);
-
+struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, struct astnode *r);
 

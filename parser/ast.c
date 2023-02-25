@@ -15,10 +15,17 @@ struct astnode *newIdent(int nodetype, char *ident) {
        identast->nodetype = nodetype;
     identast->ident.string = ident;
     identast->ident.nodetype = nodetype;
+    
     return identast;
 }
 
-
+struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, struct astnode *r) {
+       struct astnode *a = malloc(sizeof(struct astnode));
+    a->nodetype = nodetype;
+    a->tenop.left = l;
+    a->tenop.middle = m;
+    a->tenop.right = r;
+}
  struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
@@ -72,6 +79,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_TENOP:
             printf("TENOP %c\n", ast->tenop.operator);
             astwalk_impl(ast->tenop.left, depth + 1);
+            astwalk_impl(ast->tenop.middle,depth + 1);
             astwalk_impl(ast->tenop.right, depth + 1);
             break;
         case AST_NODE_TYPE_UNOP:
@@ -85,9 +93,16 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_IDENT:
             printf("IDENT %s\n", ast->ident.string);
             break;
-             case AST_NODE_TYPE_FN:
+        case AST_NODE_TYPE_CHARLIT:
+            printf("CHARLIT %c\n", ast->num.number);
+            break;
+        case AST_NODE_TYPE_STRING:
+            printf("STRING %s\n", ast->ident.string);
+            break;
+        case AST_NODE_TYPE_FN:
                 printf("FN\n");
-            astwalk_impl(ast->unop.left, depth + 1);
+                astwalk_impl(ast->unop.left, depth + 1);
+                break;
         default:
             printf("Unknown node type\n");
             break;

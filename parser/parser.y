@@ -37,10 +37,15 @@
 %token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num.integer> NUMBER 
 %token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
-%type <astnode_p> primary-expression 
+%type <astnode_p> primary-expression assignment-expression
 %type <astnode_p> expression postfix-expression expression-list
-%type <astnode_p> unary-expression cast-expression mult-expression add-expression
-%type <op> unary-operator
+%type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
+%type <astnode_p> relational-expression equality-expression
+%type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression
+%type <astnode_p> logical-or-expression logical-and-expression conditional-expression 
+
+%type <op> unary-operator assignment-operator
+
 // %left ','
 // %right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
 // %right '?' ':'
@@ -69,7 +74,7 @@ primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT,
                                             
                                             }
                 |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1);  }  
-                |   CHARLIT                 { $$ = newNum(AST_NODE_TYPE_CHARLIT, $1); }
+                |   CHARLIT                 { $$ = newNum(AST_NODE_TYPE_CHARLIT, $1);  }
                 |   '(' expression ')'      { $$ = $2;  }
                 ;
 
@@ -77,8 +82,8 @@ postfix-expression: primary-expression { $$ = $1; }
                 |   postfix-expression '[' expression ']' { struct astnode *ast = newast(AST_NODE_TYPE_BINOP, $1, $3, '+'); $$ = newast(AST_NODE_TYPE_UNOP, ast, NULL, '*'); }
                 |   postfix-expression '.' IDENT { $$ = newast(AST_NODE_TYPE_BINOP, $1, newIdent(AST_NODE_TYPE_IDENT, $3), '.'); }
                 |   postfix-expression INDSEL IDENT { struct astnode *ast = newast(AST_NODE_TYPE_UNOP, $1, NULL, '*'); $$ = newast(AST_NODE_TYPE_BINOP, ast, newIdent(AST_NODE_TYPE_IDENT, $3), '.' ); }    
-                |   postfix-expression '(' expression-list ')' { $$ = newast(AST_NODE_TYPE_FN, $1, $3, '0'); }
-                |   postfix-expression '(' ')' { $$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0'); }
+                |   postfix-expression '(' expression-list ')' { $$ = newast(AST_NODE_TYPE_FN, $1, $3, '0'); } 
+                |   postfix-expression '(' ')' { $$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0');  }
                 |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTINC); }
                 |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTDEC); }   
 
@@ -116,62 +121,62 @@ add-expression: mult-expression { $$ = $1; }
                 ;
 
 shift-expression: add-expression { $$ = $1; }
-                | shift-expression SHL add-expression { }
-                | shift-expression SHR add-expression
+                | shift-expression SHL add-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, SHL); }
+                | shift-expression SHR add-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, SHR); }
                 ;
 
-relational-expression: shift-expression {}
-                | relational-expression '<' shift-expression
-                | relational-expression LTEQ shift-expression
-                | relational-expression '>' shift-expression
-                | relational-expression GTEQ shift-expression
+relational-expression: shift-expression {$$ = $1; }
+                | relational-expression '<' shift-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '<');}
+                | relational-expression LTEQ shift-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, LTEQ);}
+                | relational-expression '>' shift-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '>');}
+                | relational-expression GTEQ shift-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, GTEQ);}
                 ;
 
-equality-expression: relational-expression
-                | equality-expression EQEQ relational-expression
-                | equality-expression NOTEQ relational-expression
+equality-expression: relational-expression {$$ = $1; }
+                | equality-expression EQEQ relational-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, EQEQ);}
+                | equality-expression NOTEQ relational-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, NOTEQ); }
                 ;
 
-bitwise-or-expression: bitwise-xor-expression
-                | bitwise-or-expression '|' bitwise-xor-expression
+bitwise-or-expression: bitwise-xor-expression {$$ = $1; }
+                | bitwise-or-expression '|' bitwise-xor-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '|');}
                 ;
 
-bitwise-xor-expression: bitwise-and-expression
-                | bitwise-xor-expression '^' bitwise-and-expression
+bitwise-xor-expression: bitwise-and-expression {$$ = $1;  }
+                | bitwise-xor-expression '^' bitwise-and-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '^');}
                 ;
 
-bitwise-and-expression: equality-expression 
-                | bitwise-and-expression '&' equality-expression
+bitwise-and-expression: equality-expression {$$ = $1; }
+                | bitwise-and-expression '&' equality-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '&');}
                 ;
 
-logical-or-expression:  logical-and-expression 
-                     |   logical-or-expression LOGOR logical-and-expression
+logical-or-expression:  logical-and-expression {$$ = $1; }
+                     |   logical-or-expression LOGOR logical-and-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, LOGOR);}
                      ;
     
-logical-and-expression: bitwise-or-expression 
-                     | logical-and-expression LOGAND bitwise-or-expression
+logical-and-expression: bitwise-or-expression { $$ = $1; }
+                     | logical-and-expression LOGAND bitwise-or-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, LOGAND);}
                      ;
                      
-conditional-expression: logical-or-expression
-                        | logical-or-expression '?' expression ':' conditional-expression
+conditional-expression: logical-or-expression {  $$ = $1; }
+                        | logical-or-expression '?' expression ':' conditional-expression { $$ = newTenop(AST_NODE_TYPE_TENOP, $1, $3 , $5); }
                         ;
 
-assignment-expression: conditional-expression 
-                        | unary-expression assignment-operator assignment-expression
+assignment-expression: conditional-expression { $$ =  $1; }
+                        | unary-expression assignment-operator assignment-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, $2); }
                         ;
                     
 
-assignment-operator: '=' { }
-                    | PLUSEQ
-                    | MINUSEQ
-                    | TIMESEQ
-                    | DIVEQ
-                    | MODEQ
-                    | SHLEQ
-                    | SHREQ
-                    | ANDEQ
-                    | OREQ
-                    | XOREQ
+assignment-operator: '=' {$$ = '='; }
+                    | PLUSEQ { $$ = PLUSEQ; }
+                    | MINUSEQ {$$ = MINUSEQ; }
+                    | TIMESEQ {$$ = TIMESEQ; }
+                    | DIVEQ {$$ = DIVEQ; }
+                    | MODEQ { $$ = MODEQ; }
+                    | SHLEQ { $$ = SHREQ; }
+                    | SHREQ { $$ = SHREQ; }
+                    | ANDEQ { $$ = ANDEQ; }
+                    | OREQ {$$ = OREQ; }
+                    | XOREQ { $$ = XOREQ; }
                     ;
 
 

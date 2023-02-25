@@ -19,8 +19,7 @@ struct astnode *newIdent(int nodetype, char *ident) {
 }
 
 
-
- struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r) {
+ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
 
@@ -28,6 +27,7 @@ struct astnode *newIdent(int nodetype, char *ident) {
         case AST_NODE_TYPE_BINOP:
             a->binop.left = l;
             a->binop.right = r;
+            a->binop.operator = operator;
             break;
 
         case AST_NODE_TYPE_TENOP:
@@ -38,8 +38,13 @@ struct astnode *newIdent(int nodetype, char *ident) {
         case AST_NODE_TYPE_UNOP:
             a->unop.left = l;
             a->unop.right = r;
+            a->unop.operator = operator;
             break;
-
+          case AST_NODE_TYPE_FN:
+            a->unop.left = l;
+            a->unop.right = r;
+            break;
+        
         // add more cases as needed for other node types
 
         default:
@@ -80,6 +85,9 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_IDENT:
             printf("IDENT %s\n", ast->ident.string);
             break;
+             case AST_NODE_TYPE_FN:
+                printf("FN\n");
+            astwalk_impl(ast->unop.left, depth + 1);
         default:
             printf("Unknown node type\n");
             break;

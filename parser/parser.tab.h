@@ -144,9 +144,10 @@ union YYSTYPE
             DOUBLE_LONG,
         } type;
     } num;
+    int op;
     struct astnode *astnode_p;
 
-#line 150 "parser.tab.h"
+#line 151 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

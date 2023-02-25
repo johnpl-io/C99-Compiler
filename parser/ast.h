@@ -1,3 +1,5 @@
+#define POSTINC 500
+#define POSTDEC 501
 enum AstNodeType {
     AST_NODE_TYPE_BINOP,
     AST_NODE_TYPE_TENOP,
@@ -5,6 +7,8 @@ enum AstNodeType {
     AST_NODE_TYPE_NUM,
     AST_NODE_TYPE_IDENT,
     AST_NODE_TYPE_STRING,
+    AST_NODE_TYPE_CHARLIT,
+    AST_NODE_TYPE_FN,
     // add more types as needed
 };
 
@@ -14,6 +18,11 @@ struct astnode_unop {
     struct astnode *left, *right;
 };
 
+
+struct astnode_fn {
+    int nodetype;
+    struct astnode *left, *right;
+};
 struct astnode_binop {
     int nodetype;
     int operator;
@@ -51,7 +60,7 @@ union {
 
 
 
-struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r);
+struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator);
 struct astnode *newNum(int nodetype, int num);
 struct astnode *newIdent(int nodetype, char *ident);
 void astwalk_impl(struct astnode *ast, int depth);

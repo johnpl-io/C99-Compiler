@@ -1,6 +1,7 @@
 %debug
 %define parse.error verbose
 %{
+
     #define YYDEBUG 1
    #include <stdlib.h>
    #include <stdio.h>
@@ -64,9 +65,12 @@
 
 %% /*RULES */
 
-expression: assignment-expression         {  }
-                    | expression ',' assignment-expression {  }
-                    | expression ';' { astwalk_impl($1, 0); }
+exprstmtlist: expression ';' { astwalk_impl($1, 0); }
+        | exprstmtlist expression ';'  { astwalk_impl($2, 0);}
+        ;
+
+expression: assignment-expression         { $$ = $1; }
+                    | expression ',' assignment-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, ','); }
                     ;
 
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
@@ -87,8 +91,8 @@ postfix-expression: primary-expression { $$ = $1; }
                 |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTINC); }
                 |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTDEC); }   
 
-expression-list: assignment-expression  {  }
-                | expression-list ',' assignment-expression {  }
+expression-list: assignment-expression  { $$ = $1; }
+                | expression-list ',' assignment-expression { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3); }
                 
 
 
@@ -187,6 +191,11 @@ assignment-operator: '=' {$$ = '='; }
 %%       
     int main() {
         yydebug = 0;
-        yyparse();
+
+  
+ yyparse();
+  
+        
         return 1;
+        
     }

@@ -26,7 +26,24 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.middle = m;
     a->tenop.right = r;
 }
- struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
+
+struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next) {
+    struct astnode *n = malloc(sizeof(struct astnode));
+
+    if(astnode->nodetype != AST_NODE_TYPE_LL) {
+        n->ll.head = astnode;
+    } else {
+       n->ll.head = astnode->ll.head;
+       astnode->ll.next = n;
+    }
+            n->ll.data = next;
+            
+            n->nodetype = AST_NODE_TYPE_LL;
+    return n;
+}
+
+
+struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
 
@@ -49,7 +66,7 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
             break;
           case AST_NODE_TYPE_FN:
             a->unop.left = l;
-            a->unop.right = r;
+            a->ll.data = r;
             break;
         
         // add more cases as needed for other node types
@@ -102,6 +119,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_FN:
                 printf("FN\n");
                 astwalk_impl(ast->unop.left, depth + 1);
+                printf("fn data %s", ast->ll.head->nodetype);
                 break;
         default:
             printf("Unknown node type\n");

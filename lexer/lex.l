@@ -51,7 +51,7 @@ DIGITFLOAT                       [0-9]
 OCTAL                            0[0-7]+
 HEX                              0[xX][0-9|a-f|A-F]+
 LONG                             [lL]
-LONGLONG                         [(LL)|(ll)]
+LONGLONG                         (LL)|(ll)
 UNSIGNED                         [uU]
 EXP                              [eE][+-]?{DIGITFLOAT}+
 P                                [pP][+-]?{DIGITFLOAT}+

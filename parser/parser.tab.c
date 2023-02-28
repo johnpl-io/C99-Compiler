@@ -1657,13 +1657,13 @@ yyreduce:
 
   case 19: /* expression-list: assignment-expression  */
 #line 94 "parser.y"
-                                        { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
+                                        { (yyval.astnode_p) =  insertElementorig(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p)); }
 #line 1662 "parser.tab.c"
     break;
 
   case 20: /* expression-list: expression-list ',' assignment-expression  */
 #line 95 "parser.y"
-                                                            { (yyval.astnode_p) = insertElement(383, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+                                                            { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p));  }
 #line 1668 "parser.tab.c"
     break;
 

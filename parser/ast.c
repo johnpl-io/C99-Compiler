@@ -27,21 +27,29 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.right = r;
 }
 
-struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next) {
+struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
     struct astnode *n = malloc(sizeof(struct astnode));
 
-    if(astnode->nodetype != AST_NODE_TYPE_LL) {
-        n->ll.head = astnode;
-    } else {
-       n->ll.head = astnode->ll.head;
-       astnode->ll.next = n;
-    }
-            n->ll.data = next;
-            
+ printf("hi");
+        n->ll.head = n;
+        n->ll.data = astnode;
+
+        
             n->nodetype = AST_NODE_TYPE_LL;
     return n;
 }
-
+struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next) {
+    struct astnode *n = malloc(sizeof(struct astnode));
+     //   printf("astnode %p \n", astnode->ll.head);
+            //printf("astnode    next %s \n", next->ident.string);
+        n->ll.head = astnode->ll.head;
+      
+        n->nodetype = AST_NODE_TYPE_LL;
+        n->ll.data = next;
+         astnode->ll.next = n;
+            
+    return n;
+}
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
@@ -65,8 +73,8 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             a->unop.operator = operator;
             break;
           case AST_NODE_TYPE_FN:
-            a->unop.left = l;
-            a->ll.data = r;
+            a->fn.left = l;
+            a->fn.ll = r;
             break;
         
         // add more cases as needed for other node types
@@ -117,10 +125,15 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("STRING %s\n", ast->ident.string);
             break;
         case AST_NODE_TYPE_FN:
-                printf("FN\n");
-                astwalk_impl(ast->unop.left, depth + 1);
-                printf("fn data %s", ast->ll.head->nodetype);
-                break;
+            printf("FN\n");
+            astwalk_impl(ast->fn.left, depth + 1);
+            struct astnode *ll_node = ast->fn.ll->ll.head;
+            while (ll_node != NULL) {
+                astwalk_impl(ll_node->ll.data, depth + 1);
+                ll_node = ll_node->ll.next;
+            }
+            break;
+                
         default:
             printf("Unknown node type\n");
             break;

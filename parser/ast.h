@@ -13,6 +13,7 @@ enum AstNodeType {
     // add more types as needed
 };
 struct astnode_linkedlist {
+    int nodetype;
     struct astnode *data; 
     struct astnode *next;
     struct astnode *head;
@@ -27,8 +28,7 @@ struct astnode_unop {
 
 struct astnode_fn {
     int nodetype;
-    struct astnode *left, *right;
-    struct node *ll;
+    struct astnode *left, *ll;
 };
 struct astnode_binop {
     int nodetype;
@@ -59,6 +59,7 @@ int nodetype;
 union {
     struct astnode_binop binop;
     struct astnode_tenop tenop;
+    struct astnode_fn fn;
     struct astnode_unop unop;
     struct astnode_num   num;
     struct astnode_ident ident;
@@ -74,3 +75,4 @@ struct astnode *newIdent(int nodetype, char *ident);
 void astwalk_impl(struct astnode *ast, int depth);
 struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, struct astnode *r);
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next);
+struct astnode *insertElementorig(int nodetype, struct astnode *astnode);

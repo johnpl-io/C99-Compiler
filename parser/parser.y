@@ -91,8 +91,8 @@ postfix-expression: primary-expression { $$ = $1; }
                 |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTINC); }
                 |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTDEC); }   
 
-expression-list: assignment-expression  { $$ = $1; }
-                | expression-list ',' assignment-expression { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3); }
+expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1); }
+                | expression-list ',' assignment-expression { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3);  }
                 
 
 

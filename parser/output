@@ -1,0 +1,95 @@
+BINOP , 
+  BINOP = 
+    IDENT a
+    IDENT b
+  BINOP Assignment OP +=
+    IDENT c
+    BINOP * 
+      UNOP - 
+        NUM INT_SIGNED 10
+      IDENT d
+TENOP Invalid character
+  BINOP Comparsion OP !=
+    STRING X
+    STRING Y
+  BINOP Assignment OP +=
+    IDENT e
+    NUM INT_SIGNED 1
+  UNOP Invalid character
+    IDENT f
+BINOP Assignment OP -=
+  IDENT g
+  UNOP * 
+    BINOP + 
+      STRING ABC
+      NUM INT_SIGNED 3
+BINOP Assignment OP %=
+  IDENT h
+  UNOP + 
+    IDENT i
+BINOP Assignment OP /=
+  IDENT i
+  NUM DOUBLEV 15.300000
+BINOP Assignment OP >>=
+  IDENT j
+  NUM INT_SIGNED 3
+BINOP , 
+  BINOP Assignment OP >>=
+    IDENT j
+    IDENT k
+  IDENT l
+BINOP Assignment OP &=
+  IDENT m
+  BINOP Logical OP &&
+    IDENT n
+    IDENT o
+BINOP Assignment OP |=
+  IDENT n
+  BINOP ^ 
+    IDENT n
+    IDENT o
+BINOP Comparison OP >=
+  FN
+    IDENT fn
+    BINOP Logical OP ||
+      BINOP Logical OP &&
+        IDENT a
+        IDENT b
+      IDENT c
+    BINOP | 
+      BINOP & 
+        IDENT d
+        IDENT e
+      BINOP ^ 
+        IDENT f
+        IDENT g
+    BINOP Comparsion OP !=
+      BINOP Comparison OP ==
+        NUM INT_SIGNED 10
+        NUM INT_SIGNED 20
+      NUM INT_SIGNED 0
+  BINOP Invalid character
+    UNOP ~ 
+      IDENT a
+    NUM INT_SIGNED 2
+BINOP Assignment OP ^=
+  IDENT o
+  CHARLIT A
+BINOP = 
+  IDENT p
+  UNOP & 
+    BINOP . 
+      UNOP * 
+        IDENT x
+      IDENT m
+UNOP * 
+  UNOP Invalid character
+    BINOP . 
+      IDENT q
+      IDENT m
+BINOP = 
+  IDENT s
+  UNOP SIZEOF 
+    BINOP Assignment OP +=
+      IDENT a
+      NUM INT_SIGNED 1

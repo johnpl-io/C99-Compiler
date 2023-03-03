@@ -1,11 +1,21 @@
 #include <stdio.h>
 #include "ast.h"
 #include <stdlib.h>
-struct astnode *newNum(int nodetype, int num) {
+#include "parser.tab.h"
+#include <ctype.h>
+struct astnode *newNum(int nodetype, struct Num num) {
   
     struct astnode *numast = malloc(sizeof(struct astnode));
     numast->nodetype = nodetype;
     numast->num.number = num;
+    numast->num.nodetype = nodetype;
+    return numast;
+}
+struct astnode *newCharlit(int nodetype, char val) {
+  
+    struct astnode *numast = malloc(sizeof(struct astnode));
+    numast->nodetype = nodetype;
+    numast->charl.val = val;
     numast->num.nodetype = nodetype;
     return numast;
 }
@@ -29,8 +39,6 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
 
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
     struct astnode *n = malloc(sizeof(struct astnode));
-
- printf("hi");
         n->ll.head = n;
         n->ll.data = astnode;
 
@@ -85,9 +93,62 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
     }
 
 return a;
-
-
 }
+
+void printoperator(int operator) {
+    if(isprint(operator)) {
+        printf("%c \n", operator); 
+    } else {
+   switch(operator) {
+        case LTEQ:
+            printf("Comparison OP <=\n"); break;
+        case GTEQ:
+            printf("Comparison OP >=\n"); break;
+        case EQEQ:
+            printf("Comparison OP ==\n"); break;
+        case NOTEQ:
+            printf("Comparsion OP !=\n"); break;
+        case PLUSEQ:
+            printf("Assignment OP +=\n"); break;
+        case MINUSEQ:
+            printf("Assignment OP -=\n"); break;
+        case TIMESEQ:
+            printf("Assignment OP *=\n"); break;
+        case DIVEQ:
+            printf("Assignment OP /=\n"); break;
+        case MODEQ:
+            printf("Assignment OP %%=\n"); break;
+        case SHLEQ:
+            printf("Assignment OP <<=\n"); break;
+        case SHREQ:
+            printf("Assignment OP >>=\n"); break;
+        case ANDEQ:
+            printf("Assignment OP &=\n"); break;
+        case XOREQ:
+            printf("Assignment OP ^=\n"); break;
+        case OREQ:
+            printf("Assignment OP |=\n"); break;
+        case LOGOR:
+            printf("Logical OP ||\n"); break;
+        case LOGAND:
+            printf("Logical OP &&\n"); break;
+        case SIZEOF:
+            printf("SIZEOF\n"); break;
+        case POSTINC:
+            printf("POSTINC\n"); break;
+        case POSTDEC: 
+            printf("POSTDEC\n"); break;
+        case SHL:
+            printf("SHL\n"); break;
+        case SHR:
+            printf("SHR\n"); break;
+        default:
+            printf("Invalid character\n"); break;
+    }
+    }
+}
+
+
 void astwalk_impl(struct astnode *ast, int depth) {
     if (!ast) {
         return;
@@ -97,29 +158,63 @@ void astwalk_impl(struct astnode *ast, int depth) {
     }
     switch (ast->nodetype) {
         case AST_NODE_TYPE_BINOP:
-            printf("BINOP %c\n", ast->binop.operator);
+            printf("BINOP ");
+            printoperator(ast->binop.operator);
             astwalk_impl(ast->binop.left, depth + 1);
             astwalk_impl(ast->binop.right, depth + 1);
             break;
         case AST_NODE_TYPE_TENOP:
-            printf("TENOP %c\n", ast->tenop.operator);
-            astwalk_impl(ast->tenop.left, depth + 1);
-            astwalk_impl(ast->tenop.middle,depth + 1);
-            astwalk_impl(ast->tenop.right, depth + 1);
+            printf("TENOP \n");
+            printf("IF:\n"); astwalk_impl(ast->tenop.left, depth + 1);
+            printf("THEN:\n");  astwalk_impl(ast->tenop.middle,depth + 1);
+             printf("ELSE:\n"); astwalk_impl(ast->tenop.right, depth + 1);
             break;
         case AST_NODE_TYPE_UNOP:
-            printf("UNOP %c\n", ast->unop.operator);
+                printf("UNOP ");
+             printoperator(ast->unop.operator);
             astwalk_impl(ast->unop.left, depth + 1);
             astwalk_impl(ast->unop.right, depth + 1);
             break;
         case AST_NODE_TYPE_NUM:
-            printf("NUM %d\n", ast->num.number);
+          printf("NUM ");
+          switch (ast->num.number.type) {
+    case INT_SIGNED:
+        printf("INT_SIGNED %lld\n", (long long)ast->num.number.integer);
+        break;
+    case INT_LONG:
+        printf("INT_LONG %ld\n", (long)ast->num.number.integer);
+        break;
+    case INT_LONGLONG:
+        printf("INT_LONGLONG %lld\n", (long long)ast->num.number.integer);
+        break;
+    case INT_UNSIGNED:
+        printf("INT_UNSIGNED %llu\n", ast->num.number.integer);
+        break;
+    case INT_ULONG:
+        printf("INT_ULONG %lu\n", (unsigned long)ast->num.number.integer);
+        break;
+    case INT_ULONGLONG:
+        printf("INT_ULONGLONG %llu\n", ast->num.number.integer);
+        break;
+    case FLOATV:
+        printf("FLOATV %Lf\n", ast->num.number.fvalue);
+        break;
+    case DOUBLEV:
+        printf("DOUBLEV %lf\n", (double)ast->num.number.fvalue);
+        break;
+    case DOUBLE_LONG:
+        printf("DOUBLE_LONG %Lf\n", ast->num.number.fvalue);
+        break;
+    default:
+        printf("Invalid type %d\n", ast->num.number.type);
+        break;
+}
             break;
         case AST_NODE_TYPE_IDENT:
             printf("IDENT %s\n", ast->ident.string);
             break;
         case AST_NODE_TYPE_CHARLIT:
-            printf("CHARLIT %c\n", ast->num.number);
+            printf("CHARLIT %c\n", ast->charl.val);
             break;
         case AST_NODE_TYPE_STRING:
             printf("STRING %s\n", ast->ident.string);

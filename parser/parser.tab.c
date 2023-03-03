@@ -1583,7 +1583,7 @@ yyreduce:
 
   case 7: /* primary-expression: NUMBER  */
 #line 77 "parser.y"
-                                            { (yyval.astnode_p) = newNum(AST_NODE_TYPE_NUM, (yyvsp[0].num.integer));
+                                            { (yyval.astnode_p) = newNum(AST_NODE_TYPE_NUM, (yyvsp[0].num));
                                             
                                             }
 #line 1590 "parser.tab.c"
@@ -1597,7 +1597,7 @@ yyreduce:
 
   case 9: /* primary-expression: CHARLIT  */
 #line 81 "parser.y"
-                                            { (yyval.astnode_p) = newNum(AST_NODE_TYPE_CHARLIT, (yyvsp[0].charlit));  }
+                                            { (yyval.astnode_p) = newCharlit(AST_NODE_TYPE_CHARLIT, (yyvsp[0].charlit));  }
 #line 1602 "parser.tab.c"
     break;
 
@@ -1675,13 +1675,13 @@ yyreduce:
 
   case 22: /* unary-expression: PLUSPLUS unary-expression  */
 #line 100 "parser.y"
-                                              { (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, 1), PLUSEQ );  }
+                                              { struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
 #line 1680 "parser.tab.c"
     break;
 
   case 23: /* unary-expression: MINUSMINUS unary-expression  */
 #line 101 "parser.y"
-                                              {(yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, 1), MINUSEQ ); }
+                                              {struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
 #line 1686 "parser.tab.c"
     break;
 
@@ -1753,13 +1753,13 @@ yyreduce:
 
   case 35: /* mult-expression: mult-expression '/' cast-expression  */
 #line 118 "parser.y"
-                                                      {(yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), '*'); }
+                                                      {(yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), '/'); }
 #line 1758 "parser.tab.c"
     break;
 
   case 36: /* mult-expression: mult-expression '%' cast-expression  */
 #line 119 "parser.y"
-                                                      { (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), '*'); }
+                                                      { (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), '%'); }
 #line 1764 "parser.tab.c"
     break;
 
@@ -1969,7 +1969,7 @@ yyreduce:
 
   case 71: /* assignment-operator: SHLEQ  */
 #line 179 "parser.y"
-                            { (yyval.op) = SHREQ; }
+                            { (yyval.op) = SHLEQ; }
 #line 1974 "parser.tab.c"
     break;
 

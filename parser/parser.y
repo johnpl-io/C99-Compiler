@@ -35,7 +35,7 @@
     struct astnode *astnode_p;
 }
 
-%token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num.integer> NUMBER 
+%token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num> NUMBER 
 %token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
 %type <astnode_p> primary-expression assignment-expression
@@ -78,7 +78,7 @@ primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT,
                                             
                                             }
                 |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1);  }  
-                |   CHARLIT                 { $$ = newNum(AST_NODE_TYPE_CHARLIT, $1);  }
+                |   CHARLIT                 { $$ = newCharlit(AST_NODE_TYPE_CHARLIT, $1);  }
                 |   '(' expression ')'      { $$ = $2;  }
                 ;
 
@@ -97,8 +97,8 @@ expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_
 
 
 unary-expression: postfix-expression {$$ = $1; }
-                | PLUSPLUS   unary-expression { $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, 1), PLUSEQ );  }
-                | MINUSMINUS unary-expression {$$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, 1), MINUSEQ ); }
+                | PLUSPLUS   unary-expression { struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
+                | MINUSMINUS unary-expression {struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
                 | unary-operator cast-expression { $$ = newast(AST_NODE_TYPE_UNOP, $2, NULL, $1); }
                 | SIZEOF '(' expression ')' { $$ = newast(AST_NODE_TYPE_UNOP, $3, NULL, SIZEOF);  }
                 ;
@@ -115,8 +115,8 @@ cast-expression: unary-expression {$$ = $1; }
 
 mult-expression: cast-expression { $$ = $1; }
                 | mult-expression '*' cast-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '*'); }
-                | mult-expression '/' cast-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '*'); }
-                | mult-expression '%' cast-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '*'); }
+                | mult-expression '/' cast-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '/'); }
+                | mult-expression '%' cast-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '%'); }
                 ;
 
 add-expression: mult-expression { $$ = $1; }
@@ -176,7 +176,7 @@ assignment-operator: '=' {$$ = '='; }
                     | TIMESEQ {$$ = TIMESEQ; }
                     | DIVEQ {$$ = DIVEQ; }
                     | MODEQ { $$ = MODEQ; }
-                    | SHLEQ { $$ = SHREQ; }
+                    | SHLEQ { $$ = SHLEQ; }
                     | SHREQ { $$ = SHREQ; }
                     | ANDEQ { $$ = ANDEQ; }
                     | OREQ {$$ = OREQ; }

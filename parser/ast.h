@@ -1,5 +1,7 @@
 #define POSTINC 500
 #define POSTDEC 501
+#include "parser.tab.h"
+
 enum AstNodeType {
     AST_NODE_TYPE_BINOP,
     AST_NODE_TYPE_TENOP,
@@ -17,6 +19,12 @@ struct astnode_linkedlist {
     struct astnode *data; 
     struct astnode *next;
     struct astnode *head;
+};
+
+struct astnode_charlit {
+    int nodetype;
+    char val;
+    struct astnode *left, *right;
 };
 
 struct astnode_unop {
@@ -44,7 +52,7 @@ struct astnode_tenop {
 
 struct astnode_num {
     int nodetype;
-    int number;
+   struct Num number;
     struct astnode *left, *right;
 };
 
@@ -64,15 +72,17 @@ union {
     struct astnode_num   num;
     struct astnode_ident ident;
     struct astnode_linkedlist ll;
+    struct astnode_charlit charl;
     };  
 };
 
 
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator);
-struct astnode *newNum(int nodetype, int num);
+struct astnode *newNum(int nodetype, struct Num num);
 struct astnode *newIdent(int nodetype, char *ident);
 void astwalk_impl(struct astnode *ast, int depth);
 struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, struct astnode *r);
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next);
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode);
+struct astnode *newCharlit(int nodetype, char val);

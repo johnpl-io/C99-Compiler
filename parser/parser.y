@@ -65,18 +65,21 @@
 
 %% /*RULES */
 
-exprstmtlist: expression ';' { astwalk_impl($1, 0); }
-        | exprstmtlist expression ';'  { astwalk_impl($2, 0);}
+stmts: declaration_or_fndef  {  }
+        | stmts declaration_or_fndef   { }
         ;
-
-expression: assignment-expression         { $$ = $1; }
-                    | expression ',' assignment-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, ','); }
+        
+declaration_or_fndef: declaration  { }
+                    | function_definition { }
                     ;
 
+function_definition: declaration-specifiers declarator compound_statement
+    ;
+
+
+
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
-                |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);
-                                            
-                                            }
+                |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
                 |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1);  }  
                 |   CHARLIT                 { $$ = newCharlit(AST_NODE_TYPE_CHARLIT, $1);  }
                 |   '(' expression ')'      { $$ = $2;  }
@@ -168,7 +171,7 @@ conditional-expression: logical-or-expression {  $$ = $1; }
 assignment-expression: conditional-expression { $$ =  $1; }
                         | unary-expression assignment-operator assignment-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, $2); }
                         ;
-                    
+               
 
 assignment-operator: '=' {$$ = '='; }
                     | PLUSEQ { $$ = PLUSEQ; }
@@ -182,11 +185,221 @@ assignment-operator: '=' {$$ = '='; }
                     | OREQ {$$ = OREQ; }
                     | XOREQ { $$ = XOREQ; }
                     ;
+expression: assignment-expression         { $$ = $1; }
+                    | expression ',' assignment-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, ','); }
+                    ;   
+/* Assignment 3 - Declarations */
 
+compound_statement: '{' decl_or_stmt_list '}'
 
+decl_or_stmt: declaration { } 
+    | statement {}
+    ;
+
+decl_or_stmt_list: decl_or_stmt  {  }
+                | decl_or_stmt_list ',' decl_or_stmt {   }
+                
+statement: compound_statement
+    | expression ';'
+    ;
+
+/* 6.7.0 ? */
+declaration: declaration-specifiers init-declarator-list ';'
+    | declaration-specifiers ';'
+    ;
+    
+declaration-specifiers: storage-class-specifier declaration-specifiers
+    | storage-class-specifier
+    | type-specifier declaration-specifiers
+    | type-specifier
+    | type-qualifier declaration-specifiers
+    | type-qualifier
+    | function-specifier declaration-specifiers
+    | function-specifier
+    ;
+
+init-declarator-list: init-declarator
+    | init-declarator-list ',' init-declarator
+    ;
+    
+init-declarator: declarator
+    | declarator '=' initializer
+    ;
                         
+/* 6.7.1 */
+storage-class-specifier: TYPEDEF
+                    |    EXTERN
+                    |    STATIC 
+                    |    AUTO 
+                    |    REGISTER
+                    ;
+
+/* 6.7.2 */
+
+type-specifier: VOID
+            |   CHAR
+            |   SHORT
+            |   INT 
+            |   LONG
+            |   FLOAT
+            |   DOUBLE
+            |   SIGNED
+            |   UNSIGNED
+            |   _BOOL
+            |   _COMPLEX
+            |  _IMAGINARY
+            | struct-or-union-specifier
+            | enum-specifier
+            | typedef-name
+            ;
+
+/* 6.7.2.1 */
+
+struct-or-union-specifier: struct-or-union IDENT '{' struct-declaration-list '}'
+                        |  struct-or-union '{' struct-declaration-list '}'
+                        |  struct-or-union IDENT
+                        ;
+
+struct-or-union: STRUCT
+                | UNION
+                ;
+                
+struct-declaration-list: struct-declaration
+                        | struct-declaration-list struct-declaration
+                        ;
                         
-                    
+struct-declaration: specifier-qualifier-list struct-declarator-list;
+
+specifier-qualifier-list: type-specifier specifier-qualifier-list;
+                        | type-specifier;
+                        | type-qualifier specifier-qualifier-list;
+                        | type-qualifier;
+
+struct-declarator-list: struct-declarator
+                       | struct-declarator-list ',' struct-declarator
+                       ;
+struct-declarator: declarator
+                |  declarator ':' conditional-expression
+                | ':' conditional-expression;
+                ;
+
+/* 6.7.2.2  Enumeration Specifiers */
+
+enum-specifier: ENUM IDENT '{' enumerator-list '}'
+            |   ENUM '{' enumerator-list ',' '}'
+            |   ENUM IDENT
+            ;
+enumerator-list: enumerator
+        | enumerator-list ',' enumerator
+        ;
+
+enumerator: IDENT
+        | IDENT '=' conditional-expression
+        ;
+     
+/* 6.7.3 Type Qualifier */
+
+type-qualifier:  CONST
+            |  RESTRICT
+            | VOLATILE
+            ;
+/* 6.7.4 */
+    function-specifier: INLINE
+        ;
+               
+/* 6.7.5 */
+    declarator: pointer direct-declarator
+            | direct-declarator
+            ;
+
+    direct-declarator: IDENT
+        | '(' declarator ')'
+        | direct-declarator '[' type-qualifier-list assignment-expression ']'     
+        | direct-declarator '[' STATIC type-qualifier-list assignment-expression ']'
+        | direct-declarator '[' STATIC assignment-expression ']'
+        | direct-declarator '[' type-qualifier-list STATIC assignment-expression ']'
+        | direct-declarator '[' type-qualifier-list '*' ']'
+        | direct-declarator '[' '*' ']'  
+        | direct-declarator '[' ']'
+        | direct-declarator '(' parameter-type-list ')'
+        | direct-declarator '(' identifier-list ')'
+        | direct-declarator '(' ')'
+        ;
+
+    pointer: '*'
+        | '*' type-qualifier-list
+        | '*' type-qualifier-list pointer
+        | '*' pointer
+        ;
+
+    type-qualifier-list: type-qualifier
+        | type-qualifier-list type-qualifier
+        ;
+    
+    parameter-type-list: parameter-list
+        | parameter-list ',' ELLIPSIS
+        ;
+    
+    parameter-list: parameter-declaration
+        | parameter-list ',' parameter-declaration
+        ;
+    
+    parameter-declaration: declaration-specifiers declarator
+        | declaration-specifiers abstract-declarator
+        | declaration-specifiers
+        ;
+    
+    identifier-list: IDENT
+        | identifier-list ',' IDENT
+        ;
+    
+    /* 6.7.6 */
+    type-name: specifier-qualifier-list
+        | specifier-qualifier-list abstract-declarator
+        ;
+    
+    abstract-declarator: pointer
+        | pointer direct-abstract-declarator
+        | direct-abstract-declarator
+        ;
+    
+    direct-abstract-declarator: '(' abstract-declarator ')'
+        | direct-abstract-declarator '[' assignment-expression ']'
+        | direct-abstract-declarator '[' ']'
+        | '[' assignment-expression ']'
+        | direct-abstract-declarator '[' '*' ']'
+        | '[' '*' ']'
+        | direct-abstract-declarator '(' parameter-type-list ')'
+        | '(' parameter-type-list ')'
+        | direct-abstract-declarator '(' ')'
+        ;
+    /* 6.7.7 */
+    typedef-name: IDENT
+        ;  
+    
+    /* 6.7.8 */
+    
+    initializer: assignment-expression
+        | '{' initializer-list '}'
+        | '{' initializer ',' '}'
+        ;
+
+    initializer-list: designation initializer
+        | initializer
+        | initializer-list ',' designation initializer
+        | initializer-list ',' initializer
+        ;
+    
+    designation: designator-list '='
+        ;
+    
+    designator-list: designator
+        | designator-list designator
+        ;
+
+    designator: '[' conditional-expression ']'
+        | '.' IDENT
+        ;
 
 %%       
     int main() {

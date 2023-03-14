@@ -68,7 +68,7 @@
 declaration_or_fndef: declaration 
                     | function_definition
                     ;
-function_definition: declaration-specifiers declarator compound_statement
+function_definition: declarator compound_statement
 compound_statement: '{' decl_or_stmt_list '}'
 decl_or_stmt_list: decl_or_stmt
         | decl_or_stmt_list decl_or_stmt 
@@ -97,10 +97,11 @@ postfix-expression: primary-expression { $$ = $1; }
                 |   postfix-expression '(' ')' { $$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0');  }
                 |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTINC); }
                 |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTDEC); }   
+                ;
 
 expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1); }
                 | expression-list ',' assignment-expression { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3);  }
-                
+                ; 
 
 
 unary-expression: postfix-expression {$$ = $1; }
@@ -116,9 +117,11 @@ unary-operator: '-' { $$ = '-'; }
                 | '~' {$$ = '~'; }
                 | '&' {$$ = '&'; }
                 | '*' {$$ = '*'; } 
-
+                ;
 cast-expression: unary-expression {$$ = $1; }
-                ;//add typename later
+               | SIZEOF '(' type-name ')' { }
+               ;
+
 
 mult-expression: cast-expression { $$ = $1; }
                 | mult-expression '*' cast-expression { $$ = newast(AST_NODE_TYPE_BINOP, $1, $3, '*'); }
@@ -242,7 +245,7 @@ type-specifier: VOID
             |  _IMAGINARY
             | struct-or-union-specifier
             | enum-specifier
-            | typedef-name
+        /*    | typedef-name */
             ;
 
 /* 6.7.2.1 */
@@ -260,13 +263,14 @@ struct-declaration-list: struct-declaration
                         | struct-declaration-list struct-declaration
                         ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list;
+struct-declaration: specifier-qualifier-list struct-declarator-list
+                    
 
-specifier-qualifier-list: type-specifier specifier-qualifier-list;
-                        | type-specifier;
-                        | type-qualifier specifier-qualifier-list;
-                        | type-qualifier;
-
+specifier-qualifier-list: type-specifier specifier-qualifier-list
+                        | type-specifier
+                        | type-qualifier specifier-qualifier-list
+                        | type-qualifier
+                        ;
 struct-declarator-list: struct-declarator
                        | struct-declarator-list ',' struct-declarator
                        ;
@@ -366,14 +370,14 @@ type-qualifier:  CONST
         | direct-abstract-declarator '(' ')'
         ;
     /* 6.7.7 */
-    typedef-name: IDENT
+   /* typedef-name: IDENT  */
         ;  
     
     /* 6.7.8 */
     
     initializer: assignment-expression
         | '{' initializer-list '}'
-        | '{' initializer ',' '}'
+        | '{' initializer-list ',' '}'
         ;
 
     initializer-list: designation initializer
@@ -391,7 +395,7 @@ type-qualifier:  CONST
 
     designator: '[' conditional-expression ']'
         | '.' IDENT
-        ;
+        ; 
 
 %%       
     int main() {

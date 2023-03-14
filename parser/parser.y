@@ -65,17 +65,21 @@
 
 %% /*RULES */
 
-stmts: declaration_or_fndef  {  }
-        | stmts declaration_or_fndef   { }
-        ;
-        
-declaration_or_fndef: declaration  { }
-                    | function_definition { }
+declaration_or_fndef: declaration 
+                    | function_definition
                     ;
-
 function_definition: declaration-specifiers declarator compound_statement
-    ;
-
+compound_statement: '{' decl_or_stmt_list '}'
+decl_or_stmt_list: decl_or_stmt
+        | decl_or_stmt_list decl_or_stmt 
+        ;
+decl_or_stmt:
+        declaration
+        | stmt
+        ;
+stmt: compound_statement
+   |  expression ';' { astwalk_impl($1, 0); }
+        ;
 
 
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
@@ -190,18 +194,6 @@ expression: assignment-expression         { $$ = $1; }
                     ;   
 /* Assignment 3 - Declarations */
 
-compound_statement: '{' decl_or_stmt_list '}'
-
-decl_or_stmt: declaration { } 
-    | statement {}
-    ;
-
-decl_or_stmt_list: decl_or_stmt  {  }
-                | decl_or_stmt_list ',' decl_or_stmt {   }
-                
-statement: compound_statement
-    | expression ';'
-    ;
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';'

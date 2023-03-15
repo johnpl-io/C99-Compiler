@@ -222,7 +222,7 @@ init-declarator: declarator
     ;
                         
 /* 6.7.1 */
-storage-class-specifier: TYPEDEF
+storage-class-specifier: TYPEDEF 
                     |    EXTERN
                     |    STATIC 
                     |    AUTO 

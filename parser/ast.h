@@ -52,7 +52,7 @@ struct astnode_tenop {
 
 struct astnode_num {
     int nodetype;
-   struct Num number;
+    struct Num number;
     struct astnode *left, *right;
 };
 

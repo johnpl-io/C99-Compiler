@@ -80,3 +80,16 @@ struct symbtab *symbtab_pop(struct symbtab *current_scope) {
     }
     return new_current_scope;
 }
+
+// create a symbol table entry
+struct symbol *create_symbol_entry(char *name, int type, int namespace){
+    struct symbol new_symb = calloc(sizeof(struct symbol), 1);
+    new_symb->name = name;
+    new_symb->attr_type = type;
+    new_symb->namespace = namespace;
+    new_symb->filename = strdup(filename);
+    new_symb->lineno = lineno;
+    return new_symb;
+}
+
+

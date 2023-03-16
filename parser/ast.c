@@ -35,6 +35,7 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.left = l;
     a->tenop.middle = m;
     a->tenop.right = r;
+    return a;
 }
 
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
@@ -57,6 +58,26 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
          astnode->ll.next = n;
             
     return n;
+}
+
+struct astnode *newScalar(int nodetype, int type) {
+    struct astnode *scalast = malloc(sizeof(struct astnode));
+    scalast->nodetype = nodetype;
+    scalast->scal.types = type;
+    return scalast;
+}
+
+struct astnode *newStorage(int nodetype, int type) {
+        struct astnode *storast = malloc(sizeof(struct astnode));
+    storast->nodetype = nodetype;
+    storast->storage.types = type;
+    return storast;
+}
+
+struct astnode *newPointer(int nodetype) {
+    struct astnode *pointerast = malloc(sizeof(struct astnode));
+    pointerast->nodetype = nodetype;
+    return pointerast;
 }
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
@@ -84,6 +105,7 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             a->fn.left = l;
             a->fn.ll = r;
             break;
+        
         
         // add more cases as needed for other node types
 

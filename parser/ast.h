@@ -12,6 +12,9 @@ enum AstNodeType {
     AST_NODE_TYPE_CHARLIT,
     AST_NODE_TYPE_FN,
     AST_NODE_TYPE_LL,
+    AST_NODE_TYPE_SCALAR,
+    AST_NODE_TYPE_STORAGE,
+    AST_NODE_TYPE_POINTER,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -62,6 +65,39 @@ struct astnode_ident {
     struct astnode *left, *right;
 };
 
+struct astnode_scalar {
+    int nodetype;
+    enum {
+        VOID_T,
+        CHAR_T,
+        SHORT_T,
+        INT_T,
+        LONG_T,
+        FLOAT_T,
+        DOUBLE_T,
+        SIGNED_T,
+        UNSIGNED_T,
+        _BOOL_T,
+    } types;
+    struct astnode *next;
+};
+
+struct astnode_pointer {
+    int nodetype;
+    struct astnode *next;
+};
+
+struct astnode_storage {
+    int nodetype;
+    enum {
+        TYPEDEF_S,
+        EXTERN_S,
+        STATIC_S,
+        AUTO_S,
+        REGISTER_S,
+    } types;
+    struct astnode *next;
+};
 struct astnode {
 int nodetype;
 union {
@@ -73,6 +109,9 @@ union {
     struct astnode_ident ident;
     struct astnode_linkedlist ll;
     struct astnode_charlit charl;
+    struct astnode_scalar scal;
+    struct astnode_storage storage;
+    struct astnode_pointer ptr;
     };  
 };
 
@@ -86,3 +125,5 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next);
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode);
 struct astnode *newCharlit(int nodetype, char val);
+struct astnode *newScalar(int nodetype, int type);
+struct astnode *newStorage(int nodetype, int type);

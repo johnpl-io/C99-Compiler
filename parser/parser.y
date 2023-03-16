@@ -44,7 +44,7 @@
 %type <astnode_p> relational-expression equality-expression
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression 
-
+%type <astnode_p> type-specifier storage-class-specifier
 %type <op> unary-operator assignment-operator
 
 // %left ','
@@ -222,27 +222,27 @@ init-declarator: declarator
     ;
                         
 /* 6.7.1 */
-storage-class-specifier: TYPEDEF 
-                    |    EXTERN
-                    |    STATIC 
-                    |    AUTO 
-                    |    REGISTER
+storage-class-specifier: TYPEDEF {$$ = newStorage(AST_NODE_TYPE_STORAGE, TYPEDEF_S);}
+                    |    EXTERN {$$ = newStorage(AST_NODE_TYPE_STORAGE, EXTERN_S);}
+                    |    STATIC  {$$ = newStorage(AST_NODE_TYPE_STORAGE, STATIC_S);}
+                    |    AUTO {$$ = newStorage(AST_NODE_TYPE_STORAGE, AUTO_S);}
+                    |    REGISTER {$$ = newStorage(AST_NODE_TYPE_STORAGE, REGISTER_S);}
                     ;
 
 /* 6.7.2 */
 
-type-specifier: VOID
-            |   CHAR
-            |   SHORT
-            |   INT 
-            |   LONG
-            |   FLOAT
-            |   DOUBLE
-            |   SIGNED
-            |   UNSIGNED
-            |   _BOOL
-            |   _COMPLEX
-            |  _IMAGINARY
+type-specifier: VOID {$$ = newScalar(AST_NODE_TYPE_SCALAR,VOID_T); }
+            |   CHAR { $$ = newScalar(AST_NODE_TYPE_SCALAR,CHAR_T);}
+            |   SHORT {$$ = newScalar(AST_NODE_TYPE_SCALAR,SHORT_T);}
+            |   INT   {$$ = newScalar(AST_NODE_TYPE_SCALAR,INT_T); }
+            |   LONG     {$$ = newScalar(AST_NODE_TYPE_SCALAR,LONG_T);}
+            |   FLOAT  {$$ = newScalar(AST_NODE_TYPE_SCALAR,FLOAT_T);}
+            |   DOUBLE   {$$ = newScalar(AST_NODE_TYPE_SCALAR,DOUBLE_T);}
+            |   SIGNED   {$$ = newScalar(AST_NODE_TYPE_SCALAR,SIGNED_T);}
+            |   UNSIGNED     {$$ = newScalar(AST_NODE_TYPE_SCALAR,UNSIGNED_T);}
+            |   _BOOL    { $$ = newScalar(AST_NODE_TYPE_SCALAR, _BOOL_T); }
+            |   _COMPLEX    { }
+            |  _IMAGINARY  { }
             | struct-or-union-specifier
             | enum-specifier
         /*    | typedef-name */
@@ -311,21 +311,23 @@ type-qualifier:  CONST
     direct-declarator: IDENT
         | '(' declarator ')'
         | direct-declarator '[' type-qualifier-list assignment-expression ']'     
+        | direct-declarator '[' assignment-expression ']'  
+        | direct-declarator '[' type-qualifier-list ']'  
         | direct-declarator '[' STATIC type-qualifier-list assignment-expression ']'
         | direct-declarator '[' STATIC assignment-expression ']'
         | direct-declarator '[' type-qualifier-list STATIC assignment-expression ']'
         | direct-declarator '[' type-qualifier-list '*' ']'
         | direct-declarator '[' '*' ']'  
-        | direct-declarator '[' ']'
+        | direct-declarator '[' ']' {printf("hi");}
         | direct-declarator '(' parameter-type-list ')'
         | direct-declarator '(' identifier-list ')'
         | direct-declarator '(' ')'
         ;
 
-    pointer: '*'
-        | '*' type-qualifier-list
-        | '*' type-qualifier-list pointer
-        | '*' pointer
+    pointer: '*' { }
+        | '*' type-qualifier-list {}
+        | '*' type-qualifier-list pointer {}
+        | '*' pointer { }
         ;
 
     type-qualifier-list: type-qualifier

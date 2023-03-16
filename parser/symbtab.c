@@ -14,15 +14,6 @@ struct symbtab *symbtab_init(int scope) {
 
 // free memory used by symbol table
 void symbtab_destroy(struct symbtab *table) {
-    struct symbol *cur = table->head;
-    while (cur) {
-        struct symbol *next = cur->next;
-        free(cur->name);
-        free(cur->namespace);
-        free(cur->filename);
-        free(cur);
-        cur = next;
-    }
     free(table);
 }
 

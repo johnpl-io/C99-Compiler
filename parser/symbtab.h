@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#include "ast.h"
+
 enum SCOPE {
     SCOPE_GLOBAL,
     SCOPE_FUNCTION,

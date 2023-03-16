@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "symbtab.h"
 #include "parser.tab.h"
 
@@ -16,7 +17,8 @@ void symbtab_destroy(struct symbtab *table) {
     struct symbol *cur = table->head;
     while (cur) {
         struct symbol *next = cur->next;
-        free(cur->ident);
+        free(cur->name);
+        free(cur->namespace);
         free(cur->filename);
         free(cur);
         cur = next;
@@ -73,13 +75,17 @@ struct symbtab *symbtab_push(int scope, struct symbtab *prev_symbtab) {
 
 // change the current scope (new_symbtab already initialized)
 struct symbtab *symbtab_insert_on(struct symbtab *current_symbtab, struct symbtab *new_symbtab) {
-    new_symbtab->current_symbtab = current_symbtab;
+    new_symbtab->next = current_symbtab;
     return new_symbtab;
 }
 
 // pop current scope, free it, and prev scope becomes new current scope
 struct symbtab *symbtab_pop(struct symbtab *current_scope) {
     struct symbtab *prev_scope = current_scope->next;
-    symbtab_destroy(current_scope);
-    return prev_scope;
+    struct symbtab *new_current_scope = NULL;
+    if (prev_scope) {
+        new_current_scope = prev_scope;
+        symbtab_destroy(current_scope);
+    }
+    return new_current_scope;
 }

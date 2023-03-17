@@ -168,7 +168,7 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
                 // get head of the type specifier list
                 struct astnode *head = r->declspec.typespecif;
                 // traverse to the end of the list
-                while (head && head->scal.next) {
+              /*  while (head && head->scal.next) {
                     head = head->scal.next;
                 }
                 // append new type qualifier node
@@ -177,8 +177,13 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
                 } else {
                     r->declspec.typespecif = l;
                 }
+                */
                 // update a->declspec.typespecif with the modified type specifier list
-                a->declspec.typespecif = r->declspec.typespecif;
+                //a->declspec.typespecif = r->declspec.typespecif;
+                if(head) {
+                    l->scal.next = head;
+                }
+                a->declspec.typespecif = l;
             }
             
             break;

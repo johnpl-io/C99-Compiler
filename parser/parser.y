@@ -200,12 +200,12 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';'
-    | declaration-specifiers ';'
+    | declaration-specifiers ';'  { printf("%d\n", $1->declspec.typespecif->scal.next->scal.next->scal.types);}
     ;
     
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
     | storage-class-specifier  { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
-    | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
+    | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);   }
     | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); } 
     | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); printf("%d\n", $$->declspec.typequal); }
     | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); }

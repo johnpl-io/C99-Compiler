@@ -44,7 +44,7 @@
 %type <astnode_p> relational-expression equality-expression
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression 
-%type <astnode_p> type-specifier storage-class-specifier
+%type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers
 %type <op> unary-operator assignment-operator
 
 // %left ','
@@ -203,14 +203,14 @@ declaration: declaration-specifiers init-declarator-list ';'
     | declaration-specifiers ';'
     ;
     
-declaration-specifiers: storage-class-specifier declaration-specifiers
-    | storage-class-specifier
-    | type-specifier declaration-specifiers
-    | type-specifier
-    | type-qualifier declaration-specifiers
-    | type-qualifier
-    | function-specifier declaration-specifiers
-    | function-specifier
+declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
+    | storage-class-specifier  { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
+    | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
+    | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); } 
+    | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); printf("%d\n", $$->declspec.typequal); }
+    | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); }
+    | function-specifier declaration-specifiers { } 
+    | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
     ;
 
 init-declarator-list: init-declarator
@@ -222,25 +222,25 @@ init-declarator: declarator
     ;
                         
 /* 6.7.1 */
-storage-class-specifier: TYPEDEF {$$ = newStorage(AST_NODE_TYPE_STORAGE, TYPEDEF_S);}
-                    |    EXTERN {$$ = newStorage(AST_NODE_TYPE_STORAGE, EXTERN_S);}
-                    |    STATIC  {$$ = newStorage(AST_NODE_TYPE_STORAGE, STATIC_S);}
-                    |    AUTO {$$ = newStorage(AST_NODE_TYPE_STORAGE, AUTO_S);}
-                    |    REGISTER {$$ = newStorage(AST_NODE_TYPE_STORAGE, REGISTER_S);}
+storage-class-specifier: TYPEDEF {$$ = newType(AST_NODE_TYPE_STORAGE, TYPEDEF_S);}
+                    |    EXTERN {$$ = newType(AST_NODE_TYPE_STORAGE, EXTERN_S);}
+                    |    STATIC  {$$ = newType(AST_NODE_TYPE_STORAGE, STATIC_S);}
+                    |    AUTO {$$ = newType(AST_NODE_TYPE_STORAGE, AUTO_S);}
+                    |    REGISTER {$$ = newType(AST_NODE_TYPE_STORAGE, REGISTER_S);}
                     ;
 
 /* 6.7.2 */
 
-type-specifier: VOID {$$ = newScalar(AST_NODE_TYPE_SCALAR,VOID_T); }
-            |   CHAR { $$ = newScalar(AST_NODE_TYPE_SCALAR,CHAR_T);}
-            |   SHORT {$$ = newScalar(AST_NODE_TYPE_SCALAR,SHORT_T);}
-            |   INT   {$$ = newScalar(AST_NODE_TYPE_SCALAR,INT_T); }
-            |   LONG     {$$ = newScalar(AST_NODE_TYPE_SCALAR,LONG_T);}
-            |   FLOAT  {$$ = newScalar(AST_NODE_TYPE_SCALAR,FLOAT_T);}
-            |   DOUBLE   {$$ = newScalar(AST_NODE_TYPE_SCALAR,DOUBLE_T);}
-            |   SIGNED   {$$ = newScalar(AST_NODE_TYPE_SCALAR,SIGNED_T);}
-            |   UNSIGNED     {$$ = newScalar(AST_NODE_TYPE_SCALAR,UNSIGNED_T);}
-            |   _BOOL    { $$ = newScalar(AST_NODE_TYPE_SCALAR, _BOOL_T); }
+type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
+            |   CHAR { $$ = newType(AST_NODE_TYPE_SCALAR,CHAR);}
+            |   SHORT {$$ = newType(AST_NODE_TYPE_SCALAR,SHORT);}
+            |   INT   {$$ = newType(AST_NODE_TYPE_SCALAR,INT); }
+            |   LONG     {$$ = newType(AST_NODE_TYPE_SCALAR,LONG);}
+            |   FLOAT  {$$ = newType(AST_NODE_TYPE_SCALAR,FLOAT);}
+            |   DOUBLE   {$$ = newType(AST_NODE_TYPE_SCALAR,DOUBLE);}
+            |   SIGNED   {$$ = newType(AST_NODE_TYPE_SCALAR,SIGNED);}
+            |   UNSIGNED     {$$ = newType(AST_NODE_TYPE_SCALAR,UNSIGNED);}
+            |   _BOOL    { $$ = newType(AST_NODE_TYPE_SCALAR, _BOOL); }
             |   _COMPLEX    { }
             |  _IMAGINARY  { }
             | struct-or-union-specifier
@@ -295,9 +295,9 @@ enumerator: IDENT
      
 /* 6.7.3 Type Qualifier */
 
-type-qualifier:  CONST
-            |  RESTRICT
-            | VOLATILE
+type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
+            |  RESTRICT {  $$ = newType(AST_NODE_TYPE_QUALIFIER, RESTRICT);}
+            | VOLATILE {   $$ = newType(AST_NODE_TYPE_QUALIFIER, VOLATILE);}
             ;
 /* 6.7.4 */
     function-specifier: INLINE

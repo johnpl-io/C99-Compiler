@@ -15,6 +15,8 @@ enum AstNodeType {
     AST_NODE_TYPE_SCALAR,
     AST_NODE_TYPE_STORAGE,
     AST_NODE_TYPE_POINTER,
+    AST_NODE_TYPE_QUALIFIER,
+    AST_NODE_TYPE_DECLSPEC,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -86,6 +88,14 @@ struct astnode_pointer {
     int nodetype;
     struct astnode *next;
 };
+struct astnode_declspec {
+    int storageclass;
+    int typequal;
+    int functionspec;
+    struct astnode *typespecif;
+    struct astnode *next;
+};
+    
 
 struct astnode_storage {
     int nodetype;
@@ -95,6 +105,16 @@ struct astnode_storage {
         STATIC_S,
         AUTO_S,
         REGISTER_S,
+    } types;
+    struct astnode *next; 
+};
+
+struct astnode_typequal {
+    int nodetype; 
+    enum {
+        CONST_T,
+        VOLATILE_T,
+        RESTRICT_T,
     } types;
     struct astnode *next;
 };
@@ -112,6 +132,8 @@ union {
     struct astnode_scalar scal;
     struct astnode_storage storage;
     struct astnode_pointer ptr;
+     struct astnode_declspec declspec;
+     struct astnode_typequal qualifier;
     };  
 };
 
@@ -125,5 +147,5 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next);
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode);
 struct astnode *newCharlit(int nodetype, char val);
-struct astnode *newScalar(int nodetype, int type);
-struct astnode *newStorage(int nodetype, int type);
+struct astnode *newType(int nodetype, int type);
+struct astnode *newDecl(int nodetype, struct astnode *val);

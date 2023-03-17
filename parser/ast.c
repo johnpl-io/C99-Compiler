@@ -60,24 +60,56 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
     return n;
 }
 
-struct astnode *newScalar(int nodetype, int type) {
-    struct astnode *scalast = malloc(sizeof(struct astnode));
-    scalast->nodetype = nodetype;
-    scalast->scal.types = type;
-    return scalast;
+struct astnode *newType(int nodetype, int type) {
+    struct astnode *ast = malloc(sizeof(struct astnode));
+    ast->nodetype = nodetype;
+
+    switch (nodetype) {
+        case AST_NODE_TYPE_SCALAR:
+            ast->scal.types = type;
+            break;
+        case AST_NODE_TYPE_STORAGE:
+            ast->storage.types = type;
+            break;
+        case AST_NODE_TYPE_QUALIFIER:
+            if(type == CONST){
+                ast->qualifier.types = 0b001;
+            } 
+            if(type == VOLATILE) {
+                 ast->qualifier.types = 0b010;
+            }
+            if(type == RESTRICT) {
+                ast->qualifier.types = 0b100;
+            }
+            break;
+        case AST_NODE_TYPE_POINTER:
+            // no need to set type for pointers
+            break;
+        default:
+            // handle invalid nodetype here
+            break;
+    }
+    return ast;
 }
 
-struct astnode *newStorage(int nodetype, int type) {
-        struct astnode *storast = malloc(sizeof(struct astnode));
-    storast->nodetype = nodetype;
-    storast->storage.types = type;
-    return storast;
-}
-
-struct astnode *newPointer(int nodetype) {
-    struct astnode *pointerast = malloc(sizeof(struct astnode));
-    pointerast->nodetype = nodetype;
-    return pointerast;
+struct astnode *newDecl(int nodetype, struct astnode *val){
+    struct astnode *declspecs = malloc(sizeof(struct astnode));
+    declspecs->nodetype = nodetype;
+    switch(val->nodetype) {
+        case AST_NODE_TYPE_STORAGE:
+            declspecs->declspec.storageclass = val->storage.types;
+            break;
+        case AST_NODE_TYPE_SCALAR:
+            declspecs->declspec.typespecif = val;
+            break;
+        case AST_NODE_TYPE_QUALIFIER:
+            declspecs->declspec.typequal = val->qualifier.types;
+            break;
+        default:
+            break;
+    }
+    return declspecs;
+    
 }
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
@@ -105,8 +137,51 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             a->fn.left = l;
             a->fn.ll = r;
             break;
-        
-        
+        case AST_NODE_TYPE_DECLSPEC:
+            // Making sure that an ident doesn't have two storage classes
+            // we're checking if r (old) is a declspec with a storage class
+            if(r->declspec.storageclass != -1) {
+                if(l->nodetype == AST_NODE_TYPE_STORAGE) {
+                    printf("Error Multiple Storage Class \n");
+                } else {
+                    a->declspec.storageclass = r->declspec.storageclass;
+                }
+            // if r (old) doesnt have a storage class, but l (new) does
+            } else {
+                if(l->nodetype == AST_NODE_TYPE_STORAGE){
+                    a->declspec.storageclass = l->nodetype;
+                }
+            // if r and l both dont have storage classes, do nothing
+            }
+            
+            //check type qualifier
+            if(l->nodetype == AST_NODE_TYPE_QUALIFIER) {
+                // bitwise or bitfields for qualifier types
+                a->declspec.typequal = l->qualifier.types | r->declspec.typequal;
+            } else {
+                a->declspec.typequal = r->declspec.typequal;
+            }
+            
+        // append type qualifier names
+            if (l->nodetype == AST_NODE_TYPE_SCALAR) {
+                // type-qualifier name to append
+                // get head of the type specifier list
+                struct astnode *head = r->declspec.typespecif;
+                // traverse to the end of the list
+                while (head && head->scal.next) {
+                    head = head->scal.next;
+                }
+                // append new type qualifier node
+                if (head) {
+                    head->scal.next = l;
+                } else {
+                    r->declspec.typespecif = l;
+                }
+                // update a->declspec.typespecif with the modified type specifier list
+                a->declspec.typespecif = r->declspec.typespecif;
+            }
+            
+            break;
         // add more cases as needed for other node types
 
         default:

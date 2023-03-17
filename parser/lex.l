@@ -88,8 +88,6 @@ ANYTHING                         [.]
 <filename>\n {BEGIN(INITIAL); }
 <filename>. { *filename_buf_ptr++ = yytext[0];  }
 
-
-
 {DIGIT}                         { yylval.num.integer= atoi(yytext); yylval.num.type = INT_SIGNED; return NUMBER; }
 {DIGIT}{LONG}                   { yylval.num.integer = atol(yytext); yylval.num.type =  INT_LONG; return NUMBER; }
 {DIGIT}{LONGLONG}               { yylval.num.integer = atoll(yytext); yylval.num.type = INT_LONGLONG; return NUMBER; }

@@ -2354,128 +2354,206 @@ yyreduce:
 #line 2355 "parser.tab.c"
     break;
 
+  case 87: /* declaration-specifiers: storage-class-specifier declaration-specifiers  */
+#line 206 "parser.y"
+                                                                       {   (yyval.astnode_p) = newast(AST_NODE_TYPE_DECLSPEC, (yyvsp[-1].astnode_p), (yyvsp[0].astnode_p), 0);}
+#line 2361 "parser.tab.c"
+    break;
+
+  case 88: /* declaration-specifiers: storage-class-specifier  */
+#line 207 "parser.y"
+                               { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p));  }
+#line 2367 "parser.tab.c"
+    break;
+
+  case 89: /* declaration-specifiers: type-specifier declaration-specifiers  */
+#line 208 "parser.y"
+                                            { (yyval.astnode_p) = newast(AST_NODE_TYPE_DECLSPEC, (yyvsp[-1].astnode_p), (yyvsp[0].astnode_p), 0); }
+#line 2373 "parser.tab.c"
+    break;
+
+  case 90: /* declaration-specifiers: type-specifier  */
+#line 209 "parser.y"
+                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p)); }
+#line 2379 "parser.tab.c"
+    break;
+
+  case 91: /* declaration-specifiers: type-qualifier declaration-specifiers  */
+#line 210 "parser.y"
+                                            { (yyval.astnode_p) = newast(AST_NODE_TYPE_DECLSPEC, (yyvsp[-1].astnode_p), (yyvsp[0].astnode_p), 0); printf("%d\n", (yyval.astnode_p)->declspec.typequal); }
+#line 2385 "parser.tab.c"
+    break;
+
+  case 92: /* declaration-specifiers: type-qualifier  */
+#line 211 "parser.y"
+                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p)); }
+#line 2391 "parser.tab.c"
+    break;
+
+  case 93: /* declaration-specifiers: function-specifier declaration-specifiers  */
+#line 212 "parser.y"
+                                                { }
+#line 2397 "parser.tab.c"
+    break;
+
+  case 94: /* declaration-specifiers: function-specifier  */
+#line 213 "parser.y"
+                         { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
+#line 2403 "parser.tab.c"
+    break;
+
   case 99: /* storage-class-specifier: TYPEDEF  */
 #line 225 "parser.y"
-                                 {(yyval.astnode_p) = newStorage(AST_NODE_TYPE_STORAGE, TYPEDEF_S);}
-#line 2361 "parser.tab.c"
+                                 {(yyval.astnode_p) = newType(AST_NODE_TYPE_STORAGE, TYPEDEF_S);}
+#line 2409 "parser.tab.c"
     break;
 
   case 100: /* storage-class-specifier: EXTERN  */
 #line 226 "parser.y"
-                                {(yyval.astnode_p) = newStorage(AST_NODE_TYPE_STORAGE, EXTERN_S);}
-#line 2367 "parser.tab.c"
+                                {(yyval.astnode_p) = newType(AST_NODE_TYPE_STORAGE, EXTERN_S);}
+#line 2415 "parser.tab.c"
     break;
 
   case 101: /* storage-class-specifier: STATIC  */
 #line 227 "parser.y"
-                                 {(yyval.astnode_p) = newStorage(AST_NODE_TYPE_STORAGE, STATIC_S);}
-#line 2373 "parser.tab.c"
+                                 {(yyval.astnode_p) = newType(AST_NODE_TYPE_STORAGE, STATIC_S);}
+#line 2421 "parser.tab.c"
     break;
 
   case 102: /* storage-class-specifier: AUTO  */
 #line 228 "parser.y"
-                              {(yyval.astnode_p) = newStorage(AST_NODE_TYPE_STORAGE, AUTO_S);}
-#line 2379 "parser.tab.c"
+                              {(yyval.astnode_p) = newType(AST_NODE_TYPE_STORAGE, AUTO_S);}
+#line 2427 "parser.tab.c"
     break;
 
   case 103: /* storage-class-specifier: REGISTER  */
 #line 229 "parser.y"
-                                  {(yyval.astnode_p) = newStorage(AST_NODE_TYPE_STORAGE, REGISTER_S);}
-#line 2385 "parser.tab.c"
+                                  {(yyval.astnode_p) = newType(AST_NODE_TYPE_STORAGE, REGISTER_S);}
+#line 2433 "parser.tab.c"
     break;
 
   case 104: /* type-specifier: VOID  */
 #line 234 "parser.y"
-                     {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,VOID_T); }
-#line 2391 "parser.tab.c"
+                     {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,VOID); }
+#line 2439 "parser.tab.c"
     break;
 
   case 105: /* type-specifier: CHAR  */
 #line 235 "parser.y"
-                     { (yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,CHAR_T);}
-#line 2397 "parser.tab.c"
+                     { (yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,CHAR);}
+#line 2445 "parser.tab.c"
     break;
 
   case 106: /* type-specifier: SHORT  */
 #line 236 "parser.y"
-                      {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,SHORT_T);}
-#line 2403 "parser.tab.c"
+                      {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,SHORT);}
+#line 2451 "parser.tab.c"
     break;
 
   case 107: /* type-specifier: INT  */
 #line 237 "parser.y"
-                      {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,INT_T); }
-#line 2409 "parser.tab.c"
+                      {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,INT); }
+#line 2457 "parser.tab.c"
     break;
 
   case 108: /* type-specifier: LONG  */
 #line 238 "parser.y"
-                         {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,LONG_T);}
-#line 2415 "parser.tab.c"
+                         {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,LONG);}
+#line 2463 "parser.tab.c"
     break;
 
   case 109: /* type-specifier: FLOAT  */
 #line 239 "parser.y"
-                       {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,FLOAT_T);}
-#line 2421 "parser.tab.c"
+                       {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,FLOAT);}
+#line 2469 "parser.tab.c"
     break;
 
   case 110: /* type-specifier: DOUBLE  */
 #line 240 "parser.y"
-                         {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,DOUBLE_T);}
-#line 2427 "parser.tab.c"
+                         {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,DOUBLE);}
+#line 2475 "parser.tab.c"
     break;
 
   case 111: /* type-specifier: SIGNED  */
 #line 241 "parser.y"
-                         {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,SIGNED_T);}
-#line 2433 "parser.tab.c"
+                         {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,SIGNED);}
+#line 2481 "parser.tab.c"
     break;
 
   case 112: /* type-specifier: UNSIGNED  */
 #line 242 "parser.y"
-                             {(yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR,UNSIGNED_T);}
-#line 2439 "parser.tab.c"
+                             {(yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR,UNSIGNED);}
+#line 2487 "parser.tab.c"
     break;
 
   case 113: /* type-specifier: _BOOL  */
 #line 243 "parser.y"
-                         { (yyval.astnode_p) = newScalar(AST_NODE_TYPE_SCALAR, _BOOL_T); }
-#line 2445 "parser.tab.c"
+                         { (yyval.astnode_p) = newType(AST_NODE_TYPE_SCALAR, _BOOL); }
+#line 2493 "parser.tab.c"
     break;
 
   case 114: /* type-specifier: _COMPLEX  */
 #line 244 "parser.y"
                             { }
-#line 2451 "parser.tab.c"
+#line 2499 "parser.tab.c"
     break;
 
   case 115: /* type-specifier: _IMAGINARY  */
 #line 245 "parser.y"
                            { }
-#line 2457 "parser.tab.c"
+#line 2505 "parser.tab.c"
+    break;
+
+  case 142: /* type-qualifier: CONST  */
+#line 298 "parser.y"
+                       {    (yyval.astnode_p) = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
+#line 2511 "parser.tab.c"
+    break;
+
+  case 143: /* type-qualifier: RESTRICT  */
+#line 299 "parser.y"
+                        {  (yyval.astnode_p) = newType(AST_NODE_TYPE_QUALIFIER, RESTRICT);}
+#line 2517 "parser.tab.c"
+    break;
+
+  case 144: /* type-qualifier: VOLATILE  */
+#line 300 "parser.y"
+                       {   (yyval.astnode_p) = newType(AST_NODE_TYPE_QUALIFIER, VOLATILE);}
+#line 2523 "parser.tab.c"
     break;
 
   case 158: /* direct-declarator: direct-declarator '[' ']'  */
 #line 321 "parser.y"
                                     {printf("hi");}
-#line 2463 "parser.tab.c"
+#line 2529 "parser.tab.c"
     break;
 
   case 162: /* pointer: '*'  */
 #line 327 "parser.y"
                  { }
-#line 2469 "parser.tab.c"
+#line 2535 "parser.tab.c"
+    break;
+
+  case 163: /* pointer: '*' type-qualifier-list  */
+#line 328 "parser.y"
+                                  {}
+#line 2541 "parser.tab.c"
+    break;
+
+  case 164: /* pointer: '*' type-qualifier-list pointer  */
+#line 329 "parser.y"
+                                          {}
+#line 2547 "parser.tab.c"
     break;
 
   case 165: /* pointer: '*' pointer  */
 #line 330 "parser.y"
                       { }
-#line 2475 "parser.tab.c"
+#line 2553 "parser.tab.c"
     break;
 
 
-#line 2479 "parser.tab.c"
+#line 2557 "parser.tab.c"
 
       default: break;
     }

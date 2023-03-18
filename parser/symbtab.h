@@ -3,7 +3,7 @@
 
 // enums for symbol entry attributes
 enum SCOPE {
-    SCOPE_GLOBAL,
+    SCOPE_GLOBAL = 0,
     SCOPE_FUNCTION,
     SCOPE_BLOCK,
     SCOPE_PROTOTYPE,
@@ -11,14 +11,14 @@ enum SCOPE {
 };
 
 enum NAMESPACE {
-    NAMESPACE_TAG,
+    NAMESPACE_TAG = 0,
     NAMESPACE_LABEL,
     NAMESPACE_MEMBER,
     NAMESPACE_ALT
 };
 
 enum SYMB_TYPE {
-    SYMB_VARIABLE_NAME,
+    SYMB_VARIABLE_NAME = 0,
     SYMB_FUNCTION_NAME,
     SYMB_TYPEDEF_NAME,
     SYMB_ENUM_CONSTANT,
@@ -31,7 +31,7 @@ enum SYMB_TYPE {
 };
 
 enum STORAGE_CLASS {
-    STG_AUTO,
+    STG_AUTO = 0,
     STG_STATIC,
     STG_EXTERN,
     STG_TYPEDEF,
@@ -39,13 +39,13 @@ enum STORAGE_CLASS {
 };
 
 enum TYPE_QUALIFIER{
-    QUAL_CONST,
+    QUAL_CONST = 0,
     QUAL_VOLATILE,
     QUAL_RESTRICT,
 };
 
 enum TYPE_SPECIFIER{
-    TYPE_SPEC_VOID,
+    TYPE_SPEC_VOID = 0,
     TYPE_SPEC_CHAR,
     TYPE_SPEC_SHORT,
     TYPE_SPEC_INT,
@@ -90,7 +90,7 @@ struct var_atr{
 struct fn_name_atr{
     struct astnode *type;
     int stor_class;
-    bool inline;
+    bool is_inline;
     bool def_seen;
 };
 // equivalent type
@@ -113,15 +113,17 @@ struct enum_tag_atr{
 // not really discussed in lecture notes
 // alludes to further understanding during code gen
 struct label_atr{
-    bool temp;
+    bool seen;
 };
+
 // type, offset (Struct only), bit field width, bit offset
 struct struct_union_mem_atr{
     struct astnode *type;
     int struct_offset; // only for structs
-    int bit_field_width;
-    int bit_offset;
-}
+    // bitfields are optional
+    // int bit_field_width;
+    // int bit_offset;
+};
 
 
 struct symbol {
@@ -137,15 +139,16 @@ struct symbol {
     struct symbol *next;
     // symbol attributes
     union {
+        // enums and typedef are optional
         struct var_atr var;
         struct fn_name_atr fn;
-        struct tpdef_name_atr tpdef; //optional
-        struct enum_constant_atr enum_const; // optional
+        // struct tpdef_name_atr tpdef; 
+        // struct enum_constant_atr enum_const; 
         struct struct_union_tag_atr struct_union_tag;
-        struct enum_tag_atr enum_tag; // optional
+        // struct enum_tag_atr enum_tag; 
         struct label_atr label;
         struct struct_union_mem_atr struct_union_mem;
-    }
+    };
 };
 
 struct symbtab {
@@ -172,6 +175,19 @@ struct symbtab *symbtab_insert_on(struct symbtab *current_symbtab, struct symbta
 struct symbtab *symbtab_pop(struct symbtab *current_scope);
 // create a symbol table entry
 struct symbol *create_symbol_entry(char *name, int type, int namespace);
+// define variable
+// void define_var(struct astnode *var, struct symbtab *table);
+// define function
+void define_func(struct astnode *func, struct symbtab *table);
+// define label
+void define_label(struct astnode *label, struct symbtab *table);
+// do later: stuct definition (forward declaration) and declaration (members, own symbtab).
+void declare_struct();
+void define_struct();
+// print out symbol table
+void print_symbtab(struct symbtab *table);
+
+
 
 // TO DO: 
 // maybe make an AST node for struct union label? Maybe not?

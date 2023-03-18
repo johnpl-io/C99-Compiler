@@ -1,6 +1,6 @@
 ***TO DO***
 
-- astnodes for functions, pointers, arrays, struct (last)
+- astnodes for functions, pointers, arrays, struct (last) (John)
 
 - test that symbol table works manually (Colin)
 - finish functions for initializing symbol attributes within symbtab.c (Colin)

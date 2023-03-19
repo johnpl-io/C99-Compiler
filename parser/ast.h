@@ -86,6 +86,7 @@ struct astnode_scalar {
 
 struct astnode_pointer {
     int nodetype;
+    int typequal;
     struct astnode *next;
 };
 struct astnode_declspec {
@@ -108,6 +109,17 @@ struct astnode_storage {
     } types;
     struct astnode *next; 
 };
+struct astnode_arraydecl{
+
+    int nodetype;
+    struct astnode *array_size;
+    struct astnode *next;
+};
+struct astnode_decl {
+    char *ident;
+
+};
+
 
 struct astnode_typequal {
     int nodetype; 
@@ -134,7 +146,9 @@ union {
     struct astnode_pointer ptr;
      struct astnode_declspec declspec;
      struct astnode_typequal qualifier;
+       struct astnode_arraydecl arraydecl;
     };  
+   
 };
 
 
@@ -149,3 +163,4 @@ struct astnode *insertElementorig(int nodetype, struct astnode *astnode);
 struct astnode *newCharlit(int nodetype, char val);
 struct astnode *newType(int nodetype, int type);
 struct astnode *newDecl(int nodetype, struct astnode *val);
+struct astnode *newArrayDecl(struct astnode *size);

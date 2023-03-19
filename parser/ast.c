@@ -60,6 +60,7 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
     return n;
 }
 
+
 struct astnode *newType(int nodetype, int type) {
     struct astnode *ast = malloc(sizeof(struct astnode));
     ast->nodetype = nodetype;
@@ -92,6 +93,12 @@ struct astnode *newType(int nodetype, int type) {
     return ast;
 }
 
+
+
+
+
+
+
 struct astnode *newDecl(int nodetype, struct astnode *val){
     struct astnode *declspecs = malloc(sizeof(struct astnode));
     declspecs->nodetype = nodetype;
@@ -110,6 +117,14 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
     }
     return declspecs;
     
+}
+
+struct astnode *newArrayDecl(struct astnode *size) {
+       struct astnode *ArrayDecl = malloc(sizeof(struct astnode));
+       ArrayDecl->nodetype = 25;
+       ArrayDecl->arraydecl.array_size = size;
+       return ArrayDecl; 
+
 }
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
@@ -137,6 +152,9 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             a->fn.left = l;
             a->fn.ll = r;
             break;
+        case AST_NODE_TYPE_QUALIFIER:
+            a->qualifier.types = l->qualifier.types | r->qualifier.types;
+        break;
         case AST_NODE_TYPE_DECLSPEC:
             // Making sure that an ident doesn't have two storage classes
             // we're checking if r (old) is a declspec with a storage class
@@ -324,15 +342,34 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_FN:
             printf("FN\n");
             astwalk_impl(ast->fn.left, depth + 1);
+            if(ast->fn.ll) {
             struct astnode *ll_node = ast->fn.ll->ll.head;
             while (ll_node != NULL) {
                 astwalk_impl(ll_node->ll.data, depth + 1);
                 ll_node = ll_node->ll.next;
             }
+            }
             break;
-                
+        case AST_NODE_TYPE_LL:
+        struct astnode *ll_nodell = ast->ll.head;
+            int count = 0;
+            while (ll_nodell != NULL) {
+                astwalk_impl(ll_nodell->ll.data, depth + 1);
+                ll_nodell = ll_nodell->ll.next;
+           
+            }
+     
+            break;
+        case 25:
+            printf("ARRAY OF SIZE "); 
+            astwalk_impl(ast->arraydecl.array_size, depth+1);
+        
+        break;
+         case AST_NODE_TYPE_POINTER:
+            printf("pointer to\n");
+            break;
         default:
-            printf("Unknown node type\n");
+            printf("Unknown node type\n %d", ast->nodetype) ;
             break;
     }
 }

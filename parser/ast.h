@@ -17,6 +17,7 @@ enum AstNodeType {
     AST_NODE_TYPE_POINTER,
     AST_NODE_TYPE_QUALIFIER,
     AST_NODE_TYPE_DECLSPEC,
+    AST_NODE_TYPE_ARRAYDECL,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -148,6 +149,7 @@ union {
      struct astnode_typequal qualifier;
        struct astnode_arraydecl arraydecl;
     };  
+   
    
 };
 

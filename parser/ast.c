@@ -121,7 +121,7 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
 
 struct astnode *newArrayDecl(struct astnode *size) {
        struct astnode *ArrayDecl = malloc(sizeof(struct astnode));
-       ArrayDecl->nodetype = 25;
+       ArrayDecl->nodetype = AST_NODE_TYPE_ARRAYDECL;
        ArrayDecl->arraydecl.array_size = size;
        return ArrayDecl; 
 

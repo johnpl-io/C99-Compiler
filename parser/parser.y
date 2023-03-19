@@ -317,8 +317,8 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' STATIC assignment-expression ']'  {}
         | direct-declarator '[' type-qualifier-list STATIC assignment-expression ']' {}
         | direct-declarator '[' type-qualifier-list '*' ']'  {}
-        | direct-declarator '[' '*' ']'   {}
-        | direct-declarator '[' ']' {printf("hi");}
+        | direct-declarator '[' '*' ']'   { }
+        | direct-declarator '[' ']' {$$ = newArrayDecl(NULL); $$->arraydecl.next = $1; }
         | direct-declarator '(' parameter-type-list ')' { }
         | direct-declarator '(' identifier-list ')' {}
         | direct-declarator '(' ')' {$$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0');  }

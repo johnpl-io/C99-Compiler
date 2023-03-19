@@ -2608,13 +2608,13 @@ yyreduce:
 
   case 157: /* direct-declarator: direct-declarator '[' '*' ']'  */
 #line 320 "parser.y"
-                                          {}
+                                          { }
 #line 2613 "parser.tab.c"
     break;
 
   case 158: /* direct-declarator: direct-declarator '[' ']'  */
 #line 321 "parser.y"
-                                    {printf("hi");}
+                                    {(yyval.astnode_p) = newArrayDecl(NULL); (yyval.astnode_p)->arraydecl.next = (yyvsp[-2].astnode_p); }
 #line 2619 "parser.tab.c"
     break;
 

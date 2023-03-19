@@ -2542,7 +2542,7 @@ yyreduce:
 
   case 146: /* declarator: pointer direct-declarator  */
 #line 307 "parser.y"
-                                          { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[-1].astnode_p), (yyvsp[0].astnode_p)); }
+                                          { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p), (yyvsp[-1].astnode_p)); }
 #line 2547 "parser.tab.c"
     break;
 

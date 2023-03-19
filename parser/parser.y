@@ -304,7 +304,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
                
 /* 6.7.5 */
-    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $2); }
+    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $2, $1); }
             | direct-declarator { $$ = $1; }
             ;
 

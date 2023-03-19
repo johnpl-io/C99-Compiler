@@ -304,14 +304,14 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
                
 /* 6.7.5 */
-    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $2, $1); }
+    declarator: pointer direct-declarator { $1->ptr.next = $2; $$ = $1; }
             | direct-declarator { $$ = $1; }
             ;
 
-    direct-declarator: IDENT { struct astnode *temp = newIdent(AST_NODE_TYPE_IDENT, $1); $$ = insertElementorig(AST_NODE_TYPE_LL, temp);  } 
+    direct-declarator: IDENT { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);  } 
         | '(' declarator ')' { $$ = $2; }
         | direct-declarator '[' type-qualifier-list assignment-expression ']'   { }  
-        | direct-declarator '[' assignment-expression ']'  { $$ = insertElement(AST_NODE_TYPE_LL, $1,  newArrayDecl($3)); /* add array size */ }
+        | direct-declarator '[' assignment-expression ']'  { $$ = newArrayDecl($3); $$->arraydecl.next = $1; /* add array size */ }
         | direct-declarator '[' type-qualifier-list ']'  {}
         | direct-declarator '[' STATIC type-qualifier-list assignment-expression ']' {}
         | direct-declarator '[' STATIC assignment-expression ']'  {}
@@ -321,10 +321,10 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' ']' {printf("hi");}
         | direct-declarator '(' parameter-type-list ')' { }
         | direct-declarator '(' identifier-list ')' {}
-        | direct-declarator '(' ')' {$$ = insertElement(AST_NODE_TYPE_LL, $1, newast(AST_NODE_TYPE_FN, NULL, NULL, '0'));  }
+        | direct-declarator '(' ')' {$$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0');  }
         ;
 
-    pointer: '*' { $$ = insertElementorig(AST_NODE_TYPE_LL, newType(AST_NODE_TYPE_POINTER,  0));  }
+    pointer: '*' { $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }
         | '*' type-qualifier-list {  /*<-thing on right receives this */ }
         | '*' type-qualifier-list pointer {}
         | '*' pointer { $$ = insertElement(AST_NODE_TYPE_LL, $2, newType(AST_NODE_TYPE_POINTER,  0)); }

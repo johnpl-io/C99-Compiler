@@ -343,6 +343,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("FN\n");
             astwalk_impl(ast->fn.left, depth + 1);
             if(ast->fn.ll) {
+                 printf("PARAMETERS \n");
             struct astnode *ll_node = ast->fn.ll->ll.head;
             while (ll_node != NULL) {
                 astwalk_impl(ll_node->ll.data, depth + 1);
@@ -364,10 +365,12 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case 25:
             printf("ARRAY OF SIZE "); 
             astwalk_impl(ast->arraydecl.array_size, depth+1);
+             astwalk_impl(ast->arraydecl.next, depth+1);
         
         break;
          case AST_NODE_TYPE_POINTER:
             printf("pointer to\n");
+             astwalk_impl(ast->ptr.next, depth+1);
             break;
         default:
             printf("Unknown node type\n %d", ast->nodetype) ;

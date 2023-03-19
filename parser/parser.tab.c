@@ -2542,7 +2542,7 @@ yyreduce:
 
   case 146: /* declarator: pointer direct-declarator  */
 #line 307 "parser.y"
-                                          { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p), (yyvsp[-1].astnode_p)); }
+                                          { (yyvsp[-1].astnode_p)->ptr.next = (yyvsp[0].astnode_p); (yyval.astnode_p) = (yyvsp[-1].astnode_p); }
 #line 2547 "parser.tab.c"
     break;
 
@@ -2554,7 +2554,7 @@ yyreduce:
 
   case 148: /* direct-declarator: IDENT  */
 #line 311 "parser.y"
-                             { struct astnode *temp = newIdent(AST_NODE_TYPE_IDENT, (yyvsp[0].string_literal)); (yyval.astnode_p) = insertElementorig(AST_NODE_TYPE_LL, temp);  }
+                             { (yyval.astnode_p) = newIdent(AST_NODE_TYPE_IDENT, (yyvsp[0].string_literal));  }
 #line 2559 "parser.tab.c"
     break;
 
@@ -2572,7 +2572,7 @@ yyreduce:
 
   case 151: /* direct-declarator: direct-declarator '[' assignment-expression ']'  */
 #line 314 "parser.y"
-                                                           { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[-3].astnode_p),  newArrayDecl((yyvsp[-1].astnode_p))); /* add array size */ }
+                                                           { (yyval.astnode_p) = newArrayDecl((yyvsp[-1].astnode_p)); (yyval.astnode_p)->arraydecl.next = (yyvsp[-3].astnode_p); /* add array size */ }
 #line 2577 "parser.tab.c"
     break;
 
@@ -2632,13 +2632,13 @@ yyreduce:
 
   case 161: /* direct-declarator: direct-declarator '(' ')'  */
 #line 324 "parser.y"
-                                    {(yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[-2].astnode_p), newast(AST_NODE_TYPE_FN, NULL, NULL, '0'));  }
+                                    {(yyval.astnode_p) = newast(AST_NODE_TYPE_FN, (yyvsp[-2].astnode_p), NULL, '0');  }
 #line 2637 "parser.tab.c"
     break;
 
   case 162: /* pointer: '*'  */
 #line 327 "parser.y"
-                 { (yyval.astnode_p) = insertElementorig(AST_NODE_TYPE_LL, newType(AST_NODE_TYPE_POINTER,  0));  }
+                 { (yyval.astnode_p) =  newType(AST_NODE_TYPE_POINTER,  0);  }
 #line 2643 "parser.tab.c"
     break;
 

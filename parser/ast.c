@@ -351,6 +351,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             }
             break;
         case AST_NODE_TYPE_LL:
+        printf("LINKED LIST \n");
         struct astnode *ll_nodell = ast->ll.head;
             int count = 0;
             while (ll_nodell != NULL) {

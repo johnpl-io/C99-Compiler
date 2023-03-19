@@ -268,6 +268,14 @@ void printoperator(int operator) {
     }
 }
 
+void declcomb(struct astnode *ptrchain, struct astnode *decl) {
+    struct astnode *temp = ptrchain;
+    while (temp->ptr.next) {
+        temp = temp->ptr.next;
+    }
+    temp->ptr.next = decl;
+}
+
 
 void astwalk_impl(struct astnode *ast, int depth) {
     if (!ast) {

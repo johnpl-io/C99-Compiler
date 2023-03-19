@@ -304,7 +304,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
                
 /* 6.7.5 */
-    declarator: pointer direct-declarator { $1->ptr.next = $2; $$ = $1; }
+    declarator: pointer direct-declarator { declcomb($1, $2); $$ = $1; }
             | direct-declarator { $$ = $1; }
             ;
 
@@ -327,7 +327,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     pointer: '*' { $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }
         | '*' type-qualifier-list {  /*<-thing on right receives this */ }
         | '*' type-qualifier-list pointer {}
-        | '*' pointer { $$ = insertElement(AST_NODE_TYPE_LL, $2, newType(AST_NODE_TYPE_POINTER,  0)); }
+        | '*' pointer { $2->ptr.next = newType(AST_NODE_TYPE_POINTER,  0);  $$ = $2;  }
         ;
 
     type-qualifier-list: type-qualifier {$$ = $1; }

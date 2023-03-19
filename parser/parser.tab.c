@@ -2542,7 +2542,7 @@ yyreduce:
 
   case 146: /* declarator: pointer direct-declarator  */
 #line 307 "parser.y"
-                                          { (yyvsp[-1].astnode_p)->ptr.next = (yyvsp[0].astnode_p); (yyval.astnode_p) = (yyvsp[-1].astnode_p); }
+                                          { declcomb((yyvsp[-1].astnode_p), (yyvsp[0].astnode_p)); (yyval.astnode_p) = (yyvsp[-1].astnode_p); }
 #line 2547 "parser.tab.c"
     break;
 
@@ -2656,7 +2656,7 @@ yyreduce:
 
   case 165: /* pointer: '*' pointer  */
 #line 330 "parser.y"
-                      { (yyval.astnode_p) = insertElement(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p), newType(AST_NODE_TYPE_POINTER,  0)); }
+                      { (yyvsp[0].astnode_p)->ptr.next = newType(AST_NODE_TYPE_POINTER,  0);  (yyval.astnode_p) = (yyvsp[0].astnode_p);  }
 #line 2661 "parser.tab.c"
     break;
 

@@ -42,8 +42,8 @@
 %type <astnode_p> expression postfix-expression expression-list
 %type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
 %type <astnode_p> relational-expression equality-expression
-%type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator 
-%type <astnode_p> logical-or-expression logical-and-expression conditional-expression 
+%type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
+%type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator 
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
 %type <op> unary-operator assignment-operator 
 
@@ -217,7 +217,7 @@ init-declarator-list: init-declarator
     | init-declarator-list ',' init-declarator
     ;
     
-init-declarator: declarator {  astwalk_impl($1, 0);}
+init-declarator: declarator { astwalk_impl($1->head, 0); }
     | declarator '=' initializer {/* do not have to do yet */ }
     ;
                         
@@ -304,30 +304,30 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
                
 /* 6.7.5 */
-    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $2, $1); }
+    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_DECL, $2,  $1); }
             | direct-declarator { $$ = $1; }
             ;
 
-    direct-declarator: IDENT { struct astnode *temp = newIdent(AST_NODE_TYPE_IDENT, $1); $$ = insertElementorig(AST_NODE_TYPE_LL, temp);  } 
-        | '(' declarator ')' { $$ = $2; }
+    direct-declarator: IDENT { $$ = newDeclar(AST_NODE_TYPE_DECL, $1);  } 
+        | '(' declarator ')' { $$ = $2;  }
         | direct-declarator '[' type-qualifier-list assignment-expression ']'   { }  
-        | direct-declarator '[' assignment-expression ']'  { $$ = insertElement(AST_NODE_TYPE_LL, $1,  newArrayDecl($3)); /* add array size */ }
+        | direct-declarator '[' assignment-expression ']'  { $$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl($3)); /* add array size */ }
         | direct-declarator '[' type-qualifier-list ']'  {}
         | direct-declarator '[' STATIC type-qualifier-list assignment-expression ']' {}
         | direct-declarator '[' STATIC assignment-expression ']'  {}
         | direct-declarator '[' type-qualifier-list STATIC assignment-expression ']' {}
-        | direct-declarator '[' type-qualifier-list '*' ']'  {}
-        | direct-declarator '[' '*' ']'   {}
-        | direct-declarator '[' ']' {printf("hi");}
-        | direct-declarator '(' parameter-type-list ')' { }
+        | direct-declarator '[' type-qualifier-list '*' ']'  { }
+        | direct-declarator '[' '*' ']'   { /*  */ }
+        | direct-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
+        | direct-declarator '(' parameter-type-list ')' {  }
         | direct-declarator '(' identifier-list ')' {}
-        | direct-declarator '(' ')' {$$ = insertElement(AST_NODE_TYPE_LL, $1, newast(AST_NODE_TYPE_FN, NULL, NULL, '0'));  }
+        | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));  }  
         ;
 
-    pointer: '*' { $$ = insertElementorig(AST_NODE_TYPE_LL, newType(AST_NODE_TYPE_POINTER,  0));  }
+    pointer: '*' {  $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }
         | '*' type-qualifier-list {  /*<-thing on right receives this */ }
         | '*' type-qualifier-list pointer {}
-        | '*' pointer { $$ = insertElement(AST_NODE_TYPE_LL, $2, newType(AST_NODE_TYPE_POINTER,  0)); }
+        | '*' pointer { $2->ptr.next = newType(AST_NODE_TYPE_POINTER,  0);  $$ = $2;  }
         ;
 
     type-qualifier-list: type-qualifier {$$ = $1; }
@@ -342,9 +342,9 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | parameter-list ',' parameter-declaration
         ;
     
-    parameter-declaration: declaration-specifiers declarator
-        | declaration-specifiers abstract-declarator
-        | declaration-specifiers
+    parameter-declaration: declaration-specifiers declarator {}
+        | declaration-specifiers abstract-declarator {   }
+        | declaration-specifiers { }
         ;
     
     identifier-list: IDENT
@@ -356,17 +356,17 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | specifier-qualifier-list abstract-declarator
         ;
     
-    abstract-declarator: pointer
-        | pointer direct-abstract-declarator
-        | direct-abstract-declarator
+    abstract-declarator: pointer { $$ = insertElement(AST_NODE_TYPE_DECL, newDeclar(AST_NODE_TYPE_DECL, NULL), $1);  }
+        | pointer direct-abstract-declarator {   $$ = insertElement(AST_NODE_TYPE_DECL, $2, $1); }
+        | direct-abstract-declarator { $$ = $1; }
         ;
     
-    direct-abstract-declarator: '(' abstract-declarator ')' { }
-        | direct-abstract-declarator '[' assignment-expression ']' {}
-        | direct-abstract-declarator '[' ']' {}
-        | '[' assignment-expression ']' {}
-        | direct-abstract-declarator '[' '*' ']'
-        | '[' '*' ']' { }
+    direct-abstract-declarator: '(' abstract-declarator ')' { $$ =  $2; }
+        | direct-abstract-declarator '[' assignment-expression ']' { $$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl($3));}
+        | direct-abstract-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
+        | '[' assignment-expression ']' { $$ = insertElement(AST_NODE_TYPE_ARRAYDCL, newDeclar(AST_NODE_TYPE_DECL, NULL), newArrayDecl($2));  }
+        | direct-abstract-declarator '[' '*' ']' {   }
+        | '[' '*' ']' {  }
         | direct-abstract-declarator '(' parameter-type-list ')' { }
         | '(' parameter-type-list ')' { }
         | direct-abstract-declarator '(' ')' { }

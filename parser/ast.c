@@ -29,6 +29,15 @@ struct astnode *newIdent(int nodetype, char *ident) {
     return identast;
 }
 
+struct astnode *newDeclar(int nodetype, char *ident) {
+    struct astnode *a = malloc(sizeof(struct astnode));
+    a->nodetype = nodetype;
+    a->decl.ident = ident;
+    a->head = a;
+    return a;
+    
+}
+
 struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, struct astnode *r) {
        struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
@@ -37,6 +46,11 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.right = r;
     return a;
 }
+
+
+
+
+
 
 struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
     struct astnode *n = malloc(sizeof(struct astnode));
@@ -47,8 +61,11 @@ struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
             n->nodetype = AST_NODE_TYPE_LL;
     return n;
 }
+
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next) {
-    struct astnode *n = malloc(sizeof(struct astnode));
+     struct astnode *n = malloc(sizeof(struct astnode));
+    if(nodetype == AST_NODE_TYPE_LL) {
+  
      //   printf("astnode %p \n", astnode->ll.head);
             //printf("astnode    next %s \n", next->ident.string);
         n->ll.head = astnode->ll.head;
@@ -56,7 +73,27 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
         n->nodetype = AST_NODE_TYPE_LL;
         n->ll.data = next;
          astnode->ll.next = n;
-            
+    } else {
+        n = next;
+        n->head = astnode->head;
+        
+        switch(astnode->nodetype) {
+            case AST_NODE_TYPE_DECL:
+                astnode->decl.next = n;
+                break;
+            case AST_NODE_TYPE_ARRAYDCL:
+                printf("hi");
+                astnode->arraydecl.next = n;
+                break;
+            case AST_NODE_TYPE_POINTER:
+                astnode->ptr.next = n;
+                break;
+            case AST_NODE_TYPE_FNDCL:
+                astnode->fndcl.next = n;
+                break;
+        }
+
+    }
     return n;
 }
 
@@ -113,6 +150,7 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
             declspecs->declspec.typequal = val->qualifier.types;
             break;
         default:
+   
             break;
     }
     return declspecs;
@@ -121,11 +159,18 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
 
 struct astnode *newArrayDecl(struct astnode *size) {
        struct astnode *ArrayDecl = malloc(sizeof(struct astnode));
-       ArrayDecl->nodetype = 25;
+       ArrayDecl->nodetype = AST_NODE_TYPE_ARRAYDCL;
        ArrayDecl->arraydecl.array_size = size;
        return ArrayDecl; 
-
 }
+
+struct astnode *newFunctDecl(struct astnode *parameters) {
+    struct astnode *funcDecl = malloc(sizeof(struct astnode));
+    funcDecl->nodetype = AST_NODE_TYPE_FNDCL;
+      funcDecl->fndcl.parameters = parameters;
+    return  funcDecl;
+}
+
 
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
@@ -361,13 +406,25 @@ void astwalk_impl(struct astnode *ast, int depth) {
             }
      
             break;
-        case 25:
+        case AST_NODE_TYPE_FNDCL:
+            printf("FUNCTION DECL \n");
+            astwalk_impl(ast->fndcl.next, depth +1);
+      
+            break;
+        case AST_NODE_TYPE_ARRAYDCL:
             printf("ARRAY OF SIZE "); 
             astwalk_impl(ast->arraydecl.array_size, depth+1);
-        
+             astwalk_impl(ast->arraydecl.next, depth+1);
         break;
-         case AST_NODE_TYPE_POINTER:
-            printf("pointer to\n");
+        case AST_NODE_TYPE_DECL:
+            printf("DECL NAME ");
+           
+                 printf("%s \n", ast->decl.ident);
+        astwalk_impl(ast->decl.next, depth+1);
+        break;
+        case AST_NODE_TYPE_POINTER:
+                printf("pointer to\n");
+             astwalk_impl(ast->ptr.next, depth+1);
             break;
         default:
             printf("Unknown node type\n %d", ast->nodetype) ;

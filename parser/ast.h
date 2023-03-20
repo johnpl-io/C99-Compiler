@@ -17,11 +17,14 @@ enum AstNodeType {
     AST_NODE_TYPE_POINTER,
     AST_NODE_TYPE_QUALIFIER,
     AST_NODE_TYPE_DECLSPEC,
+    AST_NODE_TYPE_DECL,
+    AST_NODE_TYPE_FNDCL,
+    AST_NODE_TYPE_ARRAYDCL,
     // add more types as needed
 };
 struct astnode_linkedlist {
     int nodetype;
-    struct astnode *data; 
+    struct astnode *data;
     struct astnode *next;
     struct astnode *head;
 };
@@ -89,6 +92,7 @@ struct astnode_pointer {
     int typequal;
     struct astnode *next;
 };
+
 struct astnode_declspec {
     int storageclass;
     int typequal;
@@ -110,13 +114,22 @@ struct astnode_storage {
     struct astnode *next; 
 };
 struct astnode_arraydecl{
-
     int nodetype;
     struct astnode *array_size;
     struct astnode *next;
 };
+
+struct astnode_functdecl{
+    int nodetype;
+    struct astnode *returntype;
+    struct astnode *parameters;
+    struct astnode *next;
+};
 struct astnode_decl {
     char *ident;
+    int lineno; 
+    struct astnode *next;
+    
 
 };
 
@@ -144,11 +157,13 @@ union {
     struct astnode_scalar scal;
     struct astnode_storage storage;
     struct astnode_pointer ptr;
-     struct astnode_declspec declspec;
-     struct astnode_typequal qualifier;
-       struct astnode_arraydecl arraydecl;
+    struct astnode_declspec declspec;
+    struct astnode_typequal qualifier;
+    struct astnode_arraydecl arraydecl;
+    struct astnode_decl  decl;
+    struct astnode_functdecl fndcl;
     };  
-   
+   struct astnode *head, *tail;
 };
 
 
@@ -164,3 +179,5 @@ struct astnode *newCharlit(int nodetype, char val);
 struct astnode *newType(int nodetype, int type);
 struct astnode *newDecl(int nodetype, struct astnode *val);
 struct astnode *newArrayDecl(struct astnode *size);
+struct astnode *newDeclar(int nodetype, char *ident);
+struct astnode *newFunctDecl(struct astnode *parameters);

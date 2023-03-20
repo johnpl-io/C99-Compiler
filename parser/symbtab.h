@@ -86,6 +86,7 @@ struct var_atr{
     int stor_class;
     int sf_offset;
 };
+
 // type(return type + args), storage class, presence of inline, definiton alr seen
 struct fn_name_atr{
     struct astnode *type;
@@ -93,6 +94,7 @@ struct fn_name_atr{
     bool is_inline;
     bool def_seen;
 };
+
 // equivalent type
 struct tpdef_name_atr{
     struct astnode *eq_type;

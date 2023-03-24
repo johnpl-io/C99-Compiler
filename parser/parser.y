@@ -1,18 +1,26 @@
 %debug
 %define parse.error verbose
-%{
-
+%{    
     #define YYDEBUG 1
-   #include <stdlib.h>
-   #include <stdio.h>
-   #include <ctype.h>
-   #include "ast.h"
-  int yylex();
-  void yyerror (char const *s) {
-   fprintf (stderr, "%s\n", s);
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <ctype.h>
+    #include "ast.h"
+    #include "symbtab.h"
+    int yylex();
+    void yyerror (char const *s) {
+        fprintf (stderr, "%s\n", s);
  }
-  // typedef union yylval YYSTYPE;
+    // typedef union yylval YYSTYPE
+
+    // line number and filename for debugging
+    extern char filename_buf[256];
+    extern int lineno;
+
+    // keep track of current scope, initially at global scope
+    struct symbtab *current_scope;
 %}
+
 %union{
     char *string_literal;
     char charlit;
@@ -69,7 +77,11 @@ declaration_or_fndef: declaration
                     | function_definition
                     ;
 function_definition: declarator compound_statement
-compound_statement: '{' decl_or_stmt_list '}'
+
+
+compound_statement: '{' decl_or_stmt_list '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope);};
+
+
 decl_or_stmt_list: decl_or_stmt
         | decl_or_stmt_list decl_or_stmt 
         ;
@@ -263,7 +275,7 @@ struct-declaration-list: struct-declaration
                         | struct-declaration-list struct-declaration
                         ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list
+struct-declaration: specifier-qualifier-list struct-declarator-list {current_scope = symbtab_push(SCOPE_STRUCT_UNION, current_scope);};
                     
 
 specifier-qualifier-list: type-specifier specifier-qualifier-list
@@ -296,8 +308,8 @@ enumerator: IDENT
 /* 6.7.3 Type Qualifier */
 
 type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
-            |  RESTRICT {  $$ = newType(AST_NODE_TYPE_QUALIFIER, RESTRICT);}
-            | VOLATILE {   $$ = newType(AST_NODE_TYPE_QUALIFIER, VOLATILE);}
+            |    RESTRICT {  $$ = newType(AST_NODE_TYPE_QUALIFIER, RESTRICT);}
+            |    VOLATILE {   $$ = newType(AST_NODE_TYPE_QUALIFIER, VOLATILE);}
             ;
 /* 6.7.4 */
     function-specifier: INLINE
@@ -321,7 +333,8 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
         | direct-declarator '(' parameter-type-list ')' {  }
         | direct-declarator '(' identifier-list ')' {}
-        | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));  }  
+        | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));
+                                        current_scope = symbtab_push(SCOPE_FUNCTION, current_scope); }  
         ;
 
     pointer: '*' {  $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }

@@ -3,10 +3,10 @@
 #include <string.h>
 #include <stdbool.h>
 #include "symbtab.h"
-#include "parser.tab.h"
 
-char* filename = "temp";
-int lineno = 0;
+extern char filename_buf[255];
+extern int lineno;
+extern struct symbtab *current_scope;
 
 // initialize new symbol table
 struct symbtab *symbtab_init(int scope) {
@@ -90,7 +90,7 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace){
     new_symb->name = name;
     new_symb->attr_type = type;
     new_symb->namespace = namespace;
-    new_symb->filename = strdup(filename);
+    new_symb->filename_buf = strdup(filename_buf);
     new_symb->lineno = lineno;
     return new_symb;
 }
@@ -130,7 +130,7 @@ void print_symbtab(struct symbtab *table) {
     struct symbol *cur_sym = table->head;
     printf("Name     Attr Type Namespace Filename  Line Num\n");
     while (cur_sym) {
-        printf("%s\t %d\t   %d\t     %s      %d\n", cur_sym->name, cur_sym->attr_type, cur_sym->namespace, cur_sym->filename, cur_sym->lineno);
+        printf("%s\t %d\t   %d\t     %s      %d\n", cur_sym->name, cur_sym->attr_type, cur_sym->namespace, cur_sym->filename_buf, cur_sym->lineno);
         cur_sym = cur_sym->next;
     }
 }

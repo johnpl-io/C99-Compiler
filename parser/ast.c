@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "parser.tab.h"
 #include <ctype.h>
+
 struct astnode *newNum(int nodetype, struct Num num) {
   
     struct astnode *numast = malloc(sizeof(struct astnode));
@@ -167,7 +168,7 @@ struct astnode *newArrayDecl(struct astnode *size) {
 struct astnode *newFunctDecl(struct astnode *parameters) {
     struct astnode *funcDecl = malloc(sizeof(struct astnode));
     funcDecl->nodetype = AST_NODE_TYPE_FNDCL;
-      funcDecl->fndcl.parameters = parameters;
+    funcDecl->fndcl.parameters = parameters;
     return  funcDecl;
 }
 

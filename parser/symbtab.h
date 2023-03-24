@@ -1,5 +1,8 @@
+#ifndef SYMBTAB_H
+#define SYMBTAB_H
+
 #include <stdbool.h>
-#include "ast.h"
+
 
 // enums for symbol entry attributes
 enum SCOPE {
@@ -134,7 +137,7 @@ struct symbol {
     int namespace;
     int attr_type;
     // error reporting
-    char *filename;
+    char *filename_buf;
     int lineno;
     // linked list
     struct astnode *astnode;
@@ -199,3 +202,5 @@ void print_symbtab(struct symbtab *table);
 // define struct/union, declare struct/union, labels, and functions
 // remember: enums, bit fields, typedefs, inline functions are all optional 
 // comment out unncessary optional stuff later
+
+#endif

@@ -76,10 +76,10 @@
 declaration_or_fndef: declaration 
                     | function_definition
                     ;
-function_definition: declarator compound_statement
+function_definition: declarator compound_statement { printf("ur mom ha"); }
 
 
-compound_statement: '{' decl_or_stmt_list '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope); /* this would need to happen as a mid rule after '{'  */ }
+compound_statement: '{' decl_or_stmt_list  '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope); /* this would need to happen as a mid rule after '{'  */ }
 
 
 decl_or_stmt_list: decl_or_stmt

@@ -427,6 +427,44 @@ void astwalk_impl(struct astnode *ast, int depth) {
                 printf("pointer to\n");
              astwalk_impl(ast->ptr.next, depth+1);
             break;
+        case AST_NODE_TYPE_DECLSPEC:
+            printf("DECL SPECS");
+            printf(" | Storage Class %d | Type qualifier %d | \n", ast->declspec.storageclass, ast->declspec.typequal);
+           
+            printf(" Typspecifiers \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);
+            break;
+        case AST_NODE_TYPE_SCALAR:
+            switch (ast->scal.types) {
+                case INT:
+                    printf("int\n");
+                    break;
+                case VOID:
+                    printf("void\n");
+                    break;
+                case LONG:
+                    printf("long\n");
+                    break;
+                case SHORT:
+                    printf("short\n");
+                    break;
+                case FLOAT:
+                    printf("float\n");
+                    break;
+                case DOUBLE:
+                    printf("double\n");
+                    break;
+                case SIGNED:
+                    printf("signed\n");
+                    break;
+                case UNSIGNED:
+                    printf("unsigned\n");
+                    break;
+                default:
+                    printf("unknown data type\n");
+                    break;
+            }
+            astwalk_impl(ast->scal.next, depth);
+break;
         default:
             printf("Unknown node type\n %d", ast->nodetype) ;
             break;

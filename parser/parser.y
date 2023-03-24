@@ -51,7 +51,7 @@
 %type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
 %type <astnode_p> relational-expression equality-expression
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
-%type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator 
+%type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
 %type <op> unary-operator assignment-operator 
 
@@ -79,7 +79,7 @@ declaration_or_fndef: declaration
 function_definition: declarator compound_statement
 
 
-compound_statement: '{' decl_or_stmt_list '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope);};
+compound_statement: '{' decl_or_stmt_list '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope); /* this would need to happen as a mid rule after '{'  */ }
 
 
 decl_or_stmt_list: decl_or_stmt
@@ -90,7 +90,7 @@ decl_or_stmt:
         | stmt
         ;
 stmt: compound_statement
-   |  expression ';' { astwalk_impl($1, 0); }
+   |  expression ';' {  }
         ;
 
 
@@ -211,8 +211,8 @@ expression: assignment-expression         { $$ = $1; }
 
 
 /* 6.7.0 ? */
-declaration: declaration-specifiers init-declarator-list ';'
-    | declaration-specifiers ';'  { printf("%d\n", $1->declspec.typespecif->scal.next->scal.next->scal.types);}
+declaration: declaration-specifiers init-declarator-list ';' { astwalk_impl($2, 0); }
+    | declaration-specifiers ';'  {  $$ = $1; }
     ;
     
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
@@ -225,11 +225,11 @@ declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = 
     | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
     ;
 
-init-declarator-list: init-declarator
-    | init-declarator-list ',' init-declarator
+init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1->head); }
+    | init-declarator-list ',' init-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3->head); }
     ;
     
-init-declarator: declarator { astwalk_impl($1->head, 0); }
+init-declarator: declarator { $$ = $1; }
     | declarator '=' initializer {/* do not have to do yet */ }
     ;
                         

@@ -160,6 +160,7 @@ struct symbtab {
     struct symbol *head;
     struct symbtab *next;
     int scope;
+    //maybe line and fileno as well here
 };
 
 // Create empty symbol table

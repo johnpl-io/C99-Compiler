@@ -1,3 +1,4 @@
+
 %debug
 %define parse.error verbose
 %{    
@@ -53,7 +54,7 @@
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
-%type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier
+%type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier 
 %type <op> unary-operator assignment-operator struct-or-union 
 
 // %left ','
@@ -73,14 +74,16 @@
 // %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
-
+start: declaration_or_fndef
 declaration_or_fndef: declaration 
                     | function_definition
                     ;
-function_definition: declarator compound_statement { } 
+function_definition: declaration-specifiers declarator { printf("funct on"); } compound_statement { printf("funct off"); } { }
+        ;
 
 
-compound_statement: '{' decl_or_stmt_list  '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope); /* this would need to happen as a mid rule after '{'  */ }
+compound_statement: '{' { printf("2"); }decl_or_stmt_list  '}' {  }  
+        ;
 
 
 decl_or_stmt_list: decl_or_stmt { }
@@ -214,7 +217,7 @@ expression: assignment-expression         { $$ = $1; }
 
 
 /* 6.7.0 ? */
-declaration: declaration-specifiers init-declarator-list ';' { astwalk_impl($1, 0); }
+declaration: declaration-specifiers init-declarator-list ';' {  }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
     
@@ -280,7 +283,7 @@ struct-declaration-list: struct-declaration {
                         | struct-declaration-list struct-declaration
                           ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list ';' {current_scope = symbtab_push(SCOPE_STRUCT_UNION, current_scope);};
+struct-declaration: specifier-qualifier-list struct-declarator-list ';' { };
                     
 
 specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
@@ -342,8 +345,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
         | direct-declarator '(' parameter-type-list ')' {  $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL)); }
         | direct-declarator '(' identifier-list ')' { }
-        | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));
-                                        current_scope = symbtab_push(SCOPE_FUNCTION, current_scope); }  
+        | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL)); }  
         ;
 
     pointer: '*' {  $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }

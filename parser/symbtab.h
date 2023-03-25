@@ -151,8 +151,8 @@ struct symbol {
         // struct enum_constant_atr enum_const; 
         struct struct_union_tag_atr struct_union_tag;
         // struct enum_tag_atr enum_tag; 
-        struct label_atr label;
-        struct struct_union_mem_atr struct_union_mem;
+        // struct label_atr label;
+        //struct struct_union_mem_atr struct_union_mem;
     };
 };
 
@@ -160,11 +160,13 @@ struct symbtab {
     struct symbol *head;
     struct symbtab *next;
     int scope;
+    int lineno;
+    char *filename_buf;
     //maybe line and fileno as well here
 };
 
 // Create empty symbol table
-struct symbtab *symbtab_init(int scope);
+struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf);
 // Destroy: destroy a symbol table including any storage it consumes
 void symbtab_destroy(struct symbtab *table);
 // Lookup: given an existing symbol table, a name, and a namespace class
@@ -174,19 +176,19 @@ struct symbol *symbtab_lookup(struct symbtab *table, struct symbol *symbol);
 // Insert a symbol into the symbol table
 bool symbtab_insert(struct symbtab *table, struct symbol *symbol, bool replace);
 // Push onto symbtable struct and return a pointer to the new symbol table
-struct symbtab *symbtab_push(int scope, struct symbtab *prev_symbtab);
+struct symbtab *symbtab_push(int scope, struct symbtab *prev_symbtab, int lineno, char *filename_buf);
 // Make an existing symbol table the current scope we're working with
 struct symbtab *symbtab_insert_on(struct symbtab *current_symbtab, struct symbtab *insert_symbtab);
 // Pop from symbtable struct go the previous scope
 struct symbtab *symbtab_pop(struct symbtab *current_scope);
 // create a symbol table entry
-struct symbol *create_symbol_entry(char *name, int type, int namespace);
+struct symbol *create_symbol_entry(char *name, int type, int namespace, int lineno, char *filename_buf);
 // define variable
 // void define_var(struct astnode *var, struct symbtab *table);
 // define function
-void define_func(struct astnode *func, struct symbtab *table);
+void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf);
 // define label
-void define_label(struct astnode *label, struct symbtab *table);
+void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf);
 // do later: stuct definition (forward declaration) and declaration (members, own symbtab).
 void declare_struct();
 void define_struct();

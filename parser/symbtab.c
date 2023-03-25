@@ -4,14 +4,16 @@
 #include <stdbool.h>
 #include "symbtab.h"
 
-extern char filename_buf[255];
-extern int lineno;
+// extern char filename_buf[255];
+// extern int lineno;
 extern struct symbtab *current_scope;
 
 // initialize new symbol table
-struct symbtab *symbtab_init(int scope) {
+struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf) {
     struct symbtab *table = calloc(1, sizeof(struct symbtab));
     table->scope = scope;
+    table->lineno = lineno;
+    table->filename_buf = filename_buf;
     return table;
 }
 
@@ -61,8 +63,8 @@ bool symbtab_insert(struct symbtab *table, struct symbol *symbol, bool replace) 
 }
 
 // initialize new table and push onto stack
-struct symbtab *symbtab_push(int scope, struct symbtab *prev_symbtab) {
-    struct symbtab *new_table = symbtab_init(scope);
+struct symbtab *symbtab_push(int scope, struct symbtab *prev_symbtab, int lineno, char *filename_buf) {
+    struct symbtab *new_table = symbtab_init(scope, lineno, filename_buf);
     new_table->next = prev_symbtab;
     return new_table;
 }
@@ -85,7 +87,7 @@ struct symbtab *symbtab_pop(struct symbtab *current_scope) {
 }
 
 // create a symbol table entry
-struct symbol *create_symbol_entry(char *name, int type, int namespace){
+struct symbol *create_symbol_entry(char *name, int type, int namespace, int lineno, char *filename_buf){
     struct symbol *new_symb = calloc(sizeof(struct symbol), 1);
     new_symb->name = name;
     new_symb->attr_type = type;
@@ -96,12 +98,12 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace){
 }
 
 // define function attributes within function symb
-void define_func(struct astnode *func, struct symbtab *table){
+void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf){
     if(table->scope != SCOPE_GLOBAL){
         fprintf(stderr, "Cannot define function outside of global scope");
     }
     // need to finish this after AST node for function is created. replace "temp" later
-    struct symbol *symbol = create_symbol_entry("temp", SYMB_FUNCTION_NAME, NAMESPACE_ALT);
+    struct symbol *symbol = create_symbol_entry("temp", SYMB_FUNCTION_NAME, NAMESPACE_ALT, lineno, filename_buf);
     symbol->fn.def_seen =  true;
     symbol->fn.is_inline = false; // inline is optional, not doing it
     symbol->fn.type = func;
@@ -113,16 +115,16 @@ void define_func(struct astnode *func, struct symbtab *table){
 }
 
 // define label. All we need to do is ensure we are in function scope and make sure no duplicate entry
-void define_label(struct astnode *label, struct symbtab *table){
-    while(table->scope != SCOPE_FUNCTION){
-        table = table->next;
-    }
-    // do we have an astnode for label? figure out later
-    struct symbol *symbol = create_symbol_entry("temp", SYMB_LABEL, NAMESPACE_LABEL);
-    if(!symbtab_insert(table, symbol, false)){
-        fprintf(stderr, "Label already exists");
-    }
-}
+// void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf){
+//     while(table->scope != SCOPE_FUNCTION){
+//         table = table->next;
+//     }
+//     // do we have an astnode for label? figure out later
+//     struct symbol *symbol = create_symbol_entry("temp", SYMB_LABEL, NAMESPACE_LABEL, int lineno, char *filename_buf);
+//     if(!symbtab_insert(table, symbol, false)){
+//         fprintf(stderr, "Label already exists");
+//     }
+// }
 
 void print_symbtab(struct symbtab *table) {
     printf("Symbol Table:\n");
@@ -134,3 +136,4 @@ void print_symbtab(struct symbtab *table) {
         cur_sym = cur_sym->next;
     }
 }
+

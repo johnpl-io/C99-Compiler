@@ -194,7 +194,6 @@ struct astnode *newFunctDecl(struct astnode *parameters) {
     return  funcDecl;
 }
 
-
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
@@ -510,4 +509,3 @@ void astwalk_impl(struct astnode *ast, int depth) {
             break;
     }
 }
-

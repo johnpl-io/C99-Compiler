@@ -18,7 +18,7 @@
 - ignore enums
 - error checking and default behavior as given in the c standard like functions returning functions etc 
 ### additional comments
-- declarators are laid out that that whatever they is the next element after the decl name (which is always on top)
+- declarators are laid out that that whatever is the next element after the decl name (which is always on top) will always be the type
 For example, int *fn(); will be 
 ```
 DECL NAME FN

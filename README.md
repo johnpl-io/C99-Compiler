@@ -1,14 +1,14 @@
-***TO DO***
+## TO DO
 
-- astnodes for functions, pointers, arrays, struct (last) (John)
+- [x]astnodes for functions, pointers, arrays, struct (last) (John)
 
-- test that symbol table works manually (Colin)
-- finish functions for initializing symbol attributes within symbtab.c (Colin)
-- function for printing out of the symbol table for checking (Colin)
+- [x] test that symbol table works manually (Colin)
+- [ ] finish functions for initializing symbol attributes within symbtab.c (Colin)
+- [x] function for printing out of the symbol table for checking (Colin)
 
 **LATER**
-- incorporate symbol table into parser (Colin + John)
-- function to do edge case checks before installing into symbol table (Colin + John)
+- [ ] incorporate symbol table into parser (Colin + John)
+- [ ] function to do edge case checks before installing into symbol table (Colin + John)
 
 
 **LIST TO KEEP TRACK OF STUFF**
@@ -17,3 +17,4 @@
 - come back to the decl spec list (6.7.0)
 - ignore enums
 - 
+

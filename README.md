@@ -37,5 +37,5 @@ _note -1 indicates not storage class provided so we must check within symbol tab
 - im not sure if we have struct members as a type as a symbol which is a valid identifier (this can easily be added)
 - for structs we can use the existing astnode for struct which contains its own symbol table. Therefore, the mini-scope is just the minitable that is contained inside the astnode. 
 
-Compiler progress 
+### Compiler progress 
 ![](https://geps.dev/progress/32)

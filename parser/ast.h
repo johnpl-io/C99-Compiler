@@ -20,6 +20,8 @@ enum AstNodeType {
     AST_NODE_TYPE_DECL,
     AST_NODE_TYPE_FNDCL,
     AST_NODE_TYPE_ARRAYDCL,
+    AST_NODE_TYPE_STRUCT,
+    AST_NODE_TYPE_UNION, 
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -143,6 +145,15 @@ struct astnode_typequal {
     } types;
     struct astnode *next;
 };
+
+struct astnode_structunion {
+    int nodetype;
+    char *name;
+   int is_complete;
+    struct astnode *next;
+    struct symboltab *minitable; //mini symbol table for struct or union  
+};
+
 struct astnode {
 int nodetype;
 union {
@@ -162,6 +173,7 @@ union {
     struct astnode_arraydecl arraydecl;
     struct astnode_decl  decl;
     struct astnode_functdecl fndcl;
+    struct astnode_structunion structunion;
     };  
    struct astnode *head, *tail;
 };
@@ -181,3 +193,4 @@ struct astnode *newDecl(int nodetype, struct astnode *val);
 struct astnode *newArrayDecl(struct astnode *size);
 struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
+struct astnode *newStructUnion(int nodetype, char *name, struct symboltab *minitable);

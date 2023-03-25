@@ -2,7 +2,9 @@
 #include "ast.h"
 #include <stdlib.h>
 #include "parser.tab.h"
+#include "symbtab.h"
 #include <ctype.h>
+ extern int lineno;
 
 struct astnode *newNum(int nodetype, struct Num num) {
   
@@ -47,8 +49,18 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.right = r;
     return a;
 }
-
-
+//creates a new struct or union an
+struct astnode *newStructUnion(int nodetype, char *name, struct symboltab *minitable) {
+struct astnode *a = malloc(sizeof(struct astnode));
+    if(nodetype == STRUCT) {
+        a->nodetype = AST_NODE_TYPE_STRUCT;
+    } else if (nodetype == UNION) {
+        a->nodetype = AST_NODE_TYPE_UNION;
+    }
+ a->structunion.minitable = minitable;
+ a->structunion.name = name;
+  return a;
+} 
 
 
 
@@ -249,7 +261,13 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
                 }
                 a->declspec.typespecif = l;
             }
-            
+            if(l->nodetype == AST_NODE_TYPE_STRUCT) {
+                //assume u cant have void, int, char struct as this makes no sense will check in standard
+                //for exact reference
+                if(r->declspec.typespecif) {
+                    fprintf(stderr, "two or more data types in declaration specifiers. %d \n", lineno);
+                }
+            }
             break;
         // add more cases as needed for other node types
 
@@ -431,7 +449,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("DECL SPECS");
             printf(" | Storage Class %d | Type qualifier %d | \n", ast->declspec.storageclass, ast->declspec.typequal);
            
-            printf(" Typspecifiers \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);
+            printf("Typspecifiers \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);
             break;
         case AST_NODE_TYPE_SCALAR:
             switch (ast->scal.types) {
@@ -463,8 +481,16 @@ void astwalk_impl(struct astnode *ast, int depth) {
                     printf("unknown data type\n");
                     break;
             }
-            astwalk_impl(ast->scal.next, depth);
-break;
+            astwalk_impl(ast->scal.next, depth + 1);
+        break;
+        case AST_NODE_TYPE_STRUCT:
+            printf("STRUCT %s \n", ast->structunion.name);
+           astwalk_impl(ast->structunion.next, depth + 1);
+           break;
+        case AST_NODE_TYPE_UNION:
+            printf("UNION %s \n", ast->structunion.name);
+           astwalk_impl(ast->structunion.next, depth + 1);
+           break;
         default:
             printf("Unknown node type\n %d", ast->nodetype) ;
             break;

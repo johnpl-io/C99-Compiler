@@ -43,8 +43,8 @@
     struct astnode *astnode_p;
 }
 
-%token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num> NUMBER 
-%token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
+%token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num> NUMBER  
+%token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC <op> STRUCT SWITCH TYPEDEF <op> UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
 %type <astnode_p> primary-expression assignment-expression
 %type <astnode_p> expression postfix-expression expression-list
@@ -53,7 +53,8 @@
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
-%type <op> unary-operator assignment-operator 
+%type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier
+%type <op> unary-operator assignment-operator struct-or-union 
 
 // %left ','
 // %right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
@@ -76,14 +77,14 @@
 declaration_or_fndef: declaration 
                     | function_definition
                     ;
-function_definition: declarator compound_statement { printf("ur mom ha"); }
+function_definition: declarator compound_statement { } 
 
 
 compound_statement: '{' decl_or_stmt_list  '}' {current_scope = symbtab_push(SCOPE_BLOCK, current_scope); /* this would need to happen as a mid rule after '{'  */ }
 
 
-decl_or_stmt_list: decl_or_stmt
-        | decl_or_stmt_list decl_or_stmt 
+decl_or_stmt_list: decl_or_stmt { }
+        | decl_or_stmt_list decl_or_stmt  { }
         ;
 decl_or_stmt:
         declaration
@@ -96,7 +97,9 @@ stmt: compound_statement
 
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
                 |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
-                |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1);  }  
+                |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1); /*
+                this needs to be changed to some string type after lexer is fixed with this (see hak email) */
+                 }  
                 |   CHARLIT                 { $$ = newCharlit(AST_NODE_TYPE_CHARLIT, $1);  }
                 |   '(' expression ')'      { $$ = $2;  }
                 ;
@@ -211,7 +214,7 @@ expression: assignment-expression         { $$ = $1; }
 
 
 /* 6.7.0 ? */
-declaration: declaration-specifiers init-declarator-list ';' { astwalk_impl($2, 0); }
+declaration: declaration-specifiers init-declarator-list ';' {  }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
     
@@ -219,7 +222,7 @@ declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = 
     | storage-class-specifier  { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
     | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);   }
     | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); } 
-    | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); printf("%d\n", $$->declspec.typequal); }
+    | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);  }
     | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); }
     | function-specifier declaration-specifiers { } 
     | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
@@ -255,40 +258,46 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
             |   _BOOL    { $$ = newType(AST_NODE_TYPE_SCALAR, _BOOL); }
             |   _COMPLEX    { }
             |  _IMAGINARY  { }
-            | struct-or-union-specifier
+            | struct-or-union-specifier { $$ = $1;}
             | enum-specifier
         /*    | typedef-name */
             ;
 
 /* 6.7.2.1 */
 
-struct-or-union-specifier: struct-or-union IDENT '{' struct-declaration-list '}'
-                        |  struct-or-union '{' struct-declaration-list '}'
-                        |  struct-or-union IDENT
+struct-or-union-specifier: struct-or-union IDENT { printf("insert struct in upper symbol table"); }'{' struct-declaration-list '}' { $$ = newStructUnion($1, $2, NULL); }
+                        |  struct-or-union '{' struct-declaration-list '}' { $$ = newStructUnion($1, NULL, NULL); }
+                        |  struct-or-union IDENT {  $$ = newStructUnion($1, $2, NULL);  astwalk_impl($$, 0); }
                         ;
 
-struct-or-union: STRUCT
-                | UNION
+struct-or-union: STRUCT { $$ = STRUCT; }
+                | UNION { $$ =  UNION; }
                 ;
                 
-struct-declaration-list: struct-declaration
+struct-declaration-list: struct-declaration {  
+    /* install members in struct scope here */
+}
                         | struct-declaration-list struct-declaration
                         ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list {current_scope = symbtab_push(SCOPE_STRUCT_UNION, current_scope);};
+struct-declaration: specifier-qualifier-list struct-declarator-list ';' {current_scope = symbtab_push(SCOPE_STRUCT_UNION, current_scope);};
                     
 
-specifier-qualifier-list: type-specifier specifier-qualifier-list
-                        | type-specifier
-                        | type-qualifier specifier-qualifier-list
-                        | type-qualifier
+specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
+                        | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); }
+                        | type-qualifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
+                        | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
                         ;
-struct-declarator-list: struct-declarator
-                       | struct-declarator-list ',' struct-declarator
+struct-declarator-list: struct-declarator {  $$ =  insertElementorig(AST_NODE_TYPE_LL, $1->head); }
+                       | struct-declarator-list ',' struct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3->head); }
                        ;
-struct-declarator: declarator
-                |  declarator ':' conditional-expression
-                | ':' conditional-expression;
+struct-declarator: declarator { $$ = $1; }
+                |  declarator ':' conditional-expression { 
+                    /* not supporting bitfield */ 
+                  }
+                | ':' conditional-expression { 
+                /* not supporting implicit bit field */
+                 }
                 ;
 
 /* 6.7.2.2  Enumeration Specifiers */
@@ -331,8 +340,8 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' type-qualifier-list '*' ']'  { }
         | direct-declarator '[' '*' ']'   { /*  */ }
         | direct-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
-        | direct-declarator '(' parameter-type-list ')' {  }
-        | direct-declarator '(' identifier-list ')' {}
+        | direct-declarator '(' parameter-type-list ')' {  $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL)); }
+        | direct-declarator '(' identifier-list ')' { }
         | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));
                                         current_scope = symbtab_push(SCOPE_FUNCTION, current_scope); }  
         ;

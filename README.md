@@ -19,7 +19,8 @@
 - error checking and default behavior as given in the c standard like functions returning functions etc 
 ### additional comments
 - declarators are laid out that that whatever is the next element after the decl name (which is always on top) will always be the type
-For example, int *fn(); will be 
+For example, int *fn(); will be
+ 
 ```
 DECL NAME FN
     FUNCTION DECL
@@ -36,3 +37,5 @@ _note -1 indicates not storage class provided so we must check within symbol tab
 - im not sure if we have struct members as a type as a symbol which is a valid identifier (this can easily be added)
 - for structs we can use the existing astnode for struct which contains its own symbol table. Therefore, the mini-scope is just the minitable that is contained inside the astnode. 
 
+Compiler progress 
+![](https://geps.dev/progress/32)

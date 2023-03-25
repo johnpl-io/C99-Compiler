@@ -2388,7 +2388,7 @@ yyreduce:
 
   case 85: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 217 "parser.y"
-                                                             {  }
+                                                             { astwalk_impl((yyvsp[-2].astnode_p), 0); }
 #line 2393 "parser.tab.c"
     break;
 
@@ -2418,7 +2418,7 @@ yyreduce:
 
   case 90: /* declaration-specifiers: type-specifier  */
 #line 224 "parser.y"
-                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p)); }
+                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p));  }
 #line 2423 "parser.tab.c"
     break;
 
@@ -2430,7 +2430,7 @@ yyreduce:
 
   case 92: /* declaration-specifiers: type-qualifier  */
 #line 226 "parser.y"
-                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p)); }
+                     { (yyval.astnode_p) = newDecl(AST_NODE_TYPE_DECLSPEC, (yyvsp[0].astnode_p));  }
 #line 2435 "parser.tab.c"
     break;
 
@@ -2460,7 +2460,7 @@ yyreduce:
 
   case 97: /* init-declarator: declarator  */
 #line 235 "parser.y"
-                            { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
+                            { (yyval.astnode_p) = (yyvsp[0].astnode_p);  }
 #line 2465 "parser.tab.c"
     break;
 
@@ -2574,7 +2574,7 @@ yyreduce:
 
   case 116: /* type-specifier: struct-or-union-specifier  */
 #line 261 "parser.y"
-                                        { (yyval.astnode_p) = (yyvsp[0].astnode_p);}
+                                        { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 2579 "parser.tab.c"
     break;
 
@@ -2598,7 +2598,7 @@ yyreduce:
 
   case 121: /* struct-or-union-specifier: struct-or-union IDENT  */
 #line 270 "parser.y"
-                                                 {  (yyval.astnode_p) = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), NULL);  astwalk_impl((yyval.astnode_p), 0); }
+                                                 {  (yyval.astnode_p) = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), NULL);   }
 #line 2603 "parser.tab.c"
     break;
 
@@ -2666,7 +2666,7 @@ yyreduce:
 
   case 133: /* struct-declarator: declarator  */
 #line 294 "parser.y"
-                              { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
+                              { (yyval.astnode_p) = (yyvsp[0].astnode_p);  }
 #line 2671 "parser.tab.c"
     break;
 

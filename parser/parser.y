@@ -214,16 +214,16 @@ expression: assignment-expression         { $$ = $1; }
 
 
 /* 6.7.0 ? */
-declaration: declaration-specifiers init-declarator-list ';' {  }
+declaration: declaration-specifiers init-declarator-list ';' { astwalk_impl($1, 0); }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
     
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
     | storage-class-specifier  { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
     | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);   }
-    | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); } 
+    | type-specifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  } 
     | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);  }
-    | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1); }
+    | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
     | function-specifier declaration-specifiers { } 
     | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
     ;
@@ -232,7 +232,7 @@ init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL
     | init-declarator-list ',' init-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3->head); }
     ;
     
-init-declarator: declarator { $$ = $1; }
+init-declarator: declarator { $$ = $1;  }
     | declarator '=' initializer {/* do not have to do yet */ }
     ;
                         
@@ -258,7 +258,7 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
             |   _BOOL    { $$ = newType(AST_NODE_TYPE_SCALAR, _BOOL); }
             |   _COMPLEX    { }
             |  _IMAGINARY  { }
-            | struct-or-union-specifier { $$ = $1;}
+            | struct-or-union-specifier { $$ = $1; }
             | enum-specifier
         /*    | typedef-name */
             ;
@@ -267,7 +267,7 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
 
 struct-or-union-specifier: struct-or-union IDENT { printf("insert struct in upper symbol table"); }'{' struct-declaration-list '}' { $$ = newStructUnion($1, $2, NULL); }
                         |  struct-or-union '{' struct-declaration-list '}' { $$ = newStructUnion($1, NULL, NULL); }
-                        |  struct-or-union IDENT {  $$ = newStructUnion($1, $2, NULL);  astwalk_impl($$, 0); }
+                        |  struct-or-union IDENT {  $$ = newStructUnion($1, $2, NULL);   }
                         ;
 
 struct-or-union: STRUCT { $$ = STRUCT; }
@@ -278,7 +278,7 @@ struct-declaration-list: struct-declaration {
     /* install members in struct scope here */
 }
                         | struct-declaration-list struct-declaration
-                        ;
+                          ;
                         
 struct-declaration: specifier-qualifier-list struct-declarator-list ';' {current_scope = symbtab_push(SCOPE_STRUCT_UNION, current_scope);};
                     
@@ -291,7 +291,7 @@ specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(
 struct-declarator-list: struct-declarator {  $$ =  insertElementorig(AST_NODE_TYPE_LL, $1->head); }
                        | struct-declarator-list ',' struct-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3->head); }
                        ;
-struct-declarator: declarator { $$ = $1; }
+struct-declarator: declarator { $$ = $1;  }
                 |  declarator ':' conditional-expression { 
                     /* not supporting bitfield */ 
                   }

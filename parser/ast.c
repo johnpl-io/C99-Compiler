@@ -95,8 +95,7 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
                 astnode->decl.next = n;
                 break;
             case AST_NODE_TYPE_ARRAYDCL:
-                printf("hi");
-                astnode->arraydecl.next = n;
+                            astnode->arraydecl.next = n;
                 break;
             case AST_NODE_TYPE_POINTER:
                 astnode->ptr.next = n;
@@ -156,11 +155,22 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
         case AST_NODE_TYPE_STORAGE:
             declspecs->declspec.storageclass = val->storage.types;
             break;
+        case AST_NODE_TYPE_UNION:
+            declspecs->declspec.typespecif = val;
+            declspecs->declspec.storageclass = -1;
+            break;
+        case AST_NODE_TYPE_STRUCT:
+        declspecs->declspec.typespecif = val;
+         declspecs->declspec.storageclass = -1;
+            break;
         case AST_NODE_TYPE_SCALAR:
             declspecs->declspec.typespecif = val;
+             declspecs->declspec.storageclass = -1;
             break;
         case AST_NODE_TYPE_QUALIFIER:
+        
             declspecs->declspec.typequal = val->qualifier.types;
+             declspecs->declspec.storageclass = -1;
             break;
         default:
    
@@ -216,18 +226,16 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
         case AST_NODE_TYPE_DECLSPEC:
             // Making sure that an ident doesn't have two storage classes
             // we're checking if r (old) is a declspec with a storage class
-            if(r->declspec.storageclass != -1) {
+           
                 if(l->nodetype == AST_NODE_TYPE_STORAGE) {
+                     if(r->declspec.storageclass != -1) {
                     printf("Error Multiple Storage Class \n");
                 } else {
-                    a->declspec.storageclass = r->declspec.storageclass;
+                    a->declspec.storageclass = l->storage.types;
                 }
-            // if r (old) doesnt have a storage class, but l (new) does
+       
             } else {
-                if(l->nodetype == AST_NODE_TYPE_STORAGE){
-                    a->declspec.storageclass = l->nodetype;
-                }
-            // if r and l both dont have storage classes, do nothing
+                a->declspec.storageclass = r->declspec.storageclass;
             }
             
             //check type qualifier
@@ -260,13 +268,19 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
                     l->scal.next = head;
                 }
                 a->declspec.typespecif = l;
+            } else {
+                a->declspec.typespecif = r->declspec.typespecif;
             }
-            if(l->nodetype == AST_NODE_TYPE_STRUCT) {
+            if(l->nodetype == AST_NODE_TYPE_STRUCT || l->nodetype == AST_NODE_TYPE_UNION) {
                 //assume u cant have void, int, char struct as this makes no sense will check in standard
                 //for exact reference
+                printf("hi");
                 if(r->declspec.typespecif) {
                     fprintf(stderr, "two or more data types in declaration specifiers. %d \n", lineno);
+                } else {
+                    a->declspec.typespecif = l;
                 }
+
             }
             break;
         // add more cases as needed for other node types
@@ -487,7 +501,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("STRUCT %s \n", ast->structunion.name);
            astwalk_impl(ast->structunion.next, depth + 1);
            break;
-        case AST_NODE_TYPE_UNION:
+           case AST_NODE_TYPE_UNION:
             printf("UNION %s \n", ast->structunion.name);
            astwalk_impl(ast->structunion.next, depth + 1);
            break;

@@ -24,6 +24,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         struct astnode *headdecl =  ll_nodell->ll.data->head;
         struct astnode *taildecl =  ll_nodell->ll.data;
         name =  headdecl->decl.ident;
+        //loop through to set proper structs and check for errors
         if (!(type = headdecl->decl.next)){
             isFunc = false;
         } else {

@@ -1,4 +1,5 @@
 #include <stdio.h>
+auto int x;
 int main() {
-   int x,y, a();
+extern int x;
 }

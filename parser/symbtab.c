@@ -97,13 +97,23 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
     return new_symb;
 }
 
+void define_var(struct astnode *var, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name){
+    struct symbol *symbol = create_symbol_entry(name, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
+    symbol->var.type = var;
+    symbol->var.stor_class = storage_class;
+    symbol->var.sf_offset = 0;
+    if(!symbtab_insert(table, symbol, false)){
+        fprintf(stderr, "Variable already exists");
+    }    
+}
+
 // define function attributes within function symb
-void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf){
+void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name){
     if(table->scope != SCOPE_GLOBAL){
         fprintf(stderr, "Cannot define function outside of global scope");
     }
     // need to finish this after AST node for function is created. replace "temp" later
-    struct symbol *symbol = create_symbol_entry("temp", SYMB_FUNCTION_NAME, NAMESPACE_ALT, lineno, filename_buf);
+    struct symbol *symbol = create_symbol_entry(name, SYMB_FUNCTION_NAME, NAMESPACE_ALT, lineno, filename_buf);
     symbol->fn.def_seen =  true;
     symbol->fn.is_inline = false; // inline is optional, not doing it
     symbol->fn.type = func;
@@ -133,6 +143,18 @@ void print_symbtab(struct symbtab *table) {
     printf("Name     Attr Type Namespace Filename  Line Num\n");
     while (cur_sym) {
         printf("%s\t %d\t   %d\t     %s      %d\n", cur_sym->name, cur_sym->attr_type, cur_sym->namespace, cur_sym->filename_buf, cur_sym->lineno);
+        switch(cur_sym->attr_type) {
+            case SYMB_FUNCTION_NAME:
+                astwalk_impl(cur_sym->fn.type, 0);
+                break;
+            case SYMB_VARIABLE_NAME:
+                 astwalk_impl(cur_sym->var.type, 0);
+            // case SYMB_STRUCT_TAG:
+
+            default:
+                break;
+        }
+
         cur_sym = cur_sym->next;
     }
 }

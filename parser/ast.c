@@ -153,17 +153,21 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
     declspecs->nodetype = nodetype;
     switch(val->nodetype) {
         case AST_NODE_TYPE_STORAGE:
+             declspecs->declspec.typequal = -1;
             declspecs->declspec.storageclass = val->storage.types;
             break;
         case AST_NODE_TYPE_UNION:
+             declspecs->declspec.typequal = -1;
             declspecs->declspec.typespecif = val;
             declspecs->declspec.storageclass = -1;
             break;
         case AST_NODE_TYPE_STRUCT:
+             declspecs->declspec.typequal = -1;
         declspecs->declspec.typespecif = val;
          declspecs->declspec.storageclass = -1;
             break;
         case AST_NODE_TYPE_SCALAR:
+        declspecs->declspec.typequal = -1;
             declspecs->declspec.typespecif = val;
              declspecs->declspec.storageclass = -1;
             break;

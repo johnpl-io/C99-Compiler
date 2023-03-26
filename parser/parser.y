@@ -8,6 +8,7 @@
     #include <ctype.h>
     #include "ast.h"
     #include "symbtab.h"
+    #include "symbtabinsert.h"
     int yylex();
     void yyerror (char const *s) {
         fprintf (stderr, "%s\n", s);
@@ -74,15 +75,19 @@
 // %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
-start: declaration_or_fndef
+start: declaration_or_fndef 
+    | start declaration_or_fndef 
+    ;
+
 declaration_or_fndef: declaration 
                     | function_definition
                     ;
-function_definition: declaration-specifiers declarator { printf("funct on"); } compound_statement { printf("funct off"); } { }
+function_definition: declaration-specifiers declarator {   } 
+                                                        compound_statement { printf("funct off"); } { }
         ;
 
 
-compound_statement: '{' { printf("2"); }decl_or_stmt_list  '}' {  }  
+compound_statement: '{' { current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf); }decl_or_stmt_list  {  current_scope = symbtab_pop(current_scope); }'}' {  }  
         ;
 
 
@@ -217,10 +222,11 @@ expression: assignment-expression         { $$ = $1; }
 
 
 /* 6.7.0 ? */
-declaration: declaration-specifiers init-declarator-list ';' {  }
+declaration: declaration-specifiers init-declarator-list ';' { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope);  }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
-    
+
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
     | storage-class-specifier  { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
     | type-specifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);   }
@@ -231,8 +237,8 @@ declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = 
     | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
     ;
 
-init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1->head); }
-    | init-declarator-list ',' init-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3->head); }
+init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1); }
+    | init-declarator-list ',' init-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3); }
     ;
     
 init-declarator: declarator { $$ = $1;  }

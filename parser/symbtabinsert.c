@@ -44,7 +44,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             
             if(type) {
                 //second element of list
-                astwalk_impl(headdecl, 0);
+                
                 switch(taildecl->nodetype) {
                     case AST_NODE_TYPE_POINTER:
                         taildecl->ptr.next = declspecs;
@@ -70,5 +70,5 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             ll_nodell = ll_nodell->ll.next;
            
         }
-     print_symbtab(symbtab);
+     
     }

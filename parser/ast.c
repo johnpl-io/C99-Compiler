@@ -77,6 +77,8 @@ struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
 
 struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astnode *next) {
      struct astnode *n = malloc(sizeof(struct astnode));
+     struct astnode *temp = malloc(sizeof(struct astnode));
+     int flag = 0;
     if(nodetype == AST_NODE_TYPE_LL) {
   
      //   printf("astnode %p \n", astnode->ll.head);
@@ -89,13 +91,21 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
     } else {
         n = next;
         n->head = astnode->head;
-        
+   if(next->nodetype == AST_NODE_TYPE_POINTER) {
+             temp = next;
+            while(temp->ptr.next != NULL) {
+                temp->ptr.next->head = astnode->head;
+                temp = temp->ptr.next;
+            }
+            temp->head = astnode->head;
+            flag = 1;
+        }
         switch(astnode->nodetype) {
             case AST_NODE_TYPE_DECL:
                 astnode->decl.next = n;
                 break;
             case AST_NODE_TYPE_ARRAYDCL:
-                            astnode->arraydecl.next = n;
+                astnode->arraydecl.next = n;
                 break;
             case AST_NODE_TYPE_POINTER:
                 astnode->ptr.next = n;
@@ -106,6 +116,9 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
         }
 
     }
+    if(flag == 1) {
+        return temp;
+    } 
     return n;
 }
 

@@ -237,11 +237,11 @@ declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = 
     | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
     ;
 
-init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1); }
+init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
     | init-declarator-list ',' init-declarator { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3); }
     ;
     
-init-declarator: declarator { $$ = $1;  }
+init-declarator: declarator { $$ = $1; astwalk_impl($1->head, 0); }
     | declarator '=' initializer {/* do not have to do yet */ }
     ;
                         
@@ -334,7 +334,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
                
 /* 6.7.5 */
-    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_DECL, $2,  $1); }
+    declarator: pointer direct-declarator { $$ = insertElement(AST_NODE_TYPE_DECL, $2,  $1);   }
             | direct-declarator { $$ = $1; }
             ;
 
@@ -357,7 +357,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     pointer: '*' {  $$ =  newType(AST_NODE_TYPE_POINTER,  0);  }
         | '*' type-qualifier-list {  /*<-thing on right receives this */ }
         | '*' type-qualifier-list pointer {}
-        | '*' pointer { $2->ptr.next = newType(AST_NODE_TYPE_POINTER,  0);  $$ = $2;  }
+        | '*' pointer { struct astnode *temp = newType(AST_NODE_TYPE_POINTER,  0);  temp->ptr.next = $2; $$ = temp; }
         ;
 
     type-qualifier-list: type-qualifier {$$ = $1; }

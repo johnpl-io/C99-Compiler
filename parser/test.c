@@ -2,6 +2,7 @@
 
 
 int main() {
+    auto x;
 struct a {
     struct a {
         int x;

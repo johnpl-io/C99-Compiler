@@ -2676,7 +2676,7 @@ yyreduce:
 
   case 131: /* struct-declaration: specifier-qualifier-list struct-declarator-list ';'  */
 #line 305 "parser.y"
-                                                                        { symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, cur_struct->structunion.minitable); }
+                                                                        { symbent_combinesu((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, cur_struct->structunion.minitable, current_scope); }
 #line 2681 "parser.tab.c"
     break;
 

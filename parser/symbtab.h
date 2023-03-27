@@ -164,6 +164,12 @@ struct symbtab {
     //maybe line and fileno as well here
 };
 
+struct struct_stack {
+    struct astnode *head;
+    struct astnode *next;
+    char *name;
+};
+
 // Create empty symbol table
 struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf);
 // Destroy: destroy a symbol table including any storage it consumes
@@ -197,6 +203,10 @@ void declare_struct();
 // print out symbol table
 void print_symbtab(struct symbtab *table);
 void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name);
+
+struct struct_stack *struct_stack_init(char *name);
+struct struct_stack *struct_push(struct struct_stack *current_struct, char* name);
+struct struct_stack *struct_pop(struct struct_stack *current_struct);
 
 // TO DO: 
 // maybe make an AST node for struct union label? Maybe not?

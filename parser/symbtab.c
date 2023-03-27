@@ -184,3 +184,24 @@ void print_symbtab(struct symbtab *table) {
         cur_sym = cur_sym->next;
     }
 }
+
+struct struct_stack *struct_stack_init(char *name){
+    struct struct_stack *struct_stack = calloc(1, sizeof(struct struct_stack));
+    struct_stack->name = name;
+    return struct_stack;
+}
+
+struct struct_stack *struct_push(struct struct_stack *current_struct, char* name){
+    struct struct_stack *new_struct = struct_stack_init(name);
+    new_struct->next = current_struct;
+    return new_struct;
+}
+
+struct struct_stack *struct_pop(struct struct_stack *current_struct){
+    struct struct_stack *prev_struct = current_struct->next;
+    struct struct_stack *new_current_struct = NULL;
+    if (prev_struct){
+        new_current_struct = prev_struct;
+    }
+    return new_current_struct;
+}

@@ -7,25 +7,24 @@
 #include "ast.h"
 #include "symbtabinsert.h"
 
-void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *symbtab){
+void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
     char *name;
     struct astnode *type;
     int strgclass;
-    bool isFunc;
-   
-    if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
+    bool isFunc = false;
+    bool isArr = false;
+    bool isNeither = false;
+    bool isPtr = false;
+    bool isStruct = false;
+     struct symbol *lookup;
     
+    if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
+            isStruct = true;
      struct symbol *test = create_symbol_entry(declspecs->declspec.typespecif->structunion.name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
-    struct symbol *lookup = symbtab_lookup_all(symbtab, test);
-      
-        if(lookup){
-               declspecs->declspec.typespecif = lookup->struct_union_tag.type;
-        }
-        else {
-        define_struct(declspecs->declspec.typespecif, symbtab, lineno, filename_buf, false, declspecs->declspec.typespecif->structunion.name);
-       }
+        lookup = symbtab_lookup_all(curscope, test);
+   
     }          
     // check if type struct
     // do lookup and see if struct already exists in symbtab
@@ -47,6 +46,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         //loop through to set proper structs and check for errors
         if (!(type = headdecl->decl.next)){
             isFunc = false;
+            isNeither = true;
         } else {
             switch (type->nodetype){
                 // check if function
@@ -54,13 +54,39 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                     //is function
                     isFunc = true;
                     break;
-                //is a function 
+                case AST_NODE_TYPE_ARRAYDCL:
+                    isArr = true;
+                    break;
+                case AST_NODE_TYPE_POINTER:
+              
+                    isPtr = true;
+                    break;
 
                 // default is variable
                 default:
+                 
                         isFunc = false;
                     break;
             }
+        }
+        if(isStruct) {
+            
+        if(lookup){
+            printf("found it");
+            if(isPtr) {  
+               declspecs->declspec.typespecif = lookup->struct_union_tag.type;
+            } else {
+                    printf("got ya");
+            }
+        }
+        else {
+            if(isPtr) { 
+        define_struct(declspecs->declspec.typespecif, curscope, lineno, filename_buf,declspecs->declspec.typespecif->structunion.name);
+            } else {
+               fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", "standard in", lineno, declspecs->declspec.typespecif->structunion.name);
+               exit(-1);
+            }
+       }
         }
             if(type) {
                 //second element of list
@@ -89,9 +115,9 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
 
             if (isFunc){
                 //append types //no checking yet 
-                define_func(type, symbtab, lineno, filename_buf, strgclass, name);
+                define_func(type, curscope, lineno, filename_buf, strgclass, name);
             } else {
-                define_var(type, symbtab, lineno, filename_buf, strgclass, name);
+                define_var(type, curscope, lineno, filename_buf, strgclass, name);
             }
         
             ll_nodell = ll_nodell->ll.next;
@@ -100,4 +126,6 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
        // print_symbtab(symbtab);
     }
 
-//void symbent_struct()
+void symbent_combinesu(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *structscope, struct symbtab *curscope) {
+    //properly place struct tags in curscope but everything else in struct scope
+}

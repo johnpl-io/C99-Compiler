@@ -108,7 +108,7 @@ struct enum_constant_atr{
 // symbol table with member def + whether defnition is complete
 struct struct_union_tag_atr{
     struct astnode *type;
-    bool def_complete;
+  //bool def_complete;
 };
 // once def is complete, store nothing
 struct enum_tag_atr{
@@ -196,8 +196,7 @@ void declare_struct();
 
 // print out symbol table
 void print_symbtab(struct symbtab *table);
-
-void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, bool def_complete, char *name);
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name);
 
 // TO DO: 
 // maybe make an AST node for struct union label? Maybe not?

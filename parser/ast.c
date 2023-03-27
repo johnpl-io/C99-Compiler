@@ -5,7 +5,13 @@
 #include "symbtab.h"
 #include <ctype.h>
  extern int lineno;
-
+ extern char filename_buf[256];
+char * filename(char * filename) {
+    if (!filename) {
+        return "<standard in>";
+    }
+    else return filename;
+}
 struct astnode *newNum(int nodetype, struct Num num) {
   
     struct astnode *numast = malloc(sizeof(struct astnode));
@@ -113,6 +119,10 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
                 astnode->ptr.next = n;
                 break;
             case AST_NODE_TYPE_FNDCL:
+            if(n->nodetype = AST_NODE_TYPE_FNDCL) {
+                fprintf(stderr, "%s : %d : Error Function cannot return function. \n", filename_buf, lineno);
+                exit(1);
+            }
                 astnode->fndcl.next = n;
                 break;
         }

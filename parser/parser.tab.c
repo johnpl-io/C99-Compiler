@@ -1932,7 +1932,7 @@ yyreduce:
 
   case 4: /* declaration_or_fndef: declaration  */
 #line 84 "parser.y"
-                                  {print_symbtab(current_scope); }
+                                  { }
 #line 1937 "parser.tab.c"
     break;
 
@@ -2437,7 +2437,7 @@ yyreduce:
 
   case 90: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 235 "parser.y"
-                                                             { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
+                                                             {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                           symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope);  }
 #line 2443 "parser.tab.c"
     break;
@@ -2630,15 +2630,15 @@ yyreduce:
 
   case 123: /* $@4: %empty  */
 #line 288 "parser.y"
-                                                 {   
+                                                 {                  
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-        cur_struct = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);  define_struct(cur_struct, current_scope, lineno,  filename_buf, true, cur_struct->structunion.name); }
+        cur_struct = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);  define_struct(cur_struct, current_scope, lineno,  filename_buf, cur_struct->structunion.name); }
 #line 2637 "parser.tab.c"
     break;
 
   case 124: /* struct-or-union-specifier: struct-or-union IDENT $@4 '{' struct-declaration-list '}'  */
 #line 290 "parser.y"
-                                                                                                                                                                                                                                                                   { (yyval.astnode_p) = cur_struct; }
+                                                                                                                                                                                                                                                             { cur_struct->structunion.is_complete = 1; (yyval.astnode_p) = cur_struct; }
 #line 2643 "parser.tab.c"
     break;
 

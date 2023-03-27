@@ -120,9 +120,9 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     } 
 }
 
-void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, bool def_complete, char * name){
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name){
     struct symbol *symbol = create_symbol_entry(name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
-    symbol->struct_union_tag.def_complete = def_complete;
+   // symbol->struct_union_tag.def_complete = def_complete; i think it might be better to use the one in astnode
     symbol->struct_union_tag.type = struct_union;
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Struct/Union already exists");

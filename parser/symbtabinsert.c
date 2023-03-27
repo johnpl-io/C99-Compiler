@@ -79,6 +79,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         if(isStruct) {
             
         if(lookup){
+            
            printf("found it");
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
@@ -87,6 +88,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                  declspecs->declspec.typespecif = lookup->struct_union_tag.type;
                 printf("I am complete");
               } else {
+                
                 fprintf(stderr, "Error incomplete struct declared \n");
               }
             }
@@ -136,7 +138,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             ll_nodell = ll_nodell->ll.next;
            
         }
-       // print_symbtab(symbtab);
+    
     }
 
 void symbent_combinesu(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *structscope, struct symbtab *curscope) {

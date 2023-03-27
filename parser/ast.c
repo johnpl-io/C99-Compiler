@@ -364,7 +364,7 @@ void printoperator(int operator) {
             printf("POSTINC\n"); break;
         case POSTDEC: 
             printf("POSTDEC\n"); break;
-        case SHL:
+        case SHL:                printf("I am complete");
             printf("SHL\n"); break;
         case SHR:
             printf("SHR\n"); break;
@@ -530,8 +530,8 @@ void astwalk_impl(struct astnode *ast, int depth) {
             if(ast->structunion.minitable) {
             printf("    SYMBOL TABLE FOR STRUCT \n");
 
-            print_symbtab(ast->structunion.minitable);
-                    printf("   END OF SYMBOL TABLE FOR STRUCT \n"); 
+         //  print_symbtab(ast->structunion.minitable);
+                   printf("   END OF SYMBOL TABLE FOR STRUCT \n"); 
             }
            break;
            case AST_NODE_TYPE_UNION:

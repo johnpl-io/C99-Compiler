@@ -234,7 +234,7 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);  }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);      print_symbtab(current_scope); }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
 
@@ -288,7 +288,7 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
 
 struct-or-union-specifier: struct-or-union IDENT {                  
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);  define_struct(cur_struct, current_scope, lineno,  filename_buf, cur_struct->structunion.name); }'{' struct-declaration-list {  cur_struct->structunion.is_complete = 1; } '}' {$$ = cur_struct; }
+        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);  define_struct(cur_struct, current_scope, lineno,  filename_buf, cur_struct->structunion.name); }'{' struct-declaration-list {  cur_struct->structunion.is_complete = 1; printf("ISCOMPLETE"); } '}' {$$ = cur_struct; }
                         |  struct-or-union '{'  struct-declaration-list '}' {  }
                         |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno);   }
                         ;
@@ -303,7 +303,7 @@ struct-declaration-list: struct-declaration {
                         | struct-declaration-list struct-declaration
                           ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, cur_struct->structunion.minitable, current_scope); } ;
+struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, cur_struct->structunion.minitable, current_scope);   } ;
                     
 
 specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }

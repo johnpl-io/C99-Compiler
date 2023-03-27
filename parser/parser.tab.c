@@ -2431,7 +2431,7 @@ yyreduce:
   case 90: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 236 "parser.y"
                                                              {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);  }
+                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);      print_symbtab(current_scope); }
 #line 2436 "parser.tab.c"
     break;
 
@@ -2631,13 +2631,13 @@ yyreduce:
 
   case 124: /* $@5: %empty  */
 #line 291 "parser.y"
-                                                                                                                                                                                                                                                         {  cur_struct->structunion.is_complete = 1; }
+                                                                                                                                                                                                                                                         {  cur_struct->structunion.is_complete = 1; printf("ISCOMPLETE"); }
 #line 2636 "parser.tab.c"
     break;
 
   case 125: /* struct-or-union-specifier: struct-or-union IDENT $@4 '{' struct-declaration-list $@5 '}'  */
 #line 291 "parser.y"
-                                                                                                                                                                                                                                                                                                           {(yyval.astnode_p) = cur_struct; }
+                                                                                                                                                                                                                                                                                                                                 {(yyval.astnode_p) = cur_struct; }
 #line 2642 "parser.tab.c"
     break;
 
@@ -2675,7 +2675,7 @@ yyreduce:
 
   case 132: /* struct-declaration: specifier-qualifier-list struct-declarator-list ';'  */
 #line 306 "parser.y"
-                                                                        { symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, cur_struct->structunion.minitable, current_scope); }
+                                                                        { symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, cur_struct->structunion.minitable, current_scope);   }
 #line 2680 "parser.tab.c"
     break;
 

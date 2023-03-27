@@ -185,14 +185,14 @@ void print_symbtab(struct symbtab *table) {
     }
 }
 
-struct struct_stack *struct_stack_init(char *name){
+struct struct_stack *struct_stack_init(struct astnode *struct_astnode){
     struct struct_stack *struct_stack = calloc(1, sizeof(struct struct_stack));
-    struct_stack->name = name;
+    struct_stack->astnode = struct_astnode;
     return struct_stack;
 }
 
-struct struct_stack *struct_push(struct struct_stack *current_struct, char* name){
-    struct struct_stack *new_struct = struct_stack_init(name);
+struct struct_stack *struct_push(struct struct_stack *current_struct, struct astnode *struct_astnode){
+    struct struct_stack *new_struct = struct_stack_init(struct_astnode);
     new_struct->next = current_struct;
     return new_struct;
 }

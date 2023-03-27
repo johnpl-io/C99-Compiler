@@ -165,9 +165,8 @@ struct symbtab {
 };
 
 struct struct_stack {
-    struct astnode *head;
-    struct astnode *next;
-    char *name;
+    struct struct_stack *next;
+    struct astnode *astnode;
 };
 
 // Create empty symbol table
@@ -204,10 +203,9 @@ void declare_struct();
 void print_symbtab(struct symbtab *table);
 void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name);
 
-struct struct_stack *struct_stack_init(char *name);
-struct struct_stack *struct_push(struct struct_stack *current_struct, char* name);
+struct struct_stack *struct_stack_init(struct astnode *struct_astnode);
+struct struct_stack *struct_push(struct struct_stack *current_struct, struct astnode *struct_astnode);
 struct struct_stack *struct_pop(struct struct_stack *current_struct);
-
 // TO DO: 
 // maybe make an AST node for struct union label? Maybe not?
 // need to add functions for printing out symbol table maybe

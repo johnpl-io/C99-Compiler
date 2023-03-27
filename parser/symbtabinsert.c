@@ -83,9 +83,9 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
             } else {
-              if(declspecs->declspec.typespecif->structunion.is_complete) {
+              if(lookup->struct_union_tag.type->structunion.is_complete) {
+                 declspecs->declspec.typespecif = lookup->struct_union_tag.type;
                 printf("I am complete");
-                declspecs->declspec.typespecif = lookup->struct_union_tag.type
               } else {
                 fprintf(stderr, "Error incomplete struct declared \n");
               }

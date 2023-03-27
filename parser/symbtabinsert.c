@@ -6,8 +6,7 @@
 #include "symbtab.h"
 #include "ast.h"
 #include "symbtabinsert.h"
-
-void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope){
+void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
     char *name;
@@ -18,12 +17,20 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isNeither = false;
     bool isPtr = false;
     bool isStruct = false;
+    bool isInsideStruct = false;
      struct symbol *lookup;
+     struct symbol *structlookup; 
     
     if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
             isStruct = true;
+            if(outscopeforstruct) {
+                printf("struct in struct");
+                structlookup = outscopeforstruct;
+            } else {
+                structlookup = curscope; 
+            }
      struct symbol *test = create_symbol_entry(declspecs->declspec.typespecif->structunion.name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
-        lookup = symbtab_lookup_all(curscope, test);
+        lookup = symbtab_lookup_all(structlookup , test);
    
     }          
     // check if type struct
@@ -72,18 +79,24 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         if(isStruct) {
             
         if(lookup){
-            printf("found it");
+           printf("found it");
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
             } else {
-                    printf("got ya");
+              if(declspecs->declspec.typespecif->structunion.is_complete) {
+                printf("I am complete");
+                declspecs->declspec.typespecif = lookup->struct_union_tag.type
+              } else {
+                fprintf(stderr, "Error incomplete struct declared \n");
+              }
             }
         }
         else {
             if(isPtr) { 
-        define_struct(declspecs->declspec.typespecif, curscope, lineno, filename_buf,declspecs->declspec.typespecif->structunion.name);
+        define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name);
             } else {
                fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", "standard in", lineno, declspecs->declspec.typespecif->structunion.name);
+               print_symbtab(structlookup);
                exit(-1);
             }
        }

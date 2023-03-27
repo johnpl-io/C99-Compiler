@@ -22,6 +22,7 @@
 
     // keep track of current scope, initially at global scope
     struct symbtab *current_scope;
+    struct struct_stack *current_struct;
     struct astnode *cur_struct;
 %}
 

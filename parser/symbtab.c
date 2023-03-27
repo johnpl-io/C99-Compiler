@@ -23,7 +23,7 @@ void symbtab_destroy(struct symbtab *table) {
 }
 
 // traverse through stack of scopes and each symbol in each scope for a match
-struct symbol *symbtab_lookup(struct symbtab *table, struct symbol *symbol) {
+struct symbol *symbtab_lookup_all(struct symbtab *table, struct symbol *symbol) {
     struct symbtab *cur_table = table;
     struct symbol *cur_sym = NULL;
     while (cur_table) {
@@ -40,10 +40,23 @@ struct symbol *symbtab_lookup(struct symbtab *table, struct symbol *symbol) {
     return NULL;
 }
 
+// traverse just through the current scope to find a match
+struct symbol *symbtab_lookup_current(struct symbtab *table, struct symbol *symbol){
+    struct symbol *cur_sym = NULL;
+    cur_sym = table->head;
+    while (cur_sym) {
+            if (strcmp(cur_sym->name, symbol->name) == 0 && cur_sym->namespace == symbol->namespace) {
+                return cur_sym;
+            }
+            cur_sym = cur_sym->next;
+        }
+    return NULL;
+}
+
 // return true if installed successfully, return false if it's already there and we don't want to replace
 bool symbtab_insert(struct symbtab *table, struct symbol *symbol, bool replace) {
     // check if symb exists within the table
-    struct symbol *exists = symbtab_lookup(table, symbol);
+    struct symbol *exists = symbtab_lookup_current(table, symbol);
     if (exists) {
         if (replace) {
             // replace the definition of the symbol
@@ -104,7 +117,16 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     symbol->var.sf_offset = 0;
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Variable already exists");
-    }    
+    } 
+}
+
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, bool def_complete, char * name){
+    struct symbol *symbol = create_symbol_entry(name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
+    symbol->struct_union_tag.def_complete = def_complete;
+    symbol->struct_union_tag.type = struct_union;
+    if(!symbtab_insert(table, symbol, false)){
+        fprintf(stderr, "Struct/Union already exists");
+    }
 }
 
 // define function attributes within function symb
@@ -149,13 +171,16 @@ void print_symbtab(struct symbtab *table) {
                 break;
             case SYMB_VARIABLE_NAME:
                  astwalk_impl(cur_sym->var.type, 0);
-            // case SYMB_STRUCT_TAG:
+                 break;
+            case SYMB_STRUCT_UNION_TAG:
+                
+                break;    
 
             default:
+            printf("NOOO  %d", cur_sym->attr_type);
                 break;
         }
 
         cur_sym = cur_sym->next;
     }
 }
-

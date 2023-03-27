@@ -25,8 +25,7 @@ enum SYMB_TYPE {
     SYMB_FUNCTION_NAME,
     SYMB_TYPEDEF_NAME,
     SYMB_ENUM_CONSTANT,
-    SYMB_STRUCT_TAG,
-    SYMB_UNION_TAG,
+    SYMB_STRUCT_UNION_TAG,
     SYMB_ENUM_TAG,
     SYMB_LABEL,
     SYMB_STRUCT_MEMBER,
@@ -108,7 +107,7 @@ struct enum_constant_atr{
 };
 // symbol table with member def + whether defnition is complete
 struct struct_union_tag_atr{
-    struct symbtab *symbtab;
+    struct astnode *type;
     bool def_complete;
 };
 // once def is complete, store nothing
@@ -171,7 +170,9 @@ struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf);
 void symbtab_destroy(struct symbtab *table);
 // Lookup: given an existing symbol table, a name, and a namespace class
 // Return the associated symbol table entry, or return nothing if the symbol DNE
-struct symbol *symbtab_lookup(struct symbtab *table, struct symbol *symbol);
+struct symbol *symbtab_lookup_all(struct symbtab *table, struct symbol *symbol);
+// Lookup within current scope
+struct symbol *symbtab_lookup_current(struct symbtab *table, struct symbol *symbol); 
 // Enter: give an existing symbol table, a name, a namespace class, and a set of attributes
 // Insert a symbol into the symbol table
 bool symbtab_insert(struct symbtab *table, struct symbol *symbol, bool replace);
@@ -192,11 +193,11 @@ void define_var(struct astnode *func, struct symbtab *table, int lineno, char *f
 void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf);
 // do later: stuct definition (forward declaration) and declaration (members, own symbtab).
 void declare_struct();
-void define_struct();
+
 // print out symbol table
 void print_symbtab(struct symbtab *table);
 
-
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, bool def_complete, char *name);
 
 // TO DO: 
 // maybe make an AST node for struct union label? Maybe not?

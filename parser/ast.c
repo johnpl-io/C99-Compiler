@@ -49,8 +49,8 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     a->tenop.right = r;
     return a;
 }
-//creates a new struct or union an
-struct astnode *newStructUnion(int nodetype, char *name, struct symboltab *minitable) {
+//creates a new struct or union it has redundant file name and line no that are also in the symbol for debugging
+struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno) {
 struct astnode *a = malloc(sizeof(struct astnode));
     if(nodetype == STRUCT) {
         a->nodetype = AST_NODE_TYPE_STRUCT;
@@ -59,6 +59,8 @@ struct astnode *a = malloc(sizeof(struct astnode));
     }
  a->structunion.minitable = minitable;
  a->structunion.name = name;
+ a->structunion.filename = filename;
+ a->structunion.lineno = lineno;
   return a;
 } 
 
@@ -515,7 +517,12 @@ void astwalk_impl(struct astnode *ast, int depth) {
         break;
         case AST_NODE_TYPE_STRUCT:
             printf("STRUCT %s \n", ast->structunion.name);
-           astwalk_impl(ast->structunion.next, depth + 1);
+            if(ast->structunion.minitable) {
+            printf("    SYMBOL TABLE FOR STRUCT \n");
+
+            print_symbtab(ast->structunion.minitable);
+                    printf("   END OF SYMBOL TABLE FOR STRUCT \n"); 
+            }
            break;
            case AST_NODE_TYPE_UNION:
             printf("UNION %s \n", ast->structunion.name);

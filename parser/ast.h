@@ -149,9 +149,11 @@ struct astnode_typequal {
 struct astnode_structunion {
     int nodetype;
     char *name;
-   int is_complete;
+    int is_complete;
+    char *filename; 
+    int lineno;
     struct astnode *next;
-    struct symboltab *minitable; //mini symbol table for struct or union  
+    struct symbtab *minitable; //mini symbol table for struct or union  
 };
 
 struct astnode {
@@ -193,4 +195,4 @@ struct astnode *newDecl(int nodetype, struct astnode *val);
 struct astnode *newArrayDecl(struct astnode *size);
 struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
-struct astnode *newStructUnion(int nodetype, char *name, struct symboltab *minitable);
+struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno);

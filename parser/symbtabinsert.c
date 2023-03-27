@@ -127,5 +127,6 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     }
 
 void symbent_combinesu(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *structscope, struct symbtab *curscope) {
-    //properly place struct tags in curscope but everything else in struct scope
+    //properly place struct tags in curscope but everything else in struct scope 
+    //it is the same as the one above with minor modifications
 }

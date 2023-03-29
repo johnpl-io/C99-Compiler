@@ -1,5 +1,5 @@
 
-#line 3 "lex.yy.c"
+#line 2 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -826,9 +826,9 @@ char *yytext;
     char *filename_buf_ptr;
     int string_buf_len = 0;
         
-#line 830 "lex.yy.c"
+#line 829 "lex.yy.c"
 
-#line 832 "lex.yy.c"
+#line 831 "lex.yy.c"
 
 #define INITIAL 0
 #define charseq 1
@@ -1057,7 +1057,7 @@ YY_DECL
     char *string_buf_ptr;
     int char_count; 
     int count = 0;
-#line 1061 "lex.yy.c"
+#line 1060 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1966,7 +1966,7 @@ YY_RULE_SETUP
 #line 325 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1970 "lex.yy.c"
+#line 1969 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(charseq):
 case YY_STATE_EOF(str):

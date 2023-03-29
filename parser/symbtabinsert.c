@@ -98,7 +98,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name);
             } else {
                fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", "standard in", lineno, declspecs->declspec.typespecif->structunion.name);
-               print_symbtab(structlookup);
+             //  print_symbtab(structlookup);
                exit(-1);
             }
        }

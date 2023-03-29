@@ -235,7 +235,7 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);      print_symbtab(current_scope); }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);     }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
 
@@ -289,7 +289,17 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
 
 struct-or-union-specifier: struct-or-union IDENT {                  
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);  define_struct(cur_struct, current_scope, lineno,  filename_buf, cur_struct->structunion.name); }'{' struct-declaration-list {  cur_struct->structunion.is_complete = 1; printf("ISCOMPLETE"); } '}' {$$ = cur_struct; }
+    if(!current_struct) { 
+        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);
+        current_struct =  struct_stack_init(cur_struct);
+        } else {
+            current_struct = struct_push(current_struct, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
+        }
+         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name); 
+        }
+        
+        
+        '{' struct-declaration-list {  current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); } '}' {$$ = cur_struct; }
                         |  struct-or-union '{'  struct-declaration-list '}' {  }
                         |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno);   }
                         ;
@@ -389,7 +399,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     
     parameter-declaration: declaration-specifiers declarator {}
         | declaration-specifiers abstract-declarator {   }
-        | declaration-specifiers { }
+        | declaration-specifiers { $$ = $1; }
         ;
     
     identifier-list: IDENT

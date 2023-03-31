@@ -167,7 +167,13 @@ struct astnode *newType(int nodetype, int type) {
     return ast;
 }
 
-
+struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar) {
+    struct astnode *declaration = malloc(sizeof(struct astnode));
+    declaration->nodetype = nodetype;
+    declaration->declaration.declspec = declspecs;
+    declaration->declaration.decl = declar;
+    return declaration;
+}
 
 
 
@@ -373,7 +379,12 @@ void printoperator(int operator) {
     }
     }
 }
-
+void print_spaces(int depth) {
+    
+   for (int i = 0; i < depth; i++) {
+        printf("  ");
+    }
+}
 
 void astwalk_impl(struct astnode *ast, int depth) {
     if (!ast) {
@@ -470,7 +481,9 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_FNDCL:
             printf("FUNCTION DECL \n");
             astwalk_impl(ast->fndcl.next, depth +1);
-      
+            print_spaces(depth);
+            printf("FUNCTION PARAMETERS \n");
+             astwalk_impl(ast->fndcl.parameters, depth +1);
             break;
         case AST_NODE_TYPE_ARRAYDCL:
             printf("ARRAY OF SIZE "); 
@@ -490,8 +503,8 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_DECLSPEC:
             printf("DECL SPECS");
             printf(" | Storage Class %d | Type qualifier %d | \n", ast->declspec.storageclass, ast->declspec.typequal);
-           
-            printf("Typspecifiers \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);
+                print_spaces(depth);
+            printf("Typspecifiers [ \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);     print_spaces(depth);  printf(" ]\n");
             break;
         case AST_NODE_TYPE_SCALAR:
             switch (ast->scal.types) {
@@ -538,8 +551,13 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("UNION %s \n", ast->structunion.name);
            astwalk_impl(ast->structunion.next, depth + 1);
            break;
+           case AST_NODE_TYPE_DECLARATION:
+           printf("DECLARATION \n");
+           astwalk_impl(ast->declaration.declspec, depth + 1);
+              astwalk_impl(ast->declaration.decl, depth + 1);
+           break;
         default:
-            printf("Unknown node type\n %d", ast->nodetype) ;
+            printf("Unknown node type %d \n", ast->nodetype) ;
             break;
     }
 }

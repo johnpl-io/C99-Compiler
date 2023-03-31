@@ -22,6 +22,7 @@ enum AstNodeType {
     AST_NODE_TYPE_ARRAYDCL,
     AST_NODE_TYPE_STRUCT,
     AST_NODE_TYPE_UNION, 
+    AST_NODE_TYPE_DECLARATION,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -125,7 +126,7 @@ struct astnode_functdecl{
     int nodetype;
     struct astnode *returntype;
     struct astnode *parameters;
-    struct astnode *next;
+    struct astnode *next; //is return type
 };
 struct astnode_decl {
     char *ident;
@@ -156,6 +157,12 @@ struct astnode_structunion {
     struct symbtab *minitable; //mini symbol table for struct or union  
 };
 
+
+struct astnode_declaration {
+    int nodetype;
+    struct astnode *declspec;
+    struct astnode *decl;
+};
 struct astnode {
 int nodetype;
 union {
@@ -176,6 +183,7 @@ union {
     struct astnode_decl  decl;
     struct astnode_functdecl fndcl;
     struct astnode_structunion structunion;
+    struct astnode_declaration declaration;
     };  
    struct astnode *head, *tail;
 };
@@ -196,3 +204,4 @@ struct astnode *newArrayDecl(struct astnode *size);
 struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
 struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno);
+struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar);

@@ -138,13 +138,34 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             ll_nodell = ll_nodell->ll.next;
            
         }
-    
+
+        //print_symbtab(curscope);
     }
+//function for placing parameter list inside of function scope
 
-void symbent_combinesu(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *structscope, struct symbtab *curscope) {
-    //properly place struct tags in curscope but everything else in struct scope 
-    //it is the same as the one above with minor modifications
-    // check if declspec is struct
+void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filename_buf, struct symbtab *curscopefn) {
+         struct astnode *fn_decl = fn_parameters->head;
+         if(!fn_decl->decl.next) {
+         fprintf(stderr, "Expecting a function. \n");
+         exit(-1);
+        }
+        if(fn_decl->decl.next->nodetype != AST_NODE_TYPE_FNDCL) {
+        fprintf(stderr, "Expecting a function. \n");
+         exit(-1);
+        }   
+      struct astnode *fn_parameterlist = fn_decl->decl.next->fndcl.parameters;
+       if(!fn_parameterlist) {
+           return; 
+      }
+       struct astnode *ll_nodell = fn_parameterlist->ll.head;
+            while (ll_nodell != NULL) {
+                struct astnode *declspecs =  ll_nodell->ll.data->declaration.declspec;
+                struct astnode *declarator = ll_nodell->ll.data->declaration.decl;
+        
+      symbent_combine(declspecs, insertElementorig(AST_NODE_TYPE_LL, declarator), lineno, filename_buf, curscopefn, NULL);
 
-    // if it is struct look up if it is exists and if it is defined in struct scope first and then if it does not exist in curscope
+               ll_nodell = ll_nodell->ll.next;
+             
+           }
+           
 }

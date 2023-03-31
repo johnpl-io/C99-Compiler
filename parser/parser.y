@@ -19,6 +19,7 @@
     extern char filename_buf[256];
     extern int lineno;
     int isFunc; 
+    struct astnode *fn_parameters;
 
     // keep track of current scope, initially at global scope
     struct symbtab *current_scope;
@@ -58,7 +59,7 @@
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
-%type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier 
+%type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier type-name parameter-declaration parameter-list parameter-type-list
 %type <op> unary-operator assignment-operator struct-or-union 
 
 // %left ','
@@ -87,16 +88,24 @@ declaration_or_fndef: declaration { }
                     ;
 function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                           symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
-                                                          isFunc = 1;} 
+                                                          isFunc = 1; 
+                                                          fn_parameters = $2;
+                                                  
+                                                           } 
                                                         compound_statement  { }
         ;
 
 
 compound_statement: '{' 
 
-                    { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);} 
+                    { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);
+                                   symbent_combine_fn(fn_parameters, lineno, filename_buf, current_scope);
+                                    } 
                         else { current_scope = symbtab_push(SCOPE_BLOCK, current_scope, lineno, filename_buf);}
                         isFunc = 0;
+
+                        fn_parameters = NULL;
+                        
                     } 
                     decl_or_stmt_list  
                     {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
@@ -374,7 +383,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | direct-declarator '[' type-qualifier-list '*' ']'  { }
         | direct-declarator '[' '*' ']'   { /*  */ }
         | direct-declarator '[' ']' {$$ = insertElement(AST_NODE_TYPE_ARRAYDCL, $1,  newArrayDecl(NULL));}
-        | direct-declarator '(' parameter-type-list ')' {  $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL)); }
+        | direct-declarator '(' parameter-type-list ')' {  $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl($3));  }
         | direct-declarator '(' identifier-list ')' { }
         | direct-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL)); }  
         ;
@@ -389,25 +398,25 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | type-qualifier-list type-qualifier { $$ = newast(AST_NODE_TYPE_QUALIFIER, $1, $2, 0); } 
         ;
     
-    parameter-type-list: parameter-list
+    parameter-type-list: parameter-list { $$ = $1; }
         | parameter-list ',' ELLIPSIS
         ;
     
-    parameter-list: parameter-declaration
-        | parameter-list ',' parameter-declaration
+    parameter-list: parameter-declaration { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
+        | parameter-list ',' parameter-declaration { $$ = insertElement(AST_NODE_TYPE_LL, $1, $3); }
         ;
     
-    parameter-declaration: declaration-specifiers declarator {}
-        | declaration-specifiers abstract-declarator {   }
-        | declaration-specifiers { $$ = $1; }
+    parameter-declaration: declaration-specifiers declarator { $$ = newDeclaration(AST_NODE_TYPE_DECLARATION, $1, $2); }
+        | declaration-specifiers abstract-declarator { $$ = newDeclaration(AST_NODE_TYPE_DECLARATION, $1, $2);  }
+        | declaration-specifiers { $$ = newDeclaration(AST_NODE_TYPE_DECLARATION, NULL, $1); }
         ;
     
-    identifier-list: IDENT
-        | identifier-list ',' IDENT
+    identifier-list: IDENT { }
+        | identifier-list ',' IDENT { }
         ;
     
     /* 6.7.6 */
-    type-name: specifier-qualifier-list
+    type-name: specifier-qualifier-list { $$ = $1; }
         | specifier-qualifier-list abstract-declarator
         ;
     
@@ -422,9 +431,9 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         | '[' assignment-expression ']' { $$ = insertElement(AST_NODE_TYPE_ARRAYDCL, newDeclar(AST_NODE_TYPE_DECL, NULL), newArrayDecl($2));  }
         | direct-abstract-declarator '[' '*' ']' {   }
         | '[' '*' ']' {  }
-        | direct-abstract-declarator '(' parameter-type-list ')' { }
-        | '(' parameter-type-list ')' { }
-        | direct-abstract-declarator '(' ')' { }
+        | direct-abstract-declarator '(' parameter-type-list ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl($3));  }
+        | '(' parameter-type-list ')' { $$ = newDeclar(AST_NODE_TYPE_DECL, NULL);  $$ = insertElement(AST_NODE_TYPE_FNDCL, $$,  newFunctDecl($2));}
+        | direct-abstract-declarator '(' ')' { $$ = insertElement(AST_NODE_TYPE_FNDCL, $1,  newFunctDecl(NULL));  }
         ;
     /* 6.7.7 */
    /* typedef-name: IDENT  */

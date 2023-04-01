@@ -173,7 +173,7 @@ void print_symbtab(struct symbtab *table) {
                  astwalk_impl(cur_sym->var.type, 0);
                  break;
             case SYMB_STRUCT_UNION_TAG:
-                
+                 astwalk_impl(cur_sym->struct_union_tag.type, 0);
                 break;    
 
             default:

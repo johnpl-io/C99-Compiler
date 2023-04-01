@@ -18,19 +18,28 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isPtr = false;
     bool isStruct = false;
     bool isInsideStruct = false;
+    bool isAnonStructdefine = false;
      struct symbol *lookup;
      struct symbol *structlookup; 
-    
+    if(!declspecs->declspec.typespecif) {
+        declspecs->declspec.typespecif = newType(AST_NODE_TYPE_SCALAR, INT);
+    }
     if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
             isStruct = true;
             if(outscopeforstruct) {
                 printf("struct in struct");
+                isInsideSturct = true;
                 structlookup = outscopeforstruct;
             } else {
                 structlookup = curscope; 
             }
+            if(!declspecs->declspec.typespecif->structunion.name && declspecs->declspec.typespecif->structunion.is_complete ) {
+                isAnonStructdefine = 1;
+            }  else {
+   
      struct symbol *test = create_symbol_entry(declspecs->declspec.typespecif->structunion.name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
         lookup = symbtab_lookup_all(structlookup , test);
+            }
    
     }          
     // check if type struct
@@ -42,6 +51,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         
     //extract storage class check for semantics error
     strgclass = declspecs->declspec.storageclass;
+ 
 
     struct astnode *ll_nodell = declars->ll.head;
     while (ll_nodell != NULL) {
@@ -76,7 +86,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                     break;
             }
         }
-        if(isStruct) {
+        if(isStruct && !isAnonStructdefine) {
             
         if(lookup){
             
@@ -138,6 +148,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             ll_nodell = ll_nodell->ll.next;
            
         }
+        
 
         //print_symbtab(curscope);
     }
@@ -167,5 +178,6 @@ void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filenam
                ll_nodell = ll_nodell->ll.next;
              
            }
-           
+    
+
 }

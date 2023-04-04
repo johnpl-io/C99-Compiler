@@ -90,7 +90,7 @@
 
     // keep track of current scope, initially at global scope
     struct symbtab *current_scope;
-    struct struct_stack *current_struct;
+    struct struct_stack *curstruct_scope;
     struct astnode *cur_struct;
 
 #line 97 "parser.tab.c"
@@ -2436,13 +2436,13 @@ yyreduce:
   case 90: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 246 "parser.y"
                                                              {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL); print_symbtab(current_scope);   }
+                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);   }
 #line 2441 "parser.tab.c"
     break;
 
   case 91: /* declaration: declaration-specifiers ';'  */
 #line 248 "parser.y"
-                                  {  }
+                                  { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);} symbent_struct_reset((yyvsp[-1].astnode_p), lineno, filename_buf, current_scope); }
 #line 2447 "parser.tab.c"
     break;
 
@@ -2628,15 +2628,15 @@ yyreduce:
 
   case 123: /* $@4: %empty  */
 #line 299 "parser.y"
-                                                 {                  
+                                                 {            
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-    if(!current_struct) { 
-        cur_struct = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);
-        current_struct =  struct_stack_init(cur_struct);
+    if(!curstruct_scope) { 
+        cur_struct = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
+        curstruct_scope =  struct_stack_init(cur_struct);
         } else {
-            current_struct = struct_push(current_struct, newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
+            curstruct_scope = struct_push(curstruct_scope, newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
-         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name, false); 
+         symbent_struct(curstruct_scope->astnode, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
          
         }
 #line 2643 "parser.tab.c"
@@ -2644,13 +2644,13 @@ yyreduce:
 
   case 124: /* $@5: %empty  */
 #line 312 "parser.y"
-                                    {  current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); }
+                                    {  curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); }
 #line 2649 "parser.tab.c"
     break;
 
   case 125: /* struct-or-union-specifier: struct-or-union IDENT $@4 '{' struct-declaration-list $@5 '}'  */
 #line 312 "parser.y"
-                                                                                                                                                                      {    (yyval.astnode_p) = cur_struct;  }
+                                                                                                                                                                         {    (yyval.astnode_p) = cur_struct;  }
 #line 2655 "parser.tab.c"
     break;
 
@@ -2658,11 +2658,11 @@ yyreduce:
 #line 313 "parser.y"
                                             {
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-    if(!current_struct) { 
-        cur_struct = newStructUnion((yyvsp[0].op), NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);
-        current_struct =  struct_stack_init(cur_struct);
+    if(!curstruct_scope) { 
+        cur_struct = newStructUnion((yyvsp[0].op), NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
+        curstruct_scope =  struct_stack_init(cur_struct);
         } else {
-            current_struct = struct_push(current_struct, newStructUnion((yyvsp[0].op), NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
+            curstruct_scope = struct_push(curstruct_scope, newStructUnion((yyvsp[0].op), NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
         
                             
@@ -2672,19 +2672,19 @@ yyreduce:
 
   case 127: /* $@7: %empty  */
 #line 323 "parser.y"
-                                                       {current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); }
+                                                       {curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); }
 #line 2677 "parser.tab.c"
     break;
 
   case 128: /* struct-or-union-specifier: struct-or-union $@6 '{' struct-declaration-list $@7 '}'  */
 #line 323 "parser.y"
-                                                                                                                                                                                      { (yyval.astnode_p) = cur_struct;  }
+                                                                                                                                                                                         { (yyval.astnode_p) = cur_struct;  }
 #line 2683 "parser.tab.c"
     break;
 
   case 129: /* struct-or-union-specifier: struct-or-union IDENT  */
 #line 324 "parser.y"
-                                                 { (yyval.astnode_p) = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), NULL, filename_buf, lineno);   }
+                                                 { (yyval.astnode_p) = newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), NULL, filename_buf, lineno, 0);   }
 #line 2689 "parser.tab.c"
     break;
 

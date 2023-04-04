@@ -56,7 +56,7 @@ struct astnode *newTenop(int nodetype, struct astnode *l, struct astnode *m, str
     return a;
 }
 //creates a new struct or union it has redundant file name and line no that are also in the symbol for debugging
-struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno) {
+struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno, int isBeingDefined) {
     struct astnode *a = malloc(sizeof(struct astnode));
         if(nodetype == STRUCT) {
             a->nodetype = AST_NODE_TYPE_STRUCT;
@@ -67,6 +67,7 @@ struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitab
     a->structunion.name = name;
     a->structunion.filename = filename;
     a->structunion.lineno = lineno;
+    a->structunion.isbeing_defined = isBeingDefined;
     return a;
 } 
 

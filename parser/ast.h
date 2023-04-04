@@ -153,6 +153,7 @@ struct astnode_structunion {
     int is_complete;
     char *filename; 
     int lineno;
+    int isbeing_defined; //struct is being defined
     struct astnode *next;
     struct symbtab *minitable; //mini symbol table for struct or union  
 };
@@ -203,5 +204,5 @@ struct astnode *newDecl(int nodetype, struct astnode *val);
 struct astnode *newArrayDecl(struct astnode *size);
 struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
-struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno);
+struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno, int isBeingDefined);
 struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar);

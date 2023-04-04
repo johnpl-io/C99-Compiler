@@ -23,7 +23,7 @@
 
     // keep track of current scope, initially at global scope
     struct symbtab *current_scope;
-    struct struct_stack *current_struct;
+    struct struct_stack *curstruct_scope;
     struct astnode *cur_struct;
 %}
 
@@ -244,8 +244,8 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL); print_symbtab(current_scope);   }
-    | declaration-specifiers ';'  {  }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);   }
+    | declaration-specifiers ';'  { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);} symbent_struct_reset($1, lineno, filename_buf, current_scope); }
     ;
 
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}
@@ -296,32 +296,32 @@ type-specifier: VOID {$$ = newType(AST_NODE_TYPE_SCALAR,VOID); }
 
 /* 6.7.2.1 */
 
-struct-or-union-specifier: struct-or-union IDENT {                  
+struct-or-union-specifier: struct-or-union IDENT {            
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-    if(!current_struct) { 
-        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);
-        current_struct =  struct_stack_init(cur_struct);
+    if(!curstruct_scope) { 
+        cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
+        curstruct_scope =  struct_stack_init(cur_struct);
         } else {
-            current_struct = struct_push(current_struct, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
+            curstruct_scope = struct_push(curstruct_scope, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
-         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name, false); 
+         symbent_struct(curstruct_scope->astnode, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
          
         }
         
         
-        '{' struct-declaration-list {  current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); } '}' {    $$ = cur_struct;  }
+        '{' struct-declaration-list {  curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); } '}' {    $$ = cur_struct;  }
                         |  struct-or-union  {
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
-    if(!current_struct) { 
-        cur_struct = newStructUnion($1, NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno);
-        current_struct =  struct_stack_init(cur_struct);
+    if(!curstruct_scope) { 
+        cur_struct = newStructUnion($1, NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
+        curstruct_scope =  struct_stack_init(cur_struct);
         } else {
-            current_struct = struct_push(current_struct, newStructUnion($1, NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
+            curstruct_scope = struct_push(curstruct_scope, newStructUnion($1, NULL, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
         
                             
-                        } '{'  struct-declaration-list {current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); }'}' { $$ = cur_struct;  }
-                        |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno);   }
+                        } '{'  struct-declaration-list {curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); }'}' { $$ = cur_struct;  }
+                        |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno, 0);   }
                         ;
 
 struct-or-union: STRUCT { $$ = STRUCT; }

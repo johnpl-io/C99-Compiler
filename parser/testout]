@@ -1,0 +1,8 @@
+Symbol Table:
+Scope: 0
+Name     Attr Type Namespace Filename  Line Num
+x	 0	   3	     test.c      0
+DECL SPECS | Storage Class 1 | Type qualifier -1 | 
+Typspecifiers [ 
+  int
+ ]

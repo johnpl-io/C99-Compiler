@@ -50,12 +50,8 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         
         
     //extract storage class check for semantics error
-   if(curscope->scope == SCOPE_GLOBAL) {
-        if(declspecs->declspec.storageclass == -1 || declspecs->declspec.storageclass == EXTERN) {
-                declspecs->declspec.storageclass == EXTERN;
-        }
-   }
-    strgclass = declspecs->declspec.storageclass;
+
+    
  
 
     struct astnode *ll_nodell = declars->ll.head;
@@ -91,10 +87,32 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                     break;
             }
         }
+
+
+
+        //here 
+
+    if(curscope->scope == SCOPE_GLOBAL) {
+        if(declspecs->declspec.storageclass == -1) {
+                declspecs->declspec.storageclass = EXTERN_S;
+        } else if(!(declspecs->declspec.storageclass == EXTERN_S  || declspecs->declspec.storageclass == STATIC_S )) {
+            fprintf(stderr, "error storage class not valid in global scope\n");
+             exit(-1);
+        }
+   }
+    
+    if(curscope->scope == SCOPE_FUNCTION || curscope->scope == SCOPE_BLOCK) {
+        if(declspecs->declspec.storageclass == -1 && !isFunc) {
+            declspecs->declspec.storageclass = AUTO_S;
+            
+        } if(declspecs->declspec.storageclass == -1 && isFunc) {
+            declspecs->declspec.storageclass = EXTERN_S;
+        }
+    }
+   strgclass = declspecs->declspec.storageclass;
         if(isStruct && !isAnonStructdefine) {
             
-        if(lookup){
-            
+        if(lookup){ 
            printf("found it");
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
@@ -105,6 +123,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
               } else {
                 
                 fprintf(stderr, "Error incomplete struct declared \n");
+                exit(-1);
               }
             }
         }

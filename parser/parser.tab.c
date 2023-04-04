@@ -2436,13 +2436,13 @@ yyreduce:
   case 90: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 246 "parser.y"
                                                              {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);   print_symbtab(current_scope);  }
+                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL); print_symbtab(current_scope);   }
 #line 2441 "parser.tab.c"
     break;
 
   case 91: /* declaration: declaration-specifiers ';'  */
 #line 248 "parser.y"
-                                  {  (yyval.astnode_p) = (yyvsp[-1].astnode_p); }
+                                  {  }
 #line 2447 "parser.tab.c"
     break;
 

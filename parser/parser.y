@@ -244,8 +244,8 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);   print_symbtab(current_scope);  }
-    | declaration-specifiers ';'  {  $$ = $1; }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL); print_symbtab(current_scope);   }
+    | declaration-specifiers ';'  {  }
     ;
 
 declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);}

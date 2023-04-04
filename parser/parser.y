@@ -79,7 +79,7 @@
 // %left '.' INDSEL '(' ')' '[' ']'
 
 %% /*RULES */
-start: declaration_or_fndef  { }
+start: declaration_or_fndef  { print_symbtab(current_scope); }
     | start declaration_or_fndef  { }
     ;
 

@@ -1,1 +1,5 @@
-int x;
+int main() {
+     const struct a {
+         int x;
+    };
+}

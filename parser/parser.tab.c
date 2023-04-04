@@ -1910,7 +1910,7 @@ yyreduce:
     {
   case 2: /* start: declaration_or_fndef  */
 #line 82 "parser.y"
-                             { }
+                             { print_symbtab(current_scope); }
 #line 1915 "parser.tab.c"
     break;
 

@@ -149,13 +149,14 @@ struct astnode *newType(int nodetype, int type) {
             break;
         case AST_NODE_TYPE_QUALIFIER:
             if(type == CONST){
-                ast->qualifier.types = 0b001;
+                ast->qualifier.types = 0b0010;
+               
             } 
             if(type == VOLATILE) {
-                 ast->qualifier.types = 0b010;
+                 ast->qualifier.types = 0b0100;
             }
             if(type == RESTRICT) {
-                ast->qualifier.types = 0b100;
+                ast->qualifier.types = 0b1000;
             }
             break;
         case AST_NODE_TYPE_POINTER:
@@ -185,21 +186,19 @@ struct astnode *newDecl(int nodetype, struct astnode *val){
     declspecs->nodetype = nodetype;
     switch(val->nodetype) {
         case AST_NODE_TYPE_STORAGE:
-             declspecs->declspec.typequal = -1;
+         
             declspecs->declspec.storageclass = val->storage.types;
             break;
         case AST_NODE_TYPE_UNION:
-             declspecs->declspec.typequal = -1;
+           
             declspecs->declspec.typespecif = val;
             declspecs->declspec.storageclass = -1;
             break;
         case AST_NODE_TYPE_STRUCT:
-             declspecs->declspec.typequal = -1;
         declspecs->declspec.typespecif = val;
          declspecs->declspec.storageclass = -1;
             break;
         case AST_NODE_TYPE_SCALAR:
-        declspecs->declspec.typequal = -1;
             declspecs->declspec.typespecif = val;
              declspecs->declspec.storageclass = -1;
             break;

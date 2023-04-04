@@ -1,0 +1,4 @@
+f is defined at test.c:0 [in global scope starting at test.c:0] as a function with stgclass static returning and taking arguments
+h is defined at test.c:1 [in global scope starting at test.c:0] as a function with stgclass static returning and taking arguments
+x is defined at test.c:4 [in function scope starting at test.c:4] as a variable with stgclass typedef of type:void
+h is defined at test.c:5 [in function scope starting at test.c:4] as a variable with stgclass typedef of type:void

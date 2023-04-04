@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "symbtab.h"
+#include "ast.h"
 
 // extern char filename_buf[255];
 // extern int lineno;
@@ -117,7 +118,18 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     symbol->var.sf_offset = 0;
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Variable already exists");
-    } 
+    } else {
+        printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a variable with stgclass %s of type:",
+        name,
+        filename_buf,
+        lineno,
+        (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : "block",
+        table->filename_buf,
+        table->lineno,
+        print_storage_class(storage_class)
+        );
+        print_type(var);
+    }
 }
 
 void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace){
@@ -143,20 +155,18 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Function already exists");
+    } else {
+        printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
+           name,
+           filename_buf,
+           lineno,
+           (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : "block",
+           table->filename_buf,
+           table->lineno,
+           print_storage_class(storage_class)
+           ); 
     }
 }
-
-// define label. All we need to do is ensure we are in function scope and make sure no duplicate entry
-// void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf){
-//     while(table->scope != SCOPE_FUNCTION){
-//         table = table->next;
-//     }
-//     // do we have an astnode for label? figure out later
-//     struct symbol *symbol = create_symbol_entry("temp", SYMB_LABEL, NAMESPACE_LABEL, int lineno, char *filename_buf);
-//     if(!symbtab_insert(table, symbol, false)){
-//         fprintf(stderr, "Label already exists");
-//     }
-// }
 
 void print_symbtab(struct symbtab *table) {
     printf("Symbol Table:\n");
@@ -204,4 +214,58 @@ struct struct_stack *struct_pop(struct struct_stack *current_struct){
         new_current_struct = prev_struct;
     }
     return new_current_struct;
+}
+
+void print_type(struct astnode *type) {
+    printf("%s\n", getTypeName(type->scal.types));
+}
+
+char* getTypeName(int index) {
+    switch (index) {
+        case VOID_T:
+            return "void";
+        case CHAR_T:
+            return "char";
+        case SHORT_T:
+            return "short";
+        case INT_T:
+            return "int";
+        case LONG_T:
+            return "long";
+        case FLOAT_T:
+            return "float";
+        case DOUBLE_T:
+            return "double";
+        case SIGNED_T:
+            return "signed";
+        case UNSIGNED_T:
+            return "unsigned";
+        case _BOOL_T:
+            return "_Bool";
+        default:
+            return "unknown";
+    }
+}
+
+char *print_storage_class(int storageclass) {
+    switch (storageclass) {
+        case STG_AUTO:
+            return "auto";
+            break;
+        case STG_STATIC:
+            return "static";
+            break;
+        case STG_REGISTER:
+            return "register";
+            break;
+        case STG_EXTERN:
+            return "extern";
+            break;
+        case STG_TYPEDEF:
+            return "typedef";
+            break;
+        default:
+            return "error...";
+            break;
+    }
 }

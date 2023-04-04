@@ -205,13 +205,7 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
 struct struct_stack *struct_stack_init(struct astnode *struct_astnode);
 struct struct_stack *struct_push(struct struct_stack *current_struct, struct astnode *struct_astnode);
 struct struct_stack *struct_pop(struct struct_stack *current_struct);
-// TO DO: 
-// maybe make an AST node for struct union label? Maybe not?
-// need to add functions for printing out symbol table maybe
-// need to add function for entering decl specs and decls into symb table
-// need functions for:
-// define struct/union, declare struct/union, labels, and functions
-// remember: enums, bit fields, typedefs, inline functions are all optional 
-// comment out unncessary optional stuff later
-
+void print_type(struct astnode *type);
+char *print_storage_class(int storageclass);
+char* getTypeName(int index);
 #endif

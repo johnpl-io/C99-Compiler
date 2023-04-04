@@ -28,7 +28,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             isStruct = true;
             if(outscopeforstruct) {
                 printf("struct in struct");
-                isInsideSturct = true;
+                 isInsideStruct  = true;
                 structlookup = outscopeforstruct;
             } else {
                 structlookup = curscope; 
@@ -50,6 +50,11 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         
         
     //extract storage class check for semantics error
+   if(curscope->scope == SCOPE_GLOBAL) {
+        if(declspecs->declspec.storageclass == -1 || declspecs->declspec.storageclass == EXTERN) {
+                declspecs->declspec.storageclass == EXTERN;
+        }
+   }
     strgclass = declspecs->declspec.storageclass;
  
 
@@ -105,7 +110,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         }
         else {
             if(isPtr) { 
-        define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name);
+        define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name, false);
             } else {
                fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", "standard in", lineno, declspecs->declspec.typespecif->structunion.name);
              //  print_symbtab(structlookup);

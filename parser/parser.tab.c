@@ -2436,7 +2436,7 @@ yyreduce:
   case 90: /* declaration: declaration-specifiers init-declarator-list ';'  */
 #line 246 "parser.y"
                                                              {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);     }
+                                                          symbent_combine((yyvsp[-2].astnode_p), (yyvsp[-1].astnode_p), lineno, filename_buf, current_scope, NULL);   print_symbtab(current_scope);  }
 #line 2441 "parser.tab.c"
     break;
 
@@ -2636,7 +2636,7 @@ yyreduce:
         } else {
             current_struct = struct_push(current_struct, newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
         }
-         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name); 
+         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name, false); 
          
         }
 #line 2643 "parser.tab.c"
@@ -2650,7 +2650,7 @@ yyreduce:
 
   case 125: /* struct-or-union-specifier: struct-or-union IDENT $@4 '{' struct-declaration-list $@5 '}'  */
 #line 312 "parser.y"
-                                                                                                                                                                      {    print_symbtab(current_scope); (yyval.astnode_p) = cur_struct;  }
+                                                                                                                                                                      {    (yyval.astnode_p) = cur_struct;  }
 #line 2655 "parser.tab.c"
     break;
 

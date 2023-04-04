@@ -201,8 +201,7 @@ void declare_struct();
 
 // print out symbol table
 void print_symbtab(struct symbtab *table);
-void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name);
-
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace);
 struct struct_stack *struct_stack_init(struct astnode *struct_astnode);
 struct struct_stack *struct_push(struct struct_stack *current_struct, struct astnode *struct_astnode);
 struct struct_stack *struct_pop(struct struct_stack *current_struct);

@@ -120,7 +120,7 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     } 
 }
 
-void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name){
+void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace){
     struct symbol *symbol = create_symbol_entry(name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);
    // symbol->struct_union_tag.def_complete = def_complete; i think it might be better to use the one in astnode
     symbol->struct_union_tag.type = struct_union;
@@ -173,7 +173,7 @@ void print_symbtab(struct symbtab *table) {
                  astwalk_impl(cur_sym->var.type, 0);
                  break;
             case SYMB_STRUCT_UNION_TAG:
-                 astwalk_impl(cur_sym->struct_union_tag.type, 0);
+                // astwalk_impl(cur_sym->struct_union_tag.type, 0);
                 break;    
 
             default:

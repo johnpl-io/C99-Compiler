@@ -244,7 +244,7 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);     }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);   print_symbtab(current_scope);  }
     | declaration-specifiers ';'  {  $$ = $1; }
     ;
 
@@ -304,12 +304,12 @@ struct-or-union-specifier: struct-or-union IDENT {
         } else {
             current_struct = struct_push(current_struct, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno));
         }
-         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name); 
+         define_struct(current_struct->astnode, current_scope, lineno,  filename_buf, current_struct->astnode->structunion.name, false); 
          
         }
         
         
-        '{' struct-declaration-list {  current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); } '}' {    print_symbtab(current_scope); $$ = cur_struct;  }
+        '{' struct-declaration-list {  current_struct->astnode->structunion.is_complete = 1; current_struct = struct_pop(current_struct); printf("ISCOMPLETE"); } '}' {    $$ = cur_struct;  }
                         |  struct-or-union  {
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
     if(!current_struct) { 

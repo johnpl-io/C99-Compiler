@@ -2636,7 +2636,7 @@ yyreduce:
         } else {
             curstruct_scope = struct_push(curstruct_scope, newStructUnion((yyvsp[-1].op), (yyvsp[0].string_literal), symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
-         symbent_struct(curstruct_scope->astnode, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
+         symbent_struct(curstruct_scope, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
          
         }
 #line 2643 "parser.tab.c"

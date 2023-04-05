@@ -304,7 +304,7 @@ struct-or-union-specifier: struct-or-union IDENT {
         } else {
             curstruct_scope = struct_push(curstruct_scope, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
         }
-         symbent_struct(curstruct_scope->astnode, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
+         symbent_struct(curstruct_scope, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
          
         }
         

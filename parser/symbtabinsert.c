@@ -207,8 +207,8 @@ void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filenam
  //wrapper to check symbol table entry insertion for struct   
 
 }
-void symbent_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace) {
- struct symbol *test = create_symbol_entry(struct_union->structunion.name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);   
+void symbent_struct(struct struct_stack *curstruct_scope, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace) {
+ struct symbol *test = create_symbol_entry( curstruct_scope->astnode->structunion.name, SYMB_STRUCT_UNION_TAG, NAMESPACE_TAG, lineno, filename_buf);   
 struct symbol *lookup = symbtab_lookup_all(table , test); //look up existance of struct 
 if(lookup) {
    if((!lookup->struct_union_tag.type->structunion.is_complete) && lookup->struct_union_tag.type->structunion.isbeing_defined) {
@@ -218,11 +218,11 @@ if(lookup) {
 
      if(!lookup->struct_union_tag.type->structunion.is_complete && !lookup->struct_union_tag.type->structunion.isbeing_defined) { 
         printf("finishing");
-        struct_union = lookup->struct_union_tag.type; 
+        curstruct_scope->astnode  = lookup->struct_union_tag.type; 
       return;
     }
 }
-    define_struct(struct_union, table, lineno, filename_buf, name, false);
+    define_struct(curstruct_scope->astnode, table, lineno, filename_buf, name, false);
 }
 //dealing with struct a; where struct a hides outer scope with undefined incomplete definition
 void symbent_struct_reset(struct astnode *declspecs, int lineno, char *filename_buf, struct symbtab *curscope) {

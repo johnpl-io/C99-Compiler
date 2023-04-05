@@ -139,6 +139,10 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
     symbol->struct_union_tag.type = struct_union;
     if(!symbtab_insert(table, symbol, replace)){
         fprintf(stderr, "Struct/Union already exists");
+    } else {
+        if(struct_union->structunion.isbeing_defined) {
+            printf("being defined \n");
+        }
     }
 }
 

@@ -217,7 +217,8 @@ if(lookup) {
     }
 
      if(!lookup->struct_union_tag.type->structunion.is_complete && !lookup->struct_union_tag.type->structunion.isbeing_defined) { 
-        printf("finishing");
+        lookup->struct_union_tag.type->structunion.isbeing_defined = 1;
+        printf("incomplete defintion being defined");
         curstruct_scope->astnode  = lookup->struct_union_tag.type; 
       return;
     }

@@ -128,7 +128,8 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
         table->lineno,
         print_storage_class(storage_class)
         );
-        print_type(var);
+        printf("\n");
+        astwalk_impl(var, 0);
     }
 }
 
@@ -165,6 +166,8 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
            table->lineno,
            print_storage_class(storage_class)
            ); 
+           printf("\n");
+           astwalk_impl(func, 0);
     }
 }
 
@@ -249,19 +252,19 @@ char* getTypeName(int index) {
 
 char *print_storage_class(int storageclass) {
     switch (storageclass) {
-        case STG_AUTO:
+        case AUTO_S:
             return "auto";
             break;
-        case STG_STATIC:
+        case STATIC_S:
             return "static";
             break;
-        case STG_REGISTER:
+        case REGISTER_S:
             return "register";
             break;
-        case STG_EXTERN:
+        case EXTERN_S:
             return "extern";
             break;
-        case STG_TYPEDEF:
+        case TYPEDEF_S:
             return "typedef";
             break;
         default:

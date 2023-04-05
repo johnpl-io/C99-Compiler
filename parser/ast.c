@@ -120,11 +120,12 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
                 astnode->ptr.next = n;
                 break;
             case AST_NODE_TYPE_FNDCL:
-            if(n->nodetype = AST_NODE_TYPE_FNDCL) {
-                fprintf(stderr, "%s : %d : Error Function cannot return function. \n", filename_buf, lineno);
-                exit(1);
-            }
-                astnode->fndcl.next = n;
+              astnode->fndcl.next = n;
+          if(n->nodetype == AST_NODE_TYPE_FNDCL) {
+            fprintf(stderr, "function cannot return a function\n");
+            exit(1);
+
+          }
                 break;
         }
 
@@ -479,10 +480,13 @@ void astwalk_impl(struct astnode *ast, int depth) {
      
             break;
         case AST_NODE_TYPE_FNDCL:
-            printf("FUNCTION DECL \n");
+            printf("FUNCTION DECL RETURNING :\n");
             astwalk_impl(ast->fndcl.next, depth +1);
             print_spaces(depth);
-            printf("FUNCTION PARAMETERS \n");
+            printf("FUNCTION PARAMETERS  : \n");
+            if(!ast->fndcl.parameters) {
+              print_spaces(depth);  printf("unknown arguments \n");
+            }
              astwalk_impl(ast->fndcl.parameters, depth +1);
             break;
         case AST_NODE_TYPE_ARRAYDCL:

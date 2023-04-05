@@ -94,7 +94,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
 
 
         //here 
-
+ 
     if(curscope->scope == SCOPE_GLOBAL) {
         if(declspecs->declspec.storageclass == -1) {
                 declspecs->declspec.storageclass = EXTERN_S;
@@ -124,7 +124,6 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                  declspecs->declspec.typespecif = lookup->struct_union_tag.type;
                 printf("I am complete");
               } else {
-                
                 fprintf(stderr, "Error incomplete struct declared \n");
                 exit(-1);
               }
@@ -231,7 +230,11 @@ void symbent_struct_reset(struct astnode *declspecs, int lineno, char *filename_
         return;
     }
     if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
-        define_struct(declspecs->declspec.typespecif, curscope , lineno, filename_buf ,declspecs->declspec.typespecif->structunion.name, false);
+        if(declspecs->declspec.typespecif->structunion.is_complete)
+ {
+    return;
+ }
+       define_struct(declspecs->declspec.typespecif, curscope , lineno, filename_buf ,declspecs->declspec.typespecif->structunion.name, false);
 
     }          
     //otherwise we do not care such as int; 

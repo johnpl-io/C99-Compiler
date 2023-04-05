@@ -123,7 +123,7 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
         name,
         filename_buf,
         lineno,
-        (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : "block",
+        (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : (table->scope == SCOPE_STRUCT_UNION) ? "struct_union" : "block",
         table->filename_buf,
         table->lineno,
         print_storage_class(storage_class)

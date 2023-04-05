@@ -543,13 +543,19 @@ void astwalk_impl(struct astnode *ast, int depth) {
             astwalk_impl(ast->scal.next, depth + 1);
         break;
         case AST_NODE_TYPE_STRUCT:
-            printf("STRUCT %s \n", ast->structunion.name);
-            if(ast->structunion.minitable) {
-            printf("    SYMBOL TABLE FOR STRUCT \n");
+            printf("STRUCT %s ", ast->structunion.name);
+         //   if(ast->structunion.minitable) {
+                     print_spaces(depth);
+                if(!ast->structunion.is_complete) {
+                printf("(incomplete)\n");
+                } else {
+                    printf("defined at %s %d \n", ast->structunion.filename, ast->structunion.lineno);
+                }
+           // printf("    SYMBOL TABLE FOR STRUCT \n");
 
-         print_symbtab(ast->structunion.minitable);
-                   printf("   END OF SYMBOL TABLE FOR STRUCT \n"); 
-            }
+        // print_symbtab(ast->structunion.minitable);
+          //         printf("   END OF SYMBOL TABLE FOR STRUCT \n"); 
+       //     }
            break;
            case AST_NODE_TYPE_UNION:
             printf("UNION %s \n", ast->structunion.name);

@@ -121,15 +121,15 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     } else {
         printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a variable with stgclass %s of type:",
         name,
-        filename_buf,
+        filename(filename_buf),
         lineno,
         (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : (table->scope == SCOPE_STRUCT_UNION) ? "struct_union" : "block",
-        table->filename_buf,
+        filename(table->filename_buf),
         table->lineno,
         print_storage_class(storage_class)
         );
         printf("\n");
-        astwalk_impl(var, 0);
+      astwalk_impl(var, 0);
     }
 }
 
@@ -161,7 +161,7 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Function already exists");
     } else {
-        printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
+           printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
            name,
            filename_buf,
            lineno,
@@ -169,9 +169,9 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
            table->filename_buf,
            table->lineno,
            print_storage_class(storage_class)
-           ); 
+       ); 
            printf("\n");
-           astwalk_impl(func, 0);
+        astwalk_impl(func, 0);
     }
 }
 

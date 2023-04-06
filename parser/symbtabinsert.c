@@ -9,7 +9,7 @@
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
-    char *name;
+    char *name = NULL;
     struct astnode *type;
     int strgclass;
     bool isFunc = false;
@@ -28,7 +28,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
             isStruct = true;
             if(outscopeforstruct) {
-                printf("struct in struct");
+          //      printf("struct in struct");
                  isInsideStruct  = true;
                 structlookup = outscopeforstruct;
             } else {
@@ -116,7 +116,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         if(isStruct && !isAnonStructdefine) {
             
         if(lookup){ 
-           printf("found it");
+           //printf("found it");
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
             } else {
@@ -133,7 +133,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             if(isPtr) { 
         define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name, false);
             } else {
-               fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", "standard in", lineno, declspecs->declspec.typespecif->structunion.name);
+               fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", filename(filename_buf), lineno, declspecs->declspec.typespecif->structunion.name);
              //  print_symbtab(structlookup);
                exit(-1);
             }
@@ -163,14 +163,15 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             } else {
                 type = declspecs;
             }
-
+            if(name) {
             if (isFunc){
                 //append types //no checking yet 
                 define_func(type, curscope, lineno, filename_buf, strgclass, name);
             } else {
-                define_var(type, curscope, lineno, filename_buf, strgclass, name);
+              define_var(type, curscope, lineno, filename_buf, strgclass, name);
+                
             }
-        
+            }
             ll_nodell = ll_nodell->ll.next;
            
         }
@@ -198,8 +199,10 @@ void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filenam
             while (ll_nodell != NULL) {
                 struct astnode *declspecs =  ll_nodell->ll.data->declaration.declspec;
                 struct astnode *declarator = ll_nodell->ll.data->declaration.decl;
-        
-      symbent_combine(declspecs, insertElementorig(AST_NODE_TYPE_LL, declarator), lineno, filename_buf, curscopefn, NULL);
+                if(declarator->head) {
+                     symbent_combine(declspecs, insertElementorig(AST_NODE_TYPE_LL, declarator), lineno, filename_buf, curscopefn, NULL);
+                }
+    
 
                ll_nodell = ll_nodell->ll.next;
              

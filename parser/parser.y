@@ -309,7 +309,7 @@ struct-or-union-specifier: struct-or-union IDENT {
         }
         
         
-        '{' {printf("{\n"); } struct-declaration-list {  curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); } '}' {    $$ = cur_struct;  }
+        '{' {printf("{\n"); } struct-declaration-list {  curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope);printf("}\n");  } '}' {    $$ = cur_struct;  }
                         |  struct-or-union  {
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
     if(!curstruct_scope) { 
@@ -320,7 +320,7 @@ struct-or-union-specifier: struct-or-union IDENT {
         }
         
                             
-                        } '{'  struct-declaration-list {curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("ISCOMPLETE"); }'}' { $$ = cur_struct;  }
+                        } '{'   {printf("{\n"); } struct-declaration-list {curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("}\n"); }'}' { $$ = cur_struct;  }
                         |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno, 0);   }
                         ;
 

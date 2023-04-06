@@ -206,3 +206,4 @@ struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
 struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno, int isBeingDefined);
 struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar);
+char * filename(char * filename);

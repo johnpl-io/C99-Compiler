@@ -7,7 +7,8 @@
  extern int lineno;
  extern char filename_buf[256];
 char * filename(char * filename) {
-    if (!filename) {
+    if (filename[0] == '\0') {
+
         return "<standard in>";
     }
     else return filename;
@@ -470,8 +471,10 @@ void astwalk_impl(struct astnode *ast, int depth) {
             break;
         case AST_NODE_TYPE_LL:
         printf("LINKED LIST \n");
+      
         struct astnode *ll_nodell = ast->ll.head;
             int count = 0;
+            
             while (ll_nodell != NULL) {
                 astwalk_impl(ll_nodell->ll.data, depth + 1);
                 ll_nodell = ll_nodell->ll.next;
@@ -547,7 +550,10 @@ void astwalk_impl(struct astnode *ast, int depth) {
          //   if(ast->structunion.minitable) {
                      print_spaces(depth);
                 if(!ast->structunion.is_complete) {
-                printf("(incomplete)\n");
+                printf("(incomplete)");
+                    if(ast->structunion.isbeing_defined) {
+                        printf(" is being defined at %s:%d \n", filename(ast->structunion.filename), ast->structunion.lineno);
+                    }
                 } else {
                     printf("defined at %s %d \n", ast->structunion.filename, ast->structunion.lineno);
                 }

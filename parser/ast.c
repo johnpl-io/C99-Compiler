@@ -13,6 +13,43 @@ char * filename(char * filename) {
     }
     else return filename;
 }
+const char* storage_class_string(int storage_class) {
+    const char* storage_class_names[] = {
+        "typedef",
+        "extern",
+        "static",
+        "auto",
+        "register"
+    };
+    if (storage_class >= 0 && storage_class < 5) {
+        return storage_class_names[storage_class];
+    } else {
+        return "Not applicable";
+    }
+}
+
+const char* qualifier_types_string(int qualifier_types) {
+    switch (qualifier_types) {
+        case 0b0000:
+            return "Not applicable";
+        case 0b0010:
+            return "CONST";
+        case 0b0100:
+            return "VOLATILE";
+        case 0b1000:
+            return "RESTRICT";
+        case 0b0110:
+            return "CONST VOLATILE";
+        case 0b1010:
+            return "CONST RESTRICT";
+        case 0b1100:
+            return "VOLATILE RESTRICT";
+        case 0b1110:
+            return "CONST VOLATILE RESTRICT";
+        default:
+            return "Unknown qualifier type";
+    }
+}
 struct astnode *newNum(int nodetype, struct Num num) {
   
     struct astnode *numast = malloc(sizeof(struct astnode));
@@ -486,7 +523,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("FUNCTION DECL RETURNING :\n");
             astwalk_impl(ast->fndcl.next, depth +1);
             print_spaces(depth);
-            printf("FUNCTION PARAMETERS  : \n");
+            printf("FUNCTION PARAMETERS (BE WARY THE DECL IS NOT THE HEAD) : \n");
             if(!ast->fndcl.parameters) {
               print_spaces(depth);  printf("unknown arguments \n");
             }
@@ -509,7 +546,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
             break;
         case AST_NODE_TYPE_DECLSPEC:
             printf("DECL SPECS");
-            printf(" | Storage Class %d | Type qualifier %d | \n", ast->declspec.storageclass, ast->declspec.typequal);
+            printf(" | Storage Class  : %s | Type qualifier : %s | \n", storage_class_string(ast->declspec.storageclass), qualifier_types_string(ast->declspec.typequal));
                 print_spaces(depth);
             printf("Typspecifiers [ \n"); astwalk_impl(ast->declspec.typespecif, depth + 1);     print_spaces(depth);  printf(" ]\n");
             break;

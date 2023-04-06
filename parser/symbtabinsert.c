@@ -223,6 +223,7 @@ if(lookup) {
         lookup->struct_union_tag.type->structunion.isbeing_defined = 1;
         printf("incomplete defintion being defined");
         curstruct_scope->astnode  = lookup->struct_union_tag.type; 
+        lookup->struct_union_tag.type->structunion.lineno = lineno;
       return;
     }
 }

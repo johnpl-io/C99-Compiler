@@ -17,6 +17,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isNeither = false;
     bool isPtr = false;
     bool isStruct = false;
+    bool isUnion = false;
     bool isInsideStruct = false;
     bool isAnonStructdefine = false;
      struct symbol *lookup;
@@ -25,8 +26,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     if(!declspecs->declspec.typespecif) {
         declspecs->declspec.typespecif = newType(AST_NODE_TYPE_SCALAR, INT);
     }
-    if( declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT)  {
-            isStruct = true;
+    if( (isStruct = declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT) || (isUnion =  declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_UNION) )  {
             if(outscopeforstruct) {
           //      printf("struct in struct");
                  isInsideStruct  = true;
@@ -99,8 +99,8 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         if(declspecs->declspec.storageclass == -1) {
                 declspecs->declspec.storageclass = EXTERN_S;
         } else if(!(declspecs->declspec.storageclass == EXTERN_S  || declspecs->declspec.storageclass == STATIC_S )) {
-            fprintf(stderr, "error storage class not valid in global scope\n");
-             exit(-1);
+            fprintf(stderr, "%s:%d Error storage class for '%s' not valid in global scope.\n", filename(filename_buf), lineno, name);
+        
         }
    }
     
@@ -113,19 +113,25 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
         }
     }
    strgclass = declspecs->declspec.storageclass;
-        if(isStruct && !isAnonStructdefine) {
+        if((isStruct || isUnion) && !isAnonStructdefine) {
             
         if(lookup){ 
-           //printf("found it");
+           if(isStruct && lookup->struct_union_tag.type->nodetype == AST_NODE_TYPE_UNION) {
+            fprintf(stderr, "%s:%d tag '%s' does not match previous use at %s:%d. Did you mean union %s? \n", filename(filename_buf), lineno, name, filename(lookup->filename_buf), lookup->lineno, name);
+         
+           } else if(isUnion && lookup->struct_union_tag.type->nodetype == AST_NODE_TYPE_STRUCT) {
+        fprintf(stderr, "%s:%d tag '%s' does not match previous use at %s:%d. Did you mean struct %s? \n", filename(filename_buf), lineno, name, filename(lookup->filename_buf), lookup->lineno, name);
+           
+           }
             if(isPtr) {  
                declspecs->declspec.typespecif = lookup->struct_union_tag.type;
             } else {
               if(lookup->struct_union_tag.type->structunion.is_complete) {
                  declspecs->declspec.typespecif = lookup->struct_union_tag.type;
-                printf("I am complete");
+               // printf("I am complete");
               } else {
-                fprintf(stderr, "Error incomplete struct declared \n");
-                exit(-1);
+                fprintf(stderr, "%s:%d Error incomplete struct or union '%s' declared \n", filename(filename_buf), lineno, name);
+                
               }
             }
         }
@@ -133,9 +139,9 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             if(isPtr) { 
         define_struct(declspecs->declspec.typespecif, structlookup , lineno, filename_buf,declspecs->declspec.typespecif->structunion.name, false);
             } else {
-               fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct %s \n", filename(filename_buf), lineno, declspecs->declspec.typespecif->structunion.name);
+               fprintf(stderr, "%s: %d : Error Variable has incomplete definition of struct or union %s \n", filename(filename_buf), lineno, declspecs->declspec.typespecif->structunion.name);
              //  print_symbtab(structlookup);
-               exit(-1);
+             
             }
        }
         }
@@ -184,12 +190,10 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
 void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filename_buf, struct symbtab *curscopefn) {
          struct astnode *fn_decl = fn_parameters->head;
          if(!fn_decl->decl.next) {
-         fprintf(stderr, "Expecting a function. \n");
-         exit(-1);
+         fprintf(stderr, "%s:%d Expecting a function. \n", filename(filename_buf), lineno);
         }
         if(fn_decl->decl.next->nodetype != AST_NODE_TYPE_FNDCL) {
-        fprintf(stderr, "Expecting a function. \n");
-         exit(-1);
+        fprintf(stderr, "%s:%d Expecting a function. \n", filename(filename_buf), lineno);
         }   
       struct astnode *fn_parameterlist = fn_decl->decl.next->fndcl.parameters;
        if(!fn_parameterlist) {
@@ -215,15 +219,14 @@ void symbent_struct(struct struct_stack *curstruct_scope, struct symbtab *table,
 struct symbol *lookup = symbtab_lookup_all(table , test); //look up existance of struct 
 if(lookup) {
    if((!lookup->struct_union_tag.type->structunion.is_complete) && lookup->struct_union_tag.type->structunion.isbeing_defined) {
-        printf("not allowed");
+        fprintf(stderr, "%s:%d Attempting to redeclare a struct or union '%s' that is being defined. \n", filename(filename_buf), lineno, curstruct_scope->astnode->structunion.name);
        return;
     }
 
      if(!lookup->struct_union_tag.type->structunion.is_complete && !lookup->struct_union_tag.type->structunion.isbeing_defined) { 
         lookup->struct_union_tag.type->structunion.isbeing_defined = 1;
-        printf("incomplete defintion being defined");
-        curstruct_scope->astnode  = lookup->struct_union_tag.type; 
-        lookup->struct_union_tag.type->structunion.lineno = lineno;
+        fprintf(stderr, "%s:%d incomplete defintion being defined. \n", filename(filename_buf), lineno, curstruct_scope->astnode->structunion.name);
+      define_struct(curstruct_scope->astnode, table, lineno, filename_buf, name, true);
       return;
     }
 }

@@ -8,7 +8,7 @@
    #include "parser.tab.h"
    int get_line_info();
    int handle_error();
-   int lineno;
+   int lineno = 1;
    /*  enum type {
         INT_SIGNED,
         INT_LONG,

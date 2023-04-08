@@ -302,14 +302,15 @@ struct-or-union-specifier: struct-or-union IDENT {
         cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
         curstruct_scope =  struct_stack_init(cur_struct);
         } else {
-            curstruct_scope = struct_push(curstruct_scope, newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1));
+             cur_struct = newStructUnion($1, $2, symbtab_init(SCOPE_STRUCT_UNION, lineno, filename_buf), filename_buf , lineno, 1);
+            curstruct_scope = struct_push(curstruct_scope, cur_struct);
         }
          symbent_struct(curstruct_scope, current_scope, lineno,  filename_buf, curstruct_scope->astnode->structunion.name, false); 
          
         }
         
         
-        '{' {printf("{\n"); } struct-declaration-list {  curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope);printf("}\n");  } '}' {    $$ = cur_struct;  }
+        '{'  struct-declaration-list {  curstruct_scope->astnode->structunion.is_complete = 1; cur_struct = curstruct_scope->astnode; curstruct_scope = struct_pop(curstruct_scope);  printf("}\n");} '}' {    $$ = cur_struct;   }
                         |  struct-or-union  {
     if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf); }
     if(!curstruct_scope) { 
@@ -320,7 +321,7 @@ struct-or-union-specifier: struct-or-union IDENT {
         }
         
                             
-                        } '{'   {printf("{\n"); } struct-declaration-list {curstruct_scope->astnode->structunion.is_complete = 1; curstruct_scope = struct_pop(curstruct_scope); printf("}\n"); }'}' { $$ = cur_struct;  }
+                        } '{'   struct-declaration-list {curstruct_scope->astnode->structunion.is_complete = 1;  cur_struct = curstruct_scope->astnode; curstruct_scope = struct_pop(curstruct_scope); printf("}\n"); }'}' { $$ = cur_struct;  }
                         |  struct-or-union IDENT { $$ = newStructUnion($1, $2, NULL, filename_buf, lineno, 0);   }
                         ;
 
@@ -334,7 +335,7 @@ struct-declaration-list: struct-declaration {
                         | struct-declaration-list struct-declaration
                           ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, cur_struct->structunion.minitable, current_scope);    } ;
+struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, curstruct_scope->astnode->structunion.minitable, current_scope);    } ;
                     
 
 specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }

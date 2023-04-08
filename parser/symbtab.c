@@ -121,15 +121,15 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     } else {
         printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a variable with stgclass %s of type:",
         name,
-        filename(filename_buf),
-        lineno,
+       filename(filename_buf),
+       lineno,
         (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : (table->scope == SCOPE_STRUCT_UNION) ? "struct_union" : "block",
-        filename(table->filename_buf),
-        table->lineno,
-        print_storage_class(storage_class)
+       filename(table->filename_buf),
+       table->lineno,
+      print_storage_class(storage_class)
         );
-        printf("\n");
-      astwalk_impl(var, 0);
+       printf("\n");
+     astwalk_impl(var, 0);
     }
 }
 
@@ -138,10 +138,10 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
    // symbol->struct_union_tag.def_complete = def_complete; i think it might be better to use the one in astnode
     symbol->struct_union_tag.type = struct_union;
     if(!symbtab_insert(table, symbol, replace)){
-        fprintf(stderr, "Struct/Union already exists");
+        fprintf(stderr, "%s:%d RedeStruct/Union '%s' already exists \n", filename(filename_buf), lineno, name);
     } else {
         if(struct_union->structunion.isbeing_defined) {
-            printf("being defined \n");
+            printf("%s is being defined at  %s:%d  { \n", name, filename(filename_buf), lineno);
         }
     }
 }
@@ -161,17 +161,17 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Function already exists");
     } else {
-           printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
-           name,
+          printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
+          name,
            filename_buf,
            lineno,
-           (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : "block",
-           table->filename_buf,
-           table->lineno,
+       (table->scope == SCOPE_GLOBAL) ? "global" : (table->scope == SCOPE_FUNCTION) ? "function" : "block",
+          table->filename_buf,
+          table->lineno,
            print_storage_class(storage_class)
        ); 
            printf("\n");
-        astwalk_impl(func, 0);
+       astwalk_impl(func, 0);
     }
 }
 
@@ -272,7 +272,7 @@ char *print_storage_class(int storageclass) {
             return "typedef";
             break;
         default:
-            return "error...";
+            return "not applicable";
             break;
     }
 }

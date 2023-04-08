@@ -160,8 +160,7 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
             case AST_NODE_TYPE_FNDCL:
               astnode->fndcl.next = n;
           if(n->nodetype == AST_NODE_TYPE_FNDCL) {
-            fprintf(stderr, "function cannot return a function\n");
-            exit(1);
+            fprintf(stderr, "%s:%d function cannot return a function\n", filename(filename_buf), lineno);
 
           }
                 break;
@@ -349,7 +348,7 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
                 //for exact reference
                 printf("hi");
                 if(r->declspec.typespecif) {
-                    fprintf(stderr, "two or more data types in declaration specifiers. %d \n", lineno);
+                    fprintf(stderr, "%s:%d two or more data types in declaration specifiers. %d \n", filename(filename_buf), lineno);
                 } else {
                     a->declspec.typespecif = l;
                 }
@@ -555,6 +554,9 @@ void astwalk_impl(struct astnode *ast, int depth) {
                 case INT:
                     printf("int\n");
                     break;
+                case CHAR:
+                    printf("char\n");
+                    break;
                 case VOID:
                     printf("void\n");
                     break;
@@ -601,7 +603,17 @@ void astwalk_impl(struct astnode *ast, int depth) {
        //     }
            break;
            case AST_NODE_TYPE_UNION:
-            printf("UNION %s \n", ast->structunion.name);
+                printf("UNION %s ", ast->structunion.name);
+         //   if(ast->structunion.minitable) {
+                     print_spaces(depth);
+                if(!ast->structunion.is_complete) {
+                printf("(incomplete)");
+                    if(ast->structunion.isbeing_defined) {
+                        printf(" is being defined at %s:%d \n", filename(ast->structunion.filename), ast->structunion.lineno);
+                    }
+                } else {
+                    printf("defined at %s %d \n", ast->structunion.filename, ast->structunion.lineno);
+                }
            astwalk_impl(ast->structunion.next, depth + 1);
            break;
            case AST_NODE_TYPE_DECLARATION:

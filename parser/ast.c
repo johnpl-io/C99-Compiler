@@ -346,7 +346,6 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             if(l->nodetype == AST_NODE_TYPE_STRUCT || l->nodetype == AST_NODE_TYPE_UNION) {
                 //assume u cant have void, int, char struct as this makes no sense will check in standard
                 //for exact reference
-                printf("hi");
                 if(r->declspec.typespecif) {
                     fprintf(stderr, "%s:%d two or more data types in declaration specifiers. %d \n", filename(filename_buf), lineno);
                 } else {

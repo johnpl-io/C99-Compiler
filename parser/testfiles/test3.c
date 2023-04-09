@@ -4,7 +4,7 @@ int fn(int x, int *a) {
     {
         int x;
     }
-  int *(*(*(*z)())[10])(); //example from harrison and steel
+  int *(*(*(*z)())[10])(); //example from haribson and steele
 
 }
 int a, y;

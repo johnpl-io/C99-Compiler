@@ -77,7 +77,8 @@
 // %left '*' '/' '%'
 // %left '!' '~' SIZEOF MINUSMINUS PLUSPLUS
 // %left '.' INDSEL '(' ')' '[' ']'
-
+%left IF
+%left ELSE
 %% /*RULES */
 start: declaration_or_fndef  { }
     | start declaration_or_fndef  { }
@@ -444,14 +445,12 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
 
     
-    labeled-statement: 
-        | IDENT ':' statement
+    labeled-statement: IDENT ':' statement
         | CASE conditional-expression ':' statement
         | DEFAULT ':' statement
         ;
     
 compound-statement: '{' 
-
                     { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);
                                    symbent_combine_fn(fn_parameters, lineno, filename_buf, current_scope);
                                     } 
@@ -486,7 +485,7 @@ decl_or_stmt:
     iteration-statement: WHILE '(' expression ')' statement
      |   FOR  '(' expression ';' expression ';' expression ')' statement
      |   FOR  '(' expression ';' expression ';' ')' statement
-     |  FOR  '(' expression ';' ';' expression ')' statement
+     |   FOR  '(' expression ';' ';' expression ')' statement
      |   FOR  '(' expression ';' ';' ')' statement
      |   FOR  '(' ';' expression ';' expression ')' statement
      |   FOR  '(' ';' expression ';' ')' statement
@@ -508,11 +507,11 @@ decl_or_stmt:
     declaration_or_fndef: declaration { }
                     | function_definition
                     ;
+    
     function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                             symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
                                                             isFunc = 1; 
-                                                            fn_parameters = $2;} 
-        | compound-statement  { }
+                                                            fn_parameters = $2;} compound-statement  { }
         ;
 
 %%       

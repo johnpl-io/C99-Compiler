@@ -83,47 +83,6 @@ start: declaration_or_fndef  { }
     | start declaration_or_fndef  { }
     ;
 
-declaration_or_fndef: declaration { }
-                    | function_definition
-                    ;
-function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
-                                                          isFunc = 1; 
-                                                          fn_parameters = $2;
-                                                  
-                                                           } 
-                                                        compound_statement  { }
-        ;
-
-
-compound_statement: '{' 
-
-                    { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);
-                                   symbent_combine_fn(fn_parameters, lineno, filename_buf, current_scope);
-                                    } 
-                        else { current_scope = symbtab_push(SCOPE_BLOCK, current_scope, lineno, filename_buf);}
-                        isFunc = 0;
-
-                        fn_parameters = NULL;
-                        
-                    } 
-                    decl_or_stmt_list  
-                    {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
-        ;
-
-
-decl_or_stmt_list: decl_or_stmt { }
-        | decl_or_stmt_list decl_or_stmt  { }
-        ;
-decl_or_stmt:
-        declaration {  }
-        | stmt
-        ;
-stmt: compound_statement
-   |  expression ';' {  }
-        ;
-
-
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
                 |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
                 |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1); /*
@@ -474,8 +433,90 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     designator: '[' conditional-expression ']'
         | '.' IDENT
         ; 
+    
+    /* 6.8 */
+    statement: compound-statement
+        | labeled-statement
+        | expression-statement 
+        | selection-statement
+        | iteration-statement
+        | jump-statement
+        ;
+
+    
+    labeled-statement: 
+        | IDENT ':' statement
+        | CASE conditional-expression ':' statement
+        | DEFAULT ':' statement
+        ;
+    
+compound-statement: '{' 
+
+                    { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);
+                                   symbent_combine_fn(fn_parameters, lineno, filename_buf, current_scope);
+                                    } 
+                        else { current_scope = symbtab_push(SCOPE_BLOCK, current_scope, lineno, filename_buf);}
+                        isFunc = 0;
+
+                        fn_parameters = NULL;
+                        
+                    } 
+                    decl_or_stmt_list  
+                    {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
+            | '{' '}'
+        ;
+decl_or_stmt_list: decl_or_stmt { }
+        | decl_or_stmt_list decl_or_stmt  { }
+        ;
+decl_or_stmt:
+        declaration {  }
+        | statement
+        ;
+    
+    expression-statement: expression ';'
+        | ';'
+        ;
+
+    selection-statement: IF '(' expression ')' statement %prec IF
+        | IF '(' expression ')' statement ELSE statement %prec ELSE
+        | SWITCH '(' expression ')' statement
+        ;
+
+    
+    iteration-statement: WHILE '(' expression ')' statement
+     |   FOR  '(' expression ';' expression ';' expression ')' statement
+     |   FOR  '(' expression ';' expression ';' ')' statement
+     |  FOR  '(' expression ';' ';' expression ')' statement
+     |   FOR  '(' expression ';' ';' ')' statement
+     |   FOR  '(' ';' expression ';' expression ')' statement
+     |   FOR  '(' ';' expression ';' ')' statement
+     |   FOR  '(' ';' ';' expression ')' statement
+     |   FOR  '(' ';' ';' ')' statement
+     |   FOR '(' declaration expression ';' expression ')' statement
+     |   FOR '(' declaration expression ';' ')' statement
+     |   FOR '(' declaration  ';' expression ')' statement
+     |   FOR '(' declaration  ';' ')' statement
+
+    
+    jump-statement: GOTO IDENT ';'
+        | CONTINUE ';'
+        | BREAK ';'
+        | RETURN expression ';'
+        | RETURN ';'
+        ;
+    
+    declaration_or_fndef: declaration { }
+                    | function_definition
+                    ;
+    function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
+                                                            symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
+                                                            isFunc = 1; 
+                                                            fn_parameters = $2;} 
+        | compound-statement  { }
+        ;
 
 %%       
+
     int main() {
         yydebug = 0;
 

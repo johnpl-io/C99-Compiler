@@ -8,7 +8,7 @@
 // extern char filename_buf[255];
 // extern int lineno;
 extern struct symbtab *current_scope;
-
+int debugtable = 0;
 // initialize new symbol table
 struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf) {
     struct symbtab *table = calloc(1, sizeof(struct symbtab));
@@ -119,6 +119,7 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Variable already exists");
     } else {
+        if(debugtable) {
         printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a variable with stgclass %s of type:",
         name,
        filename(filename_buf),
@@ -131,6 +132,7 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
        printf("\n");
      astwalk_impl(var, 0);
     }
+    }
 }
 
 void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace){
@@ -140,8 +142,10 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
     if(!symbtab_insert(table, symbol, replace)){
         fprintf(stderr, "%s:%d RedeStruct/Union '%s' already exists \n", filename(filename_buf), lineno, name);
     } else {
-        if(struct_union->structunion.isbeing_defined) {
+        if(debugtable) {
+         if(struct_union->structunion.isbeing_defined) {
             printf("%s is being defined at  %s:%d  { \n", name, filename(filename_buf), lineno);
+        }
         }
     }
 }
@@ -161,6 +165,7 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Function already exists");
     } else {
+        if(debugtable) {
           printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
           name,
            filename_buf,
@@ -172,6 +177,7 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
        ); 
            printf("\n");
        astwalk_impl(func, 0);
+    }
     }
 }
 

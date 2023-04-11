@@ -1,3 +1,5 @@
+#ifndef AST_H
+#define AST_H
 #define POSTINC 500
 #define POSTDEC 501
 #include "parser.tab.h"
@@ -207,3 +209,4 @@ struct astnode *newFunctDecl(struct astnode *parameters);
 struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno, int isBeingDefined);
 struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar);
 char * filename(char * filename);
+#endif

@@ -1,7 +1,7 @@
 
 %debug
 %define parse.error verbose
-%{    
+%{  
     #define YYDEBUG 1
     #include <stdlib.h>
     #include <stdio.h>
@@ -55,10 +55,10 @@
 %type <astnode_p> primary-expression assignment-expression
 %type <astnode_p> expression postfix-expression expression-list
 %type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
-%type <astnode_p> relational-expression equality-expression
+%type <astnode_p> relational-expression equality-expression statement decl_or_stmt compound-statement decl_or_stmt_list
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
-%type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list
-%type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer
+%type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list 
+%type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer 
 %type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier type-name parameter-declaration parameter-list parameter-type-list
 %type <op> unary-operator assignment-operator struct-or-union 
 
@@ -436,7 +436,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ; 
     
     /* 6.8 */
-    statement: compound-statement
+    statement: compound-statement { $$ = $1; }
         | labeled-statement
         | expression-statement 
         | selection-statement
@@ -461,18 +461,18 @@ compound-statement: '{'
                         
                     } 
                     decl_or_stmt_list  
-                    {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
+                    {  current_scope = symbtab_pop(current_scope); }'}'  { astwalk_impl($3, 0); }  
             | '{' '}'
-        ;
-decl_or_stmt_list: decl_or_stmt { }
-        | decl_or_stmt_list decl_or_stmt  { }
+            ;
+decl_or_stmt_list: decl_or_stmt { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
+        | decl_or_stmt_list decl_or_stmt  {  $$ = insertElement(AST_NODE_TYPE_LL, $1, $2); }
         ;
 decl_or_stmt:
         declaration {  }
-        | statement
+        | statement { $$ = $1; }
         ;
     
-    expression-statement: expression ';'
+    expression-statement: expression ';' { }
         | ';'
         ;
 
@@ -483,6 +483,7 @@ decl_or_stmt:
 
     
     iteration-statement: WHILE '(' expression ')' statement
+     | DO statement WHILE '(' expression ')' 
      |   FOR  '(' expression ';' expression ';' expression ')' statement
      |   FOR  '(' expression ';' expression ';' ')' statement
      |   FOR  '(' expression ';' ';' expression ')' statement

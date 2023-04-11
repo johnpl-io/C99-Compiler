@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-
 // enums for symbol entry attributes
 enum SCOPE {
     SCOPE_GLOBAL = 0,

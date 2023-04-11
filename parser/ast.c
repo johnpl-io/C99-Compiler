@@ -267,6 +267,38 @@ struct astnode *newFunctDecl(struct astnode *parameters) {
     return  funcDecl;
 }
 
+struct astnode *newifelse(struct astnode *IF, struct astnode *THEN, struct astnode *ELSE) {
+    struct astnode *ifelse = malloc(sizeof(struct astnode));
+    ifelse->nodetype = AST_NODE_TYPE_IFELSE;
+    ifelse->ifelse.IF = IF;
+     ifelse->ifelse.THEN = THEN;
+    ifelse->ifelse.ELSE = ELSE;
+    return ifelse;
+
+}
+
+struct astnode *newswitch(struct astnode *expr, struct astnode *body) {
+    struct astnode *switchstmt = malloc(sizeof(struct astnode));
+    switchstmt->nodetype = AST_NODE_TYPE_SWITCH;
+    switchstmt->switchstmt.expr = expr;
+    switchstmt->switchstmt.expr = body;
+    return switchstmt;
+}
+
+struct astnode *newwhile(int isdoWhile, struct astnode *expr, struct astnode *stmt) {
+       struct astnode *whilestmt = malloc(sizeof(struct astnode));
+       whilestmt->nodetype = AST_NODE_TYPE_WHILE;
+       whilestmt->whilestmt.expression = expr;
+       whilestmt->whilestmt.body = stmt;
+       whilestmt->whilestmt.isdowhile = isdoWhile;
+       return whilestmt;
+}
+
+struct astnode *newfor(struct astnode *init, struct astnode *cond,  struct astnode *incr, struct astnode *body) {
+     struct astnode *forstmt = malloc(sizeof(struct astnode));
+        forstmt->nodetype = AST_NODE_TYPE_FOR;
+        
+}
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;

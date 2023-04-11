@@ -25,6 +25,10 @@ enum AstNodeType {
     AST_NODE_TYPE_STRUCT,
     AST_NODE_TYPE_UNION, 
     AST_NODE_TYPE_DECLARATION,
+    AST_NODE_TYPE_IFELSE,
+    AST_NODE_TYPE_SWITCH,
+    AST_NODE_TYPE_WHILE,
+    AST_NODE_TYPE_FOR,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -97,7 +101,7 @@ struct astnode_pointer {
     int typequal;
     struct astnode *next;
 };
-
+//declarations 
 struct astnode_declspec {
     int storageclass;
     int typequal;
@@ -166,6 +170,40 @@ struct astnode_declaration {
     struct astnode *declspec;
     struct astnode *decl;
 };
+
+
+//statements 
+struct astnode_ifelse {
+    int nodetype;
+    struct astnode *IF;
+    struct astnode *THEN;
+    struct astnode *ELSE;
+    struct astnode *next;
+
+};
+struct astnode_switch {
+    int nodetype;
+    struct astnode *expr;
+    struct astnode *body;
+    struct astnode *next;
+};
+struct astnode_while {
+int nodetype;
+ int isdowhile; 
+    struct astnode *body; 
+    struct astnode *expression; 
+    struct astnode *next;
+};
+
+struct astnode_for {
+    int nodetype;
+    struct astnode *init;
+    struct astnode *cond;
+    struct astnode *incr;
+    struct astnode *body;
+    struct astnode *next;
+};
+
 struct astnode {
 int nodetype;
 union {
@@ -187,6 +225,9 @@ union {
     struct astnode_functdecl fndcl;
     struct astnode_structunion structunion;
     struct astnode_declaration declaration;
+    struct astnode_ifelse ifelse;
+     struct astnode_switch switchstmt;
+     struct astnode_while whilestmt;
     };  
    struct astnode *head, *tail;
 };
@@ -208,5 +249,9 @@ struct astnode *newDeclar(int nodetype, char *ident);
 struct astnode *newFunctDecl(struct astnode *parameters);
 struct astnode *newStructUnion(int nodetype, char *name, struct symbtab *minitable, char *filename, int lineno, int isBeingDefined);
 struct astnode *newDeclaration(int nodetype, struct astnode *declspecs, struct astnode *declar);
+struct astnode *newifelse(struct astnode *IF, struct astnode *THEN, struct astnode *ELSE);
+struct astnode *newswitch(struct astnode *expr, struct astnode *body);
+struct astnode *newwhile(int isdoWhile, struct astnode *expr, struct astnode *stmt);
+struct astnode *newfor(struct astnode *init, struct astnode *cond, struct astnode *incr, struct astnode *body);
 char * filename(char * filename);
 #endif

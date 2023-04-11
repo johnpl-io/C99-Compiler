@@ -53,7 +53,7 @@
 %token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC <op> STRUCT SWITCH TYPEDEF <op> UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
 %type <astnode_p> primary-expression assignment-expression
-%type <astnode_p> expression postfix-expression expression-list
+%type <astnode_p> expression postfix-expression expression-list selection-statement iteration-statement
 %type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
 %type <astnode_p> relational-expression equality-expression statement decl_or_stmt compound-statement decl_or_stmt_list
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
@@ -437,17 +437,17 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     
     /* 6.8 */
     statement: compound-statement { $$ = $1; }
-        | labeled-statement
-        | expression-statement 
-        | selection-statement
-        | iteration-statement
-        | jump-statement
+        | labeled-statement { }
+        | expression-statement { }
+        | selection-statement { }
+        | iteration-statement { }
+        | jump-statement { }
         ;
 
     
-    labeled-statement: IDENT ':' statement
-        | CASE conditional-expression ':' statement
-        | DEFAULT ':' statement
+    labeled-statement: IDENT ':' statement { }
+        | CASE conditional-expression ':' statement { }
+        | DEFAULT ':' statement { }
         ;
     
 compound-statement: '{' 
@@ -461,14 +461,14 @@ compound-statement: '{'
                         
                     } 
                     decl_or_stmt_list  
-                    {  current_scope = symbtab_pop(current_scope); }'}'  { astwalk_impl($3, 0); }  
+                    {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
             | '{' '}'
             ;
 decl_or_stmt_list: decl_or_stmt { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
         | decl_or_stmt_list decl_or_stmt  {  $$ = insertElement(AST_NODE_TYPE_LL, $1, $2); }
         ;
 decl_or_stmt:
-        declaration {  }
+        declaration { $$ = NULL; }
         | statement { $$ = $1; }
         ;
     
@@ -476,22 +476,22 @@ decl_or_stmt:
         | ';'
         ;
 
-    selection-statement: IF '(' expression ')' statement %prec IF
-        | IF '(' expression ')' statement ELSE statement %prec ELSE
-        | SWITCH '(' expression ')' statement
+    selection-statement: IF '(' expression ')' statement %prec IF  { $$ = newifelse($3, $5, NULL); }
+        | IF '(' expression ')' statement ELSE statement %prec ELSE { $$ = newifelse($3, $5, $7); }
+        | SWITCH '(' expression ')' statement { $$ = newswitch($3, $5); }
         ;
 
     
-    iteration-statement: WHILE '(' expression ')' statement
-     | DO statement WHILE '(' expression ')' 
-     |   FOR  '(' expression ';' expression ';' expression ')' statement
-     |   FOR  '(' expression ';' expression ';' ')' statement
-     |   FOR  '(' expression ';' ';' expression ')' statement
-     |   FOR  '(' expression ';' ';' ')' statement
-     |   FOR  '(' ';' expression ';' expression ')' statement
-     |   FOR  '(' ';' expression ';' ')' statement
-     |   FOR  '(' ';' ';' expression ')' statement
-     |   FOR  '(' ';' ';' ')' statement
+    iteration-statement: WHILE '(' expression ')' statement { $$ = newwhile(0, $3, $5);  }
+     | DO statement WHILE '(' expression ')' { $$ = newwhile(1, $5, $2); }
+     |   FOR  '(' expression ';' expression ';' expression ')' statement { $$ = newfor($3, $5, $7, $9); }
+     |   FOR  '(' expression ';' expression ';' ')' statement { $$ = newfor($3, $5, NULL, $8); }
+     |   FOR  '(' expression ';' ';' expression ')' statement {   $$ = newfor($3, NULL, $6, $8); }
+     |   FOR  '(' expression ';' ';' ')' statement {    $$ = newfor($3, NULL, NULL, $7); }
+     |   FOR  '(' ';' expression ';' expression ')' statement { $$ = newfor(NULL, $4, $6, $8); }
+     |   FOR  '(' ';' expression ';' ')' statement { $$ = newfor(NULL, $4, NULL, $7); }
+     |   FOR  '(' ';' ';' expression ')' statement {  $$ = newfor(NULL, NULL, $5, $7); }
+     |   FOR  '(' ';' ';' ')' statement {$$ = newfor(NULL, NULL, NULL, $6); }
      |   FOR '(' declaration expression ';' expression ')' statement
      |   FOR '(' declaration expression ';' ')' statement
      |   FOR '(' declaration  ';' expression ')' statement

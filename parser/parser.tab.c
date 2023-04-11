@@ -3155,7 +3155,7 @@ yyreduce:
 
   case 210: /* compound-statement: '{' $@5 decl_or_stmt_list $@6 '}'  */
 #line 464 "parser.y"
-                                                                         { astwalk_impl((yyvsp[-2].astnode_p), 0); }
+                                                                         {  }
 #line 3160 "parser.tab.c"
     break;
 
@@ -3173,7 +3173,7 @@ yyreduce:
 
   case 214: /* decl_or_stmt: declaration  */
 #line 471 "parser.y"
-                    {  }
+                    { (yyval.astnode_p) = NULL; }
 #line 3178 "parser.tab.c"
     break;
 
@@ -3189,10 +3189,88 @@ yyreduce:
 #line 3190 "parser.tab.c"
     break;
 
+  case 218: /* selection-statement: IF '(' expression ')' statement  */
+#line 479 "parser.y"
+                                                                   { (yyval.astnode_p) = newifelse((yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), NULL); }
+#line 3196 "parser.tab.c"
+    break;
+
+  case 219: /* selection-statement: IF '(' expression ')' statement ELSE statement  */
+#line 480 "parser.y"
+                                                                    { (yyval.astnode_p) = newifelse((yyvsp[-4].astnode_p), (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3202 "parser.tab.c"
+    break;
+
+  case 220: /* selection-statement: SWITCH '(' expression ')' statement  */
+#line 481 "parser.y"
+                                              { (yyval.astnode_p) = newswitch((yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3208 "parser.tab.c"
+    break;
+
+  case 221: /* iteration-statement: WHILE '(' expression ')' statement  */
+#line 485 "parser.y"
+                                                            { (yyval.astnode_p) = newwhile(0, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p));  }
+#line 3214 "parser.tab.c"
+    break;
+
+  case 222: /* iteration-statement: DO statement WHILE '(' expression ')'  */
+#line 486 "parser.y"
+                                             { (yyval.astnode_p) = newwhile(1, (yyvsp[-1].astnode_p), (yyvsp[-4].astnode_p)); }
+#line 3220 "parser.tab.c"
+    break;
+
+  case 223: /* iteration-statement: FOR '(' expression ';' expression ';' expression ')' statement  */
+#line 487 "parser.y"
+                                                                         { (yyval.astnode_p) = newfor((yyvsp[-6].astnode_p), (yyvsp[-4].astnode_p), (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3226 "parser.tab.c"
+    break;
+
+  case 224: /* iteration-statement: FOR '(' expression ';' expression ';' ')' statement  */
+#line 488 "parser.y"
+                                                              { (yyval.astnode_p) = newfor((yyvsp[-5].astnode_p), (yyvsp[-3].astnode_p), NULL, (yyvsp[0].astnode_p)); }
+#line 3232 "parser.tab.c"
+    break;
+
+  case 225: /* iteration-statement: FOR '(' expression ';' ';' expression ')' statement  */
+#line 489 "parser.y"
+                                                              {   (yyval.astnode_p) = newfor((yyvsp[-5].astnode_p), NULL, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3238 "parser.tab.c"
+    break;
+
+  case 226: /* iteration-statement: FOR '(' expression ';' ';' ')' statement  */
+#line 490 "parser.y"
+                                                   {    (yyval.astnode_p) = newfor((yyvsp[-4].astnode_p), NULL, NULL, (yyvsp[0].astnode_p)); }
+#line 3244 "parser.tab.c"
+    break;
+
+  case 227: /* iteration-statement: FOR '(' ';' expression ';' expression ')' statement  */
+#line 491 "parser.y"
+                                                              { (yyval.astnode_p) = newfor(NULL, (yyvsp[-4].astnode_p), (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3250 "parser.tab.c"
+    break;
+
+  case 228: /* iteration-statement: FOR '(' ';' expression ';' ')' statement  */
+#line 492 "parser.y"
+                                                   { (yyval.astnode_p) = newfor(NULL, (yyvsp[-3].astnode_p), NULL, (yyvsp[0].astnode_p)); }
+#line 3256 "parser.tab.c"
+    break;
+
+  case 229: /* iteration-statement: FOR '(' ';' ';' expression ')' statement  */
+#line 493 "parser.y"
+                                                   {  (yyval.astnode_p) = newfor(NULL, NULL, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p)); }
+#line 3262 "parser.tab.c"
+    break;
+
+  case 230: /* iteration-statement: FOR '(' ';' ';' ')' statement  */
+#line 494 "parser.y"
+                                        {(yyval.astnode_p) = newfor(NULL, NULL, NULL, (yyvsp[0].astnode_p)); }
+#line 3268 "parser.tab.c"
+    break;
+
   case 240: /* declaration_or_fndef: declaration  */
 #line 508 "parser.y"
                                       { }
-#line 3196 "parser.tab.c"
+#line 3274 "parser.tab.c"
     break;
 
   case 242: /* $@7: %empty  */
@@ -3201,17 +3279,17 @@ yyreduce:
                                                             symbent_combine((yyvsp[-1].astnode_p), insertElementorig(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p)), lineno, filename_buf, current_scope, NULL);   
                                                             isFunc = 1; 
                                                             fn_parameters = (yyvsp[0].astnode_p);}
-#line 3205 "parser.tab.c"
+#line 3283 "parser.tab.c"
     break;
 
   case 243: /* function_definition: declaration-specifiers declarator $@7 compound-statement  */
 #line 515 "parser.y"
                                                                                                      { }
-#line 3211 "parser.tab.c"
+#line 3289 "parser.tab.c"
     break;
 
 
-#line 3215 "parser.tab.c"
+#line 3293 "parser.tab.c"
 
       default: break;
     }

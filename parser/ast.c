@@ -77,9 +77,9 @@ struct astnode *newIdent(int nodetype, char *ident) {
     
      struct symbol *test = create_symbol_entry(ident, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
     identast->ident.symbol = symbtab_lookup_all(current_scope, test);
-        printf("%d", current_scope->scope);
-        if(current_functionscope) 
-          printf("%d", current_functionscope->scope );
+      //  printf("%d", current_scope->scope);
+       // if(current_functionscope) 
+         // printf("%d", current_functionscope->scope );
     return identast;
 }
 
@@ -342,16 +342,33 @@ struct astnode *newDefault(struct astnode *stmt) {
       return defaultstmt;;
 }
 struct astnode *newLabel(char *ident, struct astnode *stmt) {
+        struct astnode *label =  malloc(sizeof(struct astnode));
+        label->nodetype = AST_NODE_TYPE_LABEL;
+        label->label.statement = stmt;
+        label->label.ident = ident;
       struct symbol *test = create_symbol_entry(ident, SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
       struct symbol *lookup;
       lookup = symbtab_lookup_current(current_functionscope, test);
-      
-
+      if(lookup) {
+        if(!lookup->label.type->label.statement) {
+            //forward declaration
+            lookup->label.type->label.statement = stmt;
+            lookup->lineno = lineno;
+            lookup->filename_buf = filename_buf;
+        } else {
+            printf("trouble\n");
+        }
+      } else {
+        define_label(label, current_functionscope, lineno, filename_buf, false);
+      }
+    return label;
 
       
 };
 struct astnode *newGoTo(char *ident) {
-
+      struct symbol *test = create_symbol_entry(ident, SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
+      struct symbol *lookup;
+      lookup = symbtab_lookup_current(current_functionscope, test);
 };
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));

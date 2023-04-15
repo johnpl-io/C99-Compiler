@@ -3166,7 +3166,7 @@ yyreduce:
 
   case 205: /* labeled-statement: IDENT ':' statement  */
 #line 450 "parser.y"
-                                           { }
+                                           { (yyval.astnode_p) = newLabel((yyvsp[-2].string_literal), (yyvsp[0].astnode_p)); }
 #line 3171 "parser.tab.c"
     break;
 

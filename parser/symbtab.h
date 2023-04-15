@@ -116,7 +116,7 @@ struct enum_tag_atr{
 // not really discussed in lecture notes
 // alludes to further understanding during code gen
 struct label_atr{
-    struct astnode *statement; //contains statement that astnode leads to
+    struct astnode *type; //contains statement that astnode leads to
    // bool seen; contained within astnode
 };
 
@@ -208,6 +208,5 @@ struct struct_stack *struct_push(struct struct_stack *current_struct, struct ast
 struct struct_stack *struct_pop(struct struct_stack *current_struct);
 void print_type(struct astnode *type);
 char *print_storage_class(int storageclass);
-
 char* getTypeName(int index);
 #endif

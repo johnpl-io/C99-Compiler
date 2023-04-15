@@ -298,5 +298,6 @@ struct astnode *newBreak();
 struct astnode *newReturn(struct astnode *expr);
 struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt);
 struct astnode *newDefault(struct astnode *stmt);
+struct astnode *newLabel(char *ident, struct astnode *stmt);
 char * filename(char * filename);
 #endif

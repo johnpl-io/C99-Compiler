@@ -185,8 +185,11 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
 void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf, bool replace) {
     struct symbol *symbol = create_symbol_entry(label->label.ident, SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
     //according to 6.2.1.3 labels have function scope
+    symbol->label.type = label;
     if(!symbtab_insert(table, symbol, replace)) {
             fprintf(stderr, "Label all ready exists");
+    } else {
+        printf("inserted label\n");
     }
 
 

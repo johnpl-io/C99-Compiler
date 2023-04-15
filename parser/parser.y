@@ -447,7 +447,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
         ;
 
     
-    labeled-statement: IDENT ':' statement { }
+    labeled-statement: IDENT ':' statement { $$ = newLabel($1, $3); }
         | CASE conditional-expression ':' statement { $$ = newCase($2, $4); }
         | DEFAULT ':' statement { $$ = newDefault($3); }
         ;

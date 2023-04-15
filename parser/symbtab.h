@@ -107,7 +107,7 @@ struct enum_constant_atr{
 // symbol table with member def + whether defnition is complete
 struct struct_union_tag_atr{
     struct astnode *type;
-  //bool def_complete;
+  //bool def_complete; contained within astnode
 };
 // once def is complete, store nothing
 struct enum_tag_atr{
@@ -116,7 +116,8 @@ struct enum_tag_atr{
 // not really discussed in lecture notes
 // alludes to further understanding during code gen
 struct label_atr{
-    bool seen;
+    struct astnode *statement; //contains statement that astnode leads to
+   // bool seen; contained within astnode
 };
 
 // type, offset (Struct only), bit field width, bit offset
@@ -142,6 +143,7 @@ struct symbol {
     struct symbol *next;
     // symbol attributes
     union {
+        struct label_atr label;
         // enums and typedef are optional
         struct var_atr var;
         struct fn_name_atr fn;

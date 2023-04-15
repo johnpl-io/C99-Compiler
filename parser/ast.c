@@ -5,6 +5,7 @@
 #include "symbtab.h"
 #include <ctype.h>
  extern int lineno;
+extern struct symbtab *current_scope;
  extern char filename_buf[256];
 char * filename(char * filename) {
     if (filename[0] == '\0') {
@@ -72,7 +73,8 @@ struct astnode *newIdent(int nodetype, char *ident) {
        identast->nodetype = nodetype;
     identast->ident.string = ident;
     identast->ident.nodetype = nodetype;
-    
+     struct symbol *test = create_symbol_entry(ident, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
+    identast->ident.symbol = symbtab_lookup_all(current_scope, test);
     return identast;
 }
 
@@ -297,7 +299,11 @@ struct astnode *newwhile(int isdoWhile, struct astnode *expr, struct astnode *st
 struct astnode *newfor(struct astnode *init, struct astnode *cond,  struct astnode *incr, struct astnode *body) {
      struct astnode *forstmt = malloc(sizeof(struct astnode));
         forstmt->nodetype = AST_NODE_TYPE_FOR;
-        
+        forstmt->forstmt.init = init;
+        forstmt->forstmt.body = body;
+        forstmt->forstmt.cond = cond;
+        forstmt->forstmt.incr = incr;
+        return forstmt;
 }
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
@@ -517,7 +523,16 @@ void astwalk_impl(struct astnode *ast, int depth) {
 }
             break;
         case AST_NODE_TYPE_IDENT:
+            if(ast->ident.symbol) {
+                if(ast->ident.symbol->attr_type == SYMB_FUNCTION_NAME) {
+                    printf("stab_fn name=%s def @%s:%d\n ",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
+                }
+                if(ast->ident.symbol->attr_type == SYMB_VARIABLE_NAME)
+                    printf("stab_var name=%s def @%s:%d\n ",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
+            } else {
             printf("IDENT %s\n", ast->ident.string);
+            }
+
             break;
         case AST_NODE_TYPE_CHARLIT:
             printf("CHARLIT %c\n", ast->charl.val);
@@ -537,8 +552,8 @@ void astwalk_impl(struct astnode *ast, int depth) {
             }
             break;
         case AST_NODE_TYPE_LL:
-        printf("LINKED LIST \n");
-      
+        printf("LINKED LIST {\n");
+    
         struct astnode *ll_nodell = ast->ll.head;
             int count = 0;
             
@@ -547,7 +562,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
                 ll_nodell = ll_nodell->ll.next;
            
             }
-     
+          print_spaces(depth); printf("}\n");
             break;
         case AST_NODE_TYPE_FNDCL:
             printf("FUNCTION DECL RETURNING :\n");
@@ -652,6 +667,19 @@ void astwalk_impl(struct astnode *ast, int depth) {
            astwalk_impl(ast->declaration.declspec, depth + 1);
               astwalk_impl(ast->declaration.decl, depth + 1);
            break;
+           case AST_NODE_TYPE_IFELSE:
+           printf("IF STATEMENT \n");
+        print_spaces(depth);    printf(" IF:\n"); astwalk_impl(ast->ifelse.IF, depth + 1);
+         print_spaces(depth);     printf(" THEN:\n");  astwalk_impl(ast->ifelse.THEN, depth + 1);
+           print_spaces(depth);    printf(" ELSE:\n"); astwalk_impl(ast->ifelse.ELSE, depth + 1);
+            break;
+            case AST_NODE_TYPE_FOR:
+              printf("FOR\n");
+         print_spaces(depth);     printf(" INIT:\n"); astwalk_impl(ast->forstmt.init, 0);
+         print_spaces(depth);     printf(" COND: \n"); astwalk_impl(ast->forstmt.cond, 0);
+        print_spaces(depth);        printf(" BODY: \n"); astwalk_impl(ast->forstmt.body, 0);
+         print_spaces(depth);        printf(" INCR: \n"); astwalk_impl(ast->forstmt.incr, 0);
+        break;
         default:
             printf("Unknown node type %d \n", ast->nodetype) ;
             break;

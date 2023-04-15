@@ -29,6 +29,8 @@ enum AstNodeType {
     AST_NODE_TYPE_SWITCH,
     AST_NODE_TYPE_WHILE,
     AST_NODE_TYPE_FOR,
+    AST_NODE_TYPE_BREAK,
+    AST_NODE_TYPE_LABEL,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -41,6 +43,7 @@ struct astnode_linkedlist {
 struct astnode_charlit {
     int nodetype;
     char val;
+    
     struct astnode *left, *right;
 };
 
@@ -72,10 +75,17 @@ struct astnode_num {
     struct Num number;
     struct astnode *left, *right;
 };
+struct astnode_label {
+   int nodetype;
+   struct astnode *statement;
+   struct astnode *left, *right; //onlify needed 
+
+};
 
 struct astnode_ident {
     int nodetype;
     char *string;
+    struct symbol *symbol;
     struct astnode *left, *right;
 };
 
@@ -228,6 +238,7 @@ union {
     struct astnode_ifelse ifelse;
      struct astnode_switch switchstmt;
      struct astnode_while whilestmt;
+     struct astnode_for forstmt;
     };  
    struct astnode *head, *tail;
 };

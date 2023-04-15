@@ -140,7 +140,7 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
    // symbol->struct_union_tag.def_complete = def_complete; i think it might be better to use the one in astnode
     symbol->struct_union_tag.type = struct_union;
     if(!symbtab_insert(table, symbol, replace)){
-        fprintf(stderr, "%s:%d RedeStruct/Union '%s' already exists \n", filename(filename_buf), lineno, name);
+        fprintf(stderr, "%s:%d Struct/Union '%s' already exists \n", filename(filename_buf), lineno, name);
     } else {
         if(debugtable) {
          if(struct_union->structunion.isbeing_defined) {
@@ -164,6 +164,7 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     
     if(!symbtab_insert(table, symbol, false)){
         fprintf(stderr, "Function already exists");
+        free(symbol);
     } else {
         if(debugtable) {
           printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a function with stgclass %s returning and taking arguments\n",
@@ -181,6 +182,15 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     }
 }
 
+void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf) {
+    struct symbol *symbol = create_symbol_entry("test", SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
+    //according to 6.2.1.3 labels have function scope
+    if(!symbtab_insert(table, symbol, false)) {
+            fprintf(stderr, "Label all ready exists");
+    }
+
+
+}
 void print_symbtab(struct symbtab *table) {
     printf("Symbol Table:\n");
     printf("Scope: %d\n", table->scope);

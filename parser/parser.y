@@ -55,13 +55,14 @@
 %type <astnode_p> primary-expression assignment-expression
 %type <astnode_p> expression postfix-expression expression-list selection-statement iteration-statement
 %type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
-%type <astnode_p> relational-expression equality-expression statement decl_or_stmt compound-statement decl_or_stmt_list
+%type <astnode_p> relational-expression equality-expression statement decl_or_stmt compound-statement decl_or_stmt_list expression-statement
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list 
 %type <astnode_p> type-specifier storage-class-specifier type-qualifier declaration-specifiers type-qualifier-list declarator init-declarator pointer 
 %type <astnode_p> struct-declarator specifier-qualifier-list struct-declarator-list struct-or-union-specifier type-name parameter-declaration parameter-list parameter-type-list
 %type <op> unary-operator assignment-operator struct-or-union 
-
+%left IF
+%left ELSE
 // %left ','
 // %right '=' PLUSEQ MINUSEQ TIMESEQ DIVEQ MODEQ SHLEQ SHREQ ANDEQ XOREQ OREQ
 // %right '?' ':'
@@ -77,14 +78,14 @@
 // %left '*' '/' '%'
 // %left '!' '~' SIZEOF MINUSMINUS PLUSPLUS
 // %left '.' INDSEL '(' ')' '[' ']'
-%left IF
-%left ELSE
+
 %% /*RULES */
+
 start: declaration_or_fndef  { }
     | start declaration_or_fndef  { }
     ;
 
-primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);}
+primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);   }
                 |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
                 |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1); /*
                 this needs to be changed to some string type after lexer is fixed with this (see hak email) */
@@ -215,7 +216,7 @@ declaration-specifiers: storage-class-specifier declaration-specifiers {   $$ = 
     | type-qualifier declaration-specifiers { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0);  }
     | type-qualifier { $$ = newDecl(AST_NODE_TYPE_DECLSPEC, $1);  }
     | function-specifier declaration-specifiers { } 
-    | function-specifier { /*$$ = newDecl(ASTNODE_NODE_TYPE_DECLSPEC, $1);  */ }
+    | function-specifier { }
     ;
 
 init-declarator-list: init-declarator { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
@@ -461,8 +462,8 @@ compound-statement: '{'
                         
                     } 
                     decl_or_stmt_list  
-                    {  current_scope = symbtab_pop(current_scope); }'}'  {  }  
-            | '{' '}'
+                    {  current_scope = symbtab_pop(current_scope); }'}'  {  $$ = $3; }  
+            | '{' '}' { $$ = NULL; }
             ;
 decl_or_stmt_list: decl_or_stmt { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1);  }
         | decl_or_stmt_list decl_or_stmt  {  $$ = insertElement(AST_NODE_TYPE_LL, $1, $2); }
@@ -472,17 +473,17 @@ decl_or_stmt:
         | statement { $$ = $1; }
         ;
     
-    expression-statement: expression ';' { }
+    expression-statement: expression ';' { $$ = $1; }
         | ';'
         ;
 
-    selection-statement: IF '(' expression ')' statement %prec IF  { $$ = newifelse($3, $5, NULL); }
+    selection-statement: IF '(' expression ')' statement %prec IF  { $$ = newifelse($3, $5, NULL);  }
         | IF '(' expression ')' statement ELSE statement %prec ELSE { $$ = newifelse($3, $5, $7); }
-        | SWITCH '(' expression ')' statement { $$ = newswitch($3, $5); }
+        | SWITCH '(' expression ')' statement { $$ = newswitch($3, $5);    }
         ;
 
     
-    iteration-statement: WHILE '(' expression ')' statement { $$ = newwhile(0, $3, $5);  }
+    iteration-statement: WHILE '(' expression ')' statement { $$ = newwhile(0, $3, $5);   }
      | DO statement WHILE '(' expression ')' { $$ = newwhile(1, $5, $2); }
      |   FOR  '(' expression ';' expression ';' expression ')' statement { $$ = newfor($3, $5, $7, $9); }
      |   FOR  '(' expression ';' expression ';' ')' statement { $$ = newfor($3, $5, NULL, $8); }
@@ -512,7 +513,7 @@ decl_or_stmt:
     function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                             symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
                                                             isFunc = 1; 
-                                                            fn_parameters = $2;} compound-statement  { }
+                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n"); }
         ;
 
 %%       

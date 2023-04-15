@@ -182,10 +182,10 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
     }
 }
 
-void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf) {
-    struct symbol *symbol = create_symbol_entry("test", SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
+void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf, bool replace) {
+    struct symbol *symbol = create_symbol_entry(label->label.ident, SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
     //according to 6.2.1.3 labels have function scope
-    if(!symbtab_insert(table, symbol, false)) {
+    if(!symbtab_insert(table, symbol, replace)) {
             fprintf(stderr, "Label all ready exists");
     }
 

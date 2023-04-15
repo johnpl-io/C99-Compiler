@@ -196,7 +196,7 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
 void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
 void define_var(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
 // define label
-void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf);
+void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf, bool replace);
 // do later: stuct definition (forward declaration) and declaration (members, own symbtab).
 void declare_struct();
 
@@ -208,5 +208,6 @@ struct struct_stack *struct_push(struct struct_stack *current_struct, struct ast
 struct struct_stack *struct_pop(struct struct_stack *current_struct);
 void print_type(struct astnode *type);
 char *print_storage_class(int storageclass);
+
 char* getTypeName(int index);
 #endif

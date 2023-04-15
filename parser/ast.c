@@ -6,6 +6,7 @@
 #include <ctype.h>
  extern int lineno;
 extern struct symbtab *current_scope;
+extern struct symbtab *current_functionscope;
  extern char filename_buf[256];
 char * filename(char * filename) {
     if (filename[0] == '\0') {
@@ -73,8 +74,12 @@ struct astnode *newIdent(int nodetype, char *ident) {
        identast->nodetype = nodetype;
     identast->ident.string = ident;
     identast->ident.nodetype = nodetype;
+    
      struct symbol *test = create_symbol_entry(ident, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
     identast->ident.symbol = symbtab_lookup_all(current_scope, test);
+        printf("%d", current_scope->scope);
+        if(current_functionscope) 
+          printf("%d", current_functionscope->scope );
     return identast;
 }
 
@@ -305,6 +310,49 @@ struct astnode *newfor(struct astnode *init, struct astnode *cond,  struct astno
         forstmt->forstmt.incr = incr;
         return forstmt;
 }
+
+struct astnode *newBreak() {
+        struct astnode *breakstmt = malloc(sizeof(struct astnode));
+        breakstmt->nodetype = AST_NODE_TYPE_BREAK;
+        breakstmt->breakstmt.type = BREAK;
+        return breakstmt;
+};
+struct astnode *newReturn(struct astnode *expr) {
+     struct astnode *returnstmt = malloc(sizeof(struct astnode));
+    returnstmt->returnstmt.statement = expr;
+    return returnstmt;
+
+};
+struct astnode *newContinue() {
+        struct astnode *continuestmt = malloc(sizeof(struct astnode));
+        continuestmt->nodetype = AST_NODE_TYPE_CONTINUE;
+        continuestmt->continuestmt.type = CONTINUE;
+        return continuestmt;
+};
+struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt) {
+      struct astnode *casestmt = malloc(sizeof(struct astnode));
+      casestmt->caselabel.cond_expr = condexpr;
+      casestmt->caselabel.statement =  stmt;
+      return casestmt;
+};
+
+struct astnode *newDefault(struct astnode *stmt) {
+     struct astnode *defaultstmt = malloc(sizeof(struct astnode));
+      defaultstmt->defaultlabel.statement = stmt;
+      return defaultstmt;;
+}
+struct astnode *newLabel(char *ident, struct astnode *stmt) {
+      struct symbol *test = create_symbol_entry(ident, SYMB_LABEL, SCOPE_FUNCTION, lineno, filename_buf);
+      struct symbol *lookup;
+      lookup = symbtab_lookup_current(current_functionscope, test);
+      
+
+
+      
+};
+struct astnode *newGoTo(char *ident) {
+
+};
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;

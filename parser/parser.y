@@ -25,6 +25,7 @@
     struct symbtab *current_scope;
     struct struct_stack *curstruct_scope;
     struct astnode *cur_struct;
+    struct symbtab *current_functionscope; //for labels;
 %}
 
 %union{
@@ -54,7 +55,7 @@
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
 %type <astnode_p> primary-expression assignment-expression
 %type <astnode_p> expression postfix-expression expression-list selection-statement iteration-statement
-%type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression
+%type <astnode_p> unary-expression cast-expression mult-expression add-expression shift-expression jump-statement labeled-statement
 %type <astnode_p> relational-expression equality-expression statement decl_or_stmt compound-statement decl_or_stmt_list expression-statement
 %type <astnode_p> bitwise-or-expression bitwise-xor-expression bitwise-and-expression direct-declarator direct-abstract-declarator 
 %type <astnode_p> logical-or-expression logical-and-expression conditional-expression abstract-declarator declaration init-declarator-list 
@@ -447,13 +448,14 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
 
     
     labeled-statement: IDENT ':' statement { }
-        | CASE conditional-expression ':' statement { }
-        | DEFAULT ':' statement { }
+        | CASE conditional-expression ':' statement { $$ = newCase($2, $4); }
+        | DEFAULT ':' statement { $$ = newDefault($3); }
         ;
     
 compound-statement: '{' 
                     { if(isFunc) {current_scope = symbtab_push(SCOPE_FUNCTION, current_scope, lineno, filename_buf);
                                    symbent_combine_fn(fn_parameters, lineno, filename_buf, current_scope);
+                                   current_functionscope = current_scope;
                                     } 
                         else { current_scope = symbtab_push(SCOPE_BLOCK, current_scope, lineno, filename_buf);}
                         isFunc = 0;
@@ -500,10 +502,10 @@ decl_or_stmt:
 
     
     jump-statement: GOTO IDENT ';' { }
-        | CONTINUE ';' { }
-        | BREAK ';' { }
-        | RETURN expression ';' { }
-        | RETURN ';' { }
+        | CONTINUE ';' {$$ = newContinue(); }
+        | BREAK ';' { $$ = newBreak(); }
+        | RETURN expression ';' { $$ = newReturn($2);}
+        | RETURN ';' {  $$ = newReturn(NULL);}
         ;
     
     declaration_or_fndef: declaration { }

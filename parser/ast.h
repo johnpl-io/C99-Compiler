@@ -34,6 +34,7 @@ enum AstNodeType {
     AST_NODE_TYPE_RETURN,
     AST_NODE_TYPE_CONTINUE,
     AST_NODE_TYPE_GOTO,
+    AST_NODE_TYPE_DEFAULT,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -90,7 +91,7 @@ struct astnode_case {
     struct astnode *statement;
 };
 struct astnode_default {
-    int type;
+    struct astnode *statement;
 };
 struct astnode_return {
     struct astnode *statement;
@@ -261,10 +262,13 @@ union {
      struct astnode_while whilestmt;
      struct astnode_for forstmt;
      struct astnode_label label;
+     struct astnode_case caselabel;
      struct astnode_goto gotostmt;
      struct astnode_break breakstmt;
      struct astnode_continue continuestmt;
      struct astnode_return returnstmt;
+     struct astnode_default defaultlabel;
+     
     };  
    struct astnode *head, *tail;
 };
@@ -290,5 +294,9 @@ struct astnode *newifelse(struct astnode *IF, struct astnode *THEN, struct astno
 struct astnode *newswitch(struct astnode *expr, struct astnode *body);
 struct astnode *newwhile(int isdoWhile, struct astnode *expr, struct astnode *stmt);
 struct astnode *newfor(struct astnode *init, struct astnode *cond, struct astnode *incr, struct astnode *body);
+struct astnode *newBreak();
+struct astnode *newReturn(struct astnode *expr);
+struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt);
+struct astnode *newDefault(struct astnode *stmt);
 char * filename(char * filename);
 #endif

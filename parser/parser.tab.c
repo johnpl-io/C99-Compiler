@@ -3147,7 +3147,7 @@ yyreduce:
 
   case 202: /* statement: selection-statement  */
 #line 443 "parser.y"
-                              { }
+                              { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 3152 "parser.tab.c"
     break;
 
@@ -3321,10 +3321,40 @@ yyreduce:
 #line 3322 "parser.tab.c"
     break;
 
+  case 235: /* jump-statement: GOTO IDENT ';'  */
+#line 502 "parser.y"
+                                   { }
+#line 3328 "parser.tab.c"
+    break;
+
+  case 236: /* jump-statement: CONTINUE ';'  */
+#line 503 "parser.y"
+                       { }
+#line 3334 "parser.tab.c"
+    break;
+
+  case 237: /* jump-statement: BREAK ';'  */
+#line 504 "parser.y"
+                    { }
+#line 3340 "parser.tab.c"
+    break;
+
+  case 238: /* jump-statement: RETURN expression ';'  */
+#line 505 "parser.y"
+                                { }
+#line 3346 "parser.tab.c"
+    break;
+
+  case 239: /* jump-statement: RETURN ';'  */
+#line 506 "parser.y"
+                     { }
+#line 3352 "parser.tab.c"
+    break;
+
   case 240: /* declaration_or_fndef: declaration  */
 #line 509 "parser.y"
                                       { }
-#line 3328 "parser.tab.c"
+#line 3358 "parser.tab.c"
     break;
 
   case 242: /* $@7: %empty  */
@@ -3333,17 +3363,17 @@ yyreduce:
                                                             symbent_combine((yyvsp[-1].astnode_p), insertElementorig(AST_NODE_TYPE_LL, (yyvsp[0].astnode_p)), lineno, filename_buf, current_scope, NULL);   
                                                             isFunc = 1; 
                                                             fn_parameters = (yyvsp[0].astnode_p);}
-#line 3337 "parser.tab.c"
+#line 3367 "parser.tab.c"
     break;
 
   case 243: /* function_definition: declaration-specifiers declarator $@7 compound-statement  */
 #line 516 "parser.y"
                                                                                                      { printf("Ast Dump for function [ \n"); astwalk_impl((yyvsp[0].astnode_p),0); printf(" ] \n"); }
-#line 3343 "parser.tab.c"
+#line 3373 "parser.tab.c"
     break;
 
 
-#line 3347 "parser.tab.c"
+#line 3377 "parser.tab.c"
 
       default: break;
     }

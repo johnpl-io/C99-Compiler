@@ -440,7 +440,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     statement: compound-statement { $$ = $1; }
         | labeled-statement { }
         | expression-statement { }
-        | selection-statement { }
+        | selection-statement { $$ = $1; }
         | iteration-statement { }
         | jump-statement { }
         ;
@@ -499,11 +499,11 @@ decl_or_stmt:
      |   FOR '(' declaration  ';' ')' statement
 
     
-    jump-statement: GOTO IDENT ';'
-        | CONTINUE ';'
-        | BREAK ';'
-        | RETURN expression ';'
-        | RETURN ';'
+    jump-statement: GOTO IDENT ';' { }
+        | CONTINUE ';' { }
+        | BREAK ';' { }
+        | RETURN expression ';' { }
+        | RETURN ';' { }
         ;
     
     declaration_or_fndef: declaration { }

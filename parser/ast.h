@@ -31,6 +31,9 @@ enum AstNodeType {
     AST_NODE_TYPE_FOR,
     AST_NODE_TYPE_BREAK,
     AST_NODE_TYPE_LABEL,
+    AST_NODE_TYPE_RETURN,
+    AST_NODE_TYPE_CONTINUE,
+    AST_NODE_TYPE_GOTO,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -76,10 +79,28 @@ struct astnode_num {
     struct astnode *left, *right;
 };
 struct astnode_label {
-   int nodetype;
+    char *ident;
    struct astnode *statement;
-   struct astnode *left, *right; //onlify needed 
-
+};
+struct astnode_goto {
+ struct astnode *label;
+};
+struct astnode_case {
+    struct astnode *cond_expr;
+    struct astnode *statement;
+};
+struct astnode_default {
+    int type;
+};
+struct astnode_return {
+    struct astnode *statement;
+    
+};
+struct astnode_break {
+    int type; 
+};
+struct astnode_continue {
+    int type;
 };
 
 struct astnode_ident {
@@ -215,7 +236,7 @@ struct astnode_for {
 };
 
 struct astnode {
-int nodetype;
+int nodetype;int type;
 union {
     struct astnode_binop binop;
     struct astnode_tenop tenop;
@@ -239,6 +260,11 @@ union {
      struct astnode_switch switchstmt;
      struct astnode_while whilestmt;
      struct astnode_for forstmt;
+     struct astnode_label label;
+     struct astnode_goto gotostmt;
+     struct astnode_break breakstmt;
+     struct astnode_continue continuestmt;
+     struct astnode_return returnstmt;
     };  
    struct astnode *head, *tail;
 };

@@ -439,11 +439,11 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     
     /* 6.8 */
     statement: compound-statement { $$ = $1; }
-        | labeled-statement { }
-        | expression-statement { }
+        | labeled-statement { $$ = $1; }
+        | expression-statement { $$ = $1; }
         | selection-statement { $$ = $1; }
-        | iteration-statement { }
-        | jump-statement { }
+        | iteration-statement {  $$ = $1; }
+        | jump-statement { $$ = $1; }
         ;
 
     
@@ -501,7 +501,7 @@ decl_or_stmt:
      |   FOR '(' declaration  ';' ')' statement
 
     
-    jump-statement: GOTO IDENT ';' { }
+    jump-statement: GOTO IDENT ';' { $$ = newGoTo($2); }
         | CONTINUE ';' {$$ = newContinue(); }
         | BREAK ';' { $$ = newBreak(); }
         | RETURN expression ';' { $$ = newReturn($2);}

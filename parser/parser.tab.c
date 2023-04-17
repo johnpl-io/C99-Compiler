@@ -3136,13 +3136,13 @@ yyreduce:
 
   case 200: /* statement: labeled-statement  */
 #line 442 "parser.y"
-                            { }
+                            { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 3141 "parser.tab.c"
     break;
 
   case 201: /* statement: expression-statement  */
 #line 443 "parser.y"
-                               { }
+                               { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 3147 "parser.tab.c"
     break;
 
@@ -3154,13 +3154,13 @@ yyreduce:
 
   case 203: /* statement: iteration-statement  */
 #line 445 "parser.y"
-                              { }
+                              {  (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 3159 "parser.tab.c"
     break;
 
   case 204: /* statement: jump-statement  */
 #line 446 "parser.y"
-                         { }
+                         { (yyval.astnode_p) = (yyvsp[0].astnode_p); }
 #line 3165 "parser.tab.c"
     break;
 
@@ -3325,7 +3325,7 @@ yyreduce:
 
   case 235: /* jump-statement: GOTO IDENT ';'  */
 #line 504 "parser.y"
-                                   { }
+                                   { (yyval.astnode_p) = newGoTo((yyvsp[-1].string_literal)); }
 #line 3330 "parser.tab.c"
     break;
 

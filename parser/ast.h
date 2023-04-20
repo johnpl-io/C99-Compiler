@@ -35,6 +35,7 @@ enum AstNodeType {
     AST_NODE_TYPE_CONTINUE,
     AST_NODE_TYPE_GOTO,
     AST_NODE_TYPE_DEFAULT,
+    AST_NODE_TYPE_CASE,
     // add more types as needed
 };
 struct astnode_linkedlist {
@@ -300,4 +301,5 @@ struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt);
 struct astnode *newDefault(struct astnode *stmt);
 struct astnode *newLabel(char *ident, struct astnode *stmt);
 char * filename(char * filename);
+struct astnode *newGoTo(char *ident);
 #endif

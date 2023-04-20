@@ -501,7 +501,7 @@ decl_or_stmt:
      |   FOR '(' declaration  ';' ')' statement
 
     
-    jump-statement: GOTO IDENT ';' { $$ = newGoTo($2); }
+    jump-statement: GOTO IDENT ';' { $$ = newGoTo($2);  }
         | CONTINUE ';' {$$ = newContinue(); }
         | BREAK ';' { $$ = newBreak(); }
         | RETURN expression ';' { $$ = newReturn($2);}

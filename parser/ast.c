@@ -288,7 +288,7 @@ struct astnode *newswitch(struct astnode *expr, struct astnode *body) {
     struct astnode *switchstmt = malloc(sizeof(struct astnode));
     switchstmt->nodetype = AST_NODE_TYPE_SWITCH;
     switchstmt->switchstmt.expr = expr;
-    switchstmt->switchstmt.expr = body;
+    switchstmt->switchstmt.body = body;
     return switchstmt;
 }
 
@@ -318,7 +318,9 @@ struct astnode *newBreak() {
         return breakstmt;
 };
 struct astnode *newReturn(struct astnode *expr) {
+    
      struct astnode *returnstmt = malloc(sizeof(struct astnode));
+    returnstmt->nodetype = AST_NODE_TYPE_RETURN;
     returnstmt->returnstmt.statement = expr;
     return returnstmt;
 
@@ -331,6 +333,7 @@ struct astnode *newContinue() {
 };
 struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt) {
       struct astnode *casestmt = malloc(sizeof(struct astnode));
+      casestmt->nodetype = AST_NODE_TYPE_CASE;
       casestmt->caselabel.cond_expr = condexpr;
       casestmt->caselabel.statement =  stmt;
       return casestmt;
@@ -375,15 +378,16 @@ struct astnode *newGoTo(char *ident) {
       if(lookup) {
         if(lookup->label.type->label.statement) {
             printf("prev goto found \n");
-            gotostmt->label.statement = lookup->label.type->label.statement;
-            gotostmt->label.ident =  lookup->label.type->label.statement;
+            gotostmt->gotostmt.label = lookup->label.type;
+       //     gotostmt->gotostmt.label->label.ident =  lookup->label.type->label.ident;
         }
 
       } else {
         printf("new goto\n");
         struct astnode *label =  malloc(sizeof(struct astnode));
         label->nodetype = AST_NODE_TYPE_LABEL;
-        label->label.ident = ident;
+       label->label.ident = ident;
+        gotostmt->gotostmt.label = label;
         define_label(label, current_functionscope, lineno, filename_buf, false);
       }
       return gotostmt;
@@ -560,9 +564,9 @@ void astwalk_impl(struct astnode *ast, int depth) {
             break;
         case AST_NODE_TYPE_TENOP:
             printf("TENOP \n");
-            printf("IF:\n"); astwalk_impl(ast->tenop.left, depth + 1);
-            printf("THEN:\n");  astwalk_impl(ast->tenop.middle,depth + 1);
-             printf("ELSE:\n"); astwalk_impl(ast->tenop.right, depth + 1);
+          print_spaces(depth);  printf("IF:\n"); astwalk_impl(ast->tenop.left, depth + 1);
+        print_spaces(depth);    printf("THEN:\n");  astwalk_impl(ast->tenop.middle,depth + 1);
+        print_spaces(depth);     printf("ELSE:\n"); astwalk_impl(ast->tenop.right, depth + 1);
             break;
         case AST_NODE_TYPE_UNOP:
                 printf("UNOP ");
@@ -608,10 +612,10 @@ void astwalk_impl(struct astnode *ast, int depth) {
         case AST_NODE_TYPE_IDENT:
             if(ast->ident.symbol) {
                 if(ast->ident.symbol->attr_type == SYMB_FUNCTION_NAME) {
-                    printf("stab_fn name=%s def @%s:%d\n ",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
+                    printf("stab_fn name=%s def @%s:%d\n",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
                 }
                 if(ast->ident.symbol->attr_type == SYMB_VARIABLE_NAME)
-                    printf("stab_var name=%s def @%s:%d\n ",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
+                    printf("stab_var name=%s def @%s:%d\n",ast->ident.string,  filename(ast->ident.symbol->filename_buf), ast->ident.symbol->lineno);
             } else {
             printf("IDENT %s\n", ast->ident.string);
             }
@@ -758,33 +762,57 @@ void astwalk_impl(struct astnode *ast, int depth) {
             break;
             case AST_NODE_TYPE_FOR:
               printf("FOR\n");
-         print_spaces(depth);     printf(" INIT:\n"); astwalk_impl(ast->forstmt.init, 0);
-         print_spaces(depth);     printf(" COND: \n"); astwalk_impl(ast->forstmt.cond, 0);
-        print_spaces(depth);        printf(" BODY: \n"); astwalk_impl(ast->forstmt.body, 0);
-         print_spaces(depth);      printf(" INCR: \n"); astwalk_impl(ast->forstmt.incr, 0);
+         print_spaces(depth);     printf(" INIT:\n"); astwalk_impl(ast->forstmt.init, depth + 1);
+         print_spaces(depth);     printf(" COND: \n"); astwalk_impl(ast->forstmt.cond, depth + 1);
+        print_spaces(depth);        printf(" BODY: \n"); astwalk_impl(ast->forstmt.body, depth + 1);
+         print_spaces(depth);      printf(" INCR: \n"); astwalk_impl(ast->forstmt.incr, depth + 1);
         break;
         case AST_NODE_TYPE_WHILE:
-            char * dowhile;
             if(ast->whilestmt.isdowhile)
-                dowhile = "DO WHILE";
-            printf("WHILE %s \n", dowhile);  
-            print_spaces(depth); printf("BODY: \n"); astwalk_impl(ast->whilestmt.body, 0); 
-            print_spaces(depth); printf("COND: \n"); astwalk_impl(ast->whilestmt.expression, 0);
+                printf("DO");
+            printf("WHILE  \n" );  
+            print_spaces(depth); printf("BODY: \n"); astwalk_impl(ast->whilestmt.body, depth + 1); 
+            print_spaces(depth); printf("COND: \n"); astwalk_impl(ast->whilestmt.expression, depth + 1);
             break;
         case AST_NODE_TYPE_SWITCH:
-
+            printf("SWITCH, EXP:\n"); astwalk_impl(ast->switchstmt.expr, depth + 1);
+            print_spaces(depth); printf("BODY:\n"); astwalk_impl(ast->switchstmt.body, depth + 1);
         break;
         case AST_NODE_TYPE_LABEL:
+            printf("LABEL (%s) \n", ast->label.ident);
+            astwalk_impl(ast->label.statement, depth + 1);
+
         break;
         case  AST_NODE_TYPE_GOTO:
+       
+           printf("GOTO %s ",  ast->gotostmt.label->label.ident);
+            if(ast->gotostmt.label->label.statement) {
+                printf("(DEFINED PREV) \n ");
+            } else {
+                printf("FORWARD DECL \n");
+            }
             
         break;
         case AST_NODE_TYPE_BREAK:
             printf("BREAK\n");
         break;
         case AST_NODE_TYPE_RETURN:
+            printf("RETURN\n");
+            astwalk_impl(ast->returnstmt.statement, depth + 1);
         break;
+        case AST_NODE_TYPE_CASE:
+            printf("CASE:\n");
+            astwalk_impl(ast->caselabel.cond_expr, depth + 1);
+            astwalk_impl(ast->caselabel.statement, depth + 1);
 
+        break;
+        case AST_NODE_TYPE_CONTINUE:
+        printf("CONTINUE:\n");
+        break;
+        case AST_NODE_TYPE_DEFAULT:
+        printf("DEFAULT : \n");
+        astwalk_impl(ast->defaultlabel.statement, depth + 1);
+        break;
         default:
             printf("Unknown node type %d \n", ast->nodetype) ;
             break;

@@ -3325,7 +3325,7 @@ yyreduce:
 
   case 235: /* jump-statement: GOTO IDENT ';'  */
 #line 504 "parser.y"
-                                   { (yyval.astnode_p) = newGoTo((yyvsp[-1].string_literal)); }
+                                   { (yyval.astnode_p) = newGoTo((yyvsp[-1].string_literal));  }
 #line 3330 "parser.tab.c"
     break;
 

@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall
 
-parser: parser.tab.o lex.yy.o ast.o symbtab.o symbtabinsert.o parser.tab.h symbtab.h symbtabinsert.h
-	$(CC) $(CFLAGS) -o parser lex.yy.o parser.tab.o ast.o symbtab.o symbtabinsert.o
+parser: parser.tab.o lex.yy.o ast.o symbtab.o symbtabinsert.o quads.o
+	$(CC) $(CFLAGS) -o parser lex.yy.o parser.tab.o ast.o symbtab.o symbtabinsert.o quads.o
 
 parser.tab.c: parser.y
 	bison -d parser.y
@@ -25,9 +25,12 @@ symbtab.o: symbtab.c symbtab.h
 symbtabinsert.o: symbtabinsert.c symbtabinsert.h
 	$(CC) $(CFLAGS) -c symbtabinsert.c
 
+quads.o: quads.c quads.h
+	$(CC) $(CFLAGS) -c quads.c
+
 debug: CFLAGS += -g
 debug: CC = gcc -g
 debug: parser
 
 clean:
-	rm -f parser parser.tab.* lex.yy.* ast.o
+	rm -f parser parser.tab.* lex.yy.* ast.o symbtab.o symbtabinsert.o quads.o

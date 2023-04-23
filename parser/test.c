@@ -1,4 +1,6 @@
-
+int x;
+x = 5;
 int main() {
-struct a; 
+    int x = 4;
+
 }

@@ -344,6 +344,7 @@ struct astnode *newDefault(struct astnode *stmt) {
       defaultstmt->defaultlabel.statement = stmt;
       return defaultstmt;;
 }
+
 struct astnode *newLabel(char *ident, struct astnode *stmt) {
         struct astnode *label =  malloc(sizeof(struct astnode));
         label->nodetype = AST_NODE_TYPE_LABEL;
@@ -366,9 +367,8 @@ struct astnode *newLabel(char *ident, struct astnode *stmt) {
         define_label(label, current_functionscope, lineno, filename_buf, false);
       }
     return label;
-
-      
 };
+
 struct astnode *newGoTo(char *ident) {
          struct astnode *gotostmt = malloc(sizeof(struct astnode));
          gotostmt->nodetype = AST_NODE_TYPE_GOTO;
@@ -381,7 +381,6 @@ struct astnode *newGoTo(char *ident) {
             gotostmt->gotostmt.label = lookup->label.type;
        //     gotostmt->gotostmt.label->label.ident =  lookup->label.type->label.ident;
         }
-
       } else {
         printf("new goto\n");
         struct astnode *label =  malloc(sizeof(struct astnode));
@@ -392,6 +391,7 @@ struct astnode *newGoTo(char *ident) {
       }
       return gotostmt;
 };
+
 struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int operator) {
     struct astnode *a = malloc(sizeof(struct astnode));
     a->nodetype = nodetype;
@@ -419,7 +419,7 @@ struct astnode *newast(int nodetype, struct astnode *l, struct astnode *r, int o
             break;
         case AST_NODE_TYPE_QUALIFIER:
             a->qualifier.types = l->qualifier.types | r->qualifier.types;
-        break;
+            break;
         case AST_NODE_TYPE_DECLSPEC:
             // Making sure that an ident doesn't have two storage classes
             // we're checking if r (old) is a declspec with a storage class
@@ -493,7 +493,7 @@ void printoperator(int operator) {
     if(isprint(operator)) {
         printf("%c \n", operator); 
     } else {
-   switch(operator) {
+    switch(operator) {
         case LTEQ:
             printf("Comparison OP <=\n"); break;
         case GTEQ:

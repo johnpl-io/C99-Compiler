@@ -1,7 +1,7 @@
 #ifndef QUAD_H
 #define QUAD_H
-#include "ast.h"
-#include "symbtab.h"
+#include "../ast.h"
+#include "../symbtab.h"
 enum opcode {
     LOAD_OC, STORE_OC, LEA_OC,
     MULT_OC, ADD_OC, SUB_OC, DIV_OC, MOD_OC,
@@ -22,8 +22,10 @@ struct quad {
 struct basic_block {
     char *bbname;
     int bb_no;
-   struct quad *list;
+   struct quad *listquadbeg;
     struct basic_block *next;
+    struct quad *listquadend;
+    int regidcount; //keep track of temp register number per basic block
 };
 
 struct generic_node {
@@ -47,6 +49,12 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode);
 struct generic_node *gen_assign(struct astnode *expr);
 struct basic_block *gen_quads(struct astnode *stmtlist);
+void gen_stmt(struct astnode *stmt);
 //this function creates a new quad and appends it to the current list of quads 
 void emit_quads(int opcode, struct generic_node *result, struct generic_node *src1, struct generic_node *src2);
+void print_quads(struct quad *quad);
+void print_basicblock(struct basic_block *basic_block);
+link_bb(); //like hak lecture notes
+struct generic_node *new_temporary();
+int get_opcode(struct astnode *opcode);
 #endif

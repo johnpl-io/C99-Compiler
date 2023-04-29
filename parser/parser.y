@@ -9,7 +9,7 @@
     #include "ast.h"
     #include "symbtab.h"
     #include "symbtabinsert.h"
-    #include "quads.h"
+    #include "quads/quads.h"
     int yylex();
     void yyerror (char const *s) {
         fprintf (stderr, "%s\n", s);

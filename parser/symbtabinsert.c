@@ -21,7 +21,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isInsideStruct = false;
     bool isAnonStructdefine = false;
      struct symbol *lookup;
-     struct symbol *structlookup; 
+     struct symbol *structlookup;  //maybe wrong type !
    
     if(!declspecs->declspec.typespecif) {
         declspecs->declspec.typespecif = newType(AST_NODE_TYPE_SCALAR, INT);

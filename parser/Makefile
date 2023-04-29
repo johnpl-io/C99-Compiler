@@ -25,8 +25,8 @@ symbtab.o: symbtab.c symbtab.h
 symbtabinsert.o: symbtabinsert.c symbtabinsert.h
 	$(CC) $(CFLAGS) -c symbtabinsert.c
 
-quads.o: quads.c quads.h
-	$(CC) $(CFLAGS) -c quads.c
+quads.o: quads/quads.c quads/quads.h
+	$(CC) $(CFLAGS) -c quads/quads.c
 
 debug: CFLAGS += -g
 debug: CC = gcc -g

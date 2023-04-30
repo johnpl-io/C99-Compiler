@@ -114,8 +114,8 @@ expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_
 unary-expression: postfix-expression {$$ = $1; }
                 | PLUSPLUS   unary-expression { struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
                 | MINUSMINUS unary-expression {struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
-                | unary-operator cast-expression { $$ = newast(AST_NODE_TYPE_UNOP, $2, NULL, $1); }
-                | SIZEOF '(' expression ')' { $$ = newast(AST_NODE_TYPE_UNOP, $3, NULL, SIZEOF);  }
+                | unary-operator cast-expression { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $2, $1); }
+                | SIZEOF '(' expression ')' { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $3, SIZEOF);  }
                 ;
 
 unary-operator: '-' { $$ = '-'; }

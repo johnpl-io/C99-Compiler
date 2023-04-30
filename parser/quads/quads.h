@@ -57,4 +57,5 @@ void print_basicblock(struct basic_block *basic_block);
 link_bb(); //like hak lecture notes
 struct generic_node *new_temporary();
 int get_opcode(struct astnode *opcode);
+char* opcode_to_string(enum opcode op);
 #endif

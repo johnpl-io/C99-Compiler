@@ -2185,13 +2185,13 @@ yyreduce:
 
   case 22: /* unary-expression: unary-operator cast-expression  */
 #line 117 "parser.y"
-                                                 { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, (yyvsp[0].astnode_p), NULL, (yyvsp[-1].op)); }
+                                                 { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, NULL, (yyvsp[0].astnode_p), (yyvsp[-1].op)); }
 #line 2190 "parser.tab.c"
     break;
 
   case 23: /* unary-expression: SIZEOF '(' expression ')'  */
 #line 118 "parser.y"
-                                            { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, (yyvsp[-1].astnode_p), NULL, SIZEOF);  }
+                                            { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, NULL, (yyvsp[-1].astnode_p), SIZEOF);  }
 #line 2196 "parser.tab.c"
     break;
 

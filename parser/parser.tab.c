@@ -2113,7 +2113,7 @@ yyreduce:
 
   case 10: /* postfix-expression: postfix-expression '[' expression ']'  */
 #line 100 "parser.y"
-                                                          { struct astnode *ast = newast(AST_NODE_TYPE_BINOP, (yyvsp[-3].astnode_p), (yyvsp[-1].astnode_p), '+'); (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, ast, NULL, '*'); }
+                                                          { struct astnode *ast = newast(AST_NODE_TYPE_BINOP, (yyvsp[-3].astnode_p), (yyvsp[-1].astnode_p), '+'); (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, NULL, ast, '*'); }
 #line 2118 "parser.tab.c"
     break;
 

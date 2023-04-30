@@ -97,7 +97,7 @@ primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT,
                 ;
 
 postfix-expression: primary-expression { $$ = $1; }
-                |   postfix-expression '[' expression ']' { struct astnode *ast = newast(AST_NODE_TYPE_BINOP, $1, $3, '+'); $$ = newast(AST_NODE_TYPE_UNOP, ast, NULL, '*'); }
+                |   postfix-expression '[' expression ']' { struct astnode *ast = newast(AST_NODE_TYPE_BINOP, $1, $3, '+'); $$ = newast(AST_NODE_TYPE_UNOP, NULL, ast, '*'); }
                 |   postfix-expression '.' IDENT { $$ = newast(AST_NODE_TYPE_BINOP, $1, newIdent(AST_NODE_TYPE_IDENT, $3), '.'); }
                 |   postfix-expression INDSEL IDENT { struct astnode *ast = newast(AST_NODE_TYPE_UNOP, $1, NULL, '*'); $$ = newast(AST_NODE_TYPE_BINOP, ast, newIdent(AST_NODE_TYPE_IDENT, $3), '.' ); }    
                 |   postfix-expression '(' expression-list ')' { $$ = newast(AST_NODE_TYPE_FN, $1, $3, '0'); } 

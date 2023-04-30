@@ -33,8 +33,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
        case AST_NODE_TYPE_BINOP:
         if(stmt->binop.operator == '=') {
             printf("general assignment \n");
-        astwalk_impl(stmt->binop.right, 0);
-         gen_rvalue(stmt->binop.right, NULL);
+       gen_assign(stmt);
         }
        break;
        default:
@@ -77,13 +76,31 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         //check types
         } else {
           //check if it is a scalar variable 
-           if( rexpr->ident.symbol->var.type->nodetype == AST_NODE_TYPE_DECLSPEC) {
+           switch(rexpr->ident.symbol->var.type->nodetype) {
+            case AST_NODE_TYPE_DECLSPEC: {
            target->types = VARIABLE_TYPE;
            target->ident_symbol = rexpr->ident.symbol;
            target->value.ident = strdup(rexpr->ident.string);
             return target;
-           } else {
-            fprintf(stderr, "UHOHH! IDENT CASE ");
+           
+           }  
+           case AST_NODE_TYPE_ARRAYDCL:
+           {
+    
+            struct generic_node *temp = new_temporary();
+            target->types = VARIABLE_TYPE;
+           target->ident_symbol = rexpr->ident.symbol;
+           target->value.ident = strdup(rexpr->ident.string);
+              emit_quads(LEA_OC, target, NULL , temp);
+              return temp;
+           }
+        
+        
+
+           default:
+           
+            fprintf(stderr, "UHOHH! IDENT CASE NOT SUPPORTED YET %d\n ", rexpr->ident.symbol->var.type->nodetype);
+           break;
            }
         }
 
@@ -107,13 +124,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
               addr = new_temporary(); 
              
             } 
-
+                     
                      emit_quads(get_opcode(rexpr), left, right, addr);     
            
             return addr;
         break;
     case AST_NODE_TYPE_UNOP:
-     fprintf(stderr, "here");
+   
        if(rexpr->unop.operator == '*') //pointer deference
     {
        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
@@ -132,15 +149,29 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 }
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
+    astwalk_impl(lexpr, 0);
  switch(lexpr->nodetype) {
     case AST_NODE_TYPE_IDENT: {
     //check symbol thgen insert 
         *mode = DIRECT;
-
+        struct generic_node *target = malloc(sizeof(struct generic_node));
+            target->types = VARIABLE_TYPE;
+           target->ident_symbol = lexpr->ident.symbol;
+           target->value.ident = strdup(lexpr->ident.string);
+            return target;
 
     }
-    case AST_NODE_TYPE_NUM:
-    case AST_NODE_TYPE_UNOP:
+    case AST_NODE_TYPE_NUM: {
+        return NULL;
+    }
+    case AST_NODE_TYPE_UNOP: {
+        
+        if(lexpr->unop.operator == '*') {
+            *mode = INDIRECT;
+            fprintf(stderr, "hrere\n");
+            return gen_rvalue(lexpr->unop.right, NULL);
+        }
+    }
 
  }
 }
@@ -153,6 +184,21 @@ target->types = REGISTER_TYPE;
  
 return target;
 
+}
+
+struct generic_node *gen_assign(struct astnode *expr) {
+    int destmode;
+    struct generic_node *dst = gen_lvalue(expr->binop.left, &destmode);
+    if(!dst) {
+        printf("error");
+    }
+    if(destmode == DIRECT) {
+        gen_rvalue(expr->binop.right, dst);
+
+    } else {
+       emit_quads(STORE_OC, gen_rvalue(expr->binop.right, NULL), dst, NULL);
+
+    }
 }
 void emit_quads(int opcode, struct generic_node *src1, struct generic_node *src2, struct generic_node *result) {
 struct quad *quad = malloc(sizeof (struct quad));

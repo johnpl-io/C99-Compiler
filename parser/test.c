@@ -1,3 +1,3 @@
 int main() {
-int int x;
+long x;
 } 

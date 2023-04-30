@@ -140,6 +140,9 @@ struct astnode_declspec {
     int typequal;
     int functionspec;
     struct astnode *typespecif;
+    int typespecif_res;  //first element whether it is signed or unsigned second element the type 
+    int unsigned_signed; //signed = 0 default unsigned 1
+    int typespecif_res_flag;
     struct astnode *next;
 };
     

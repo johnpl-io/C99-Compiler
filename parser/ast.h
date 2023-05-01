@@ -2,6 +2,8 @@
 #define AST_H
 #define POSTINC 500
 #define POSTDEC 501
+#define LONG_LONG 502
+#define LONG_DOUBLE 503
 #include "parser.tab.h"
 
 enum AstNodeType {
@@ -142,7 +144,6 @@ struct astnode_declspec {
     struct astnode *typespecif;
     int typespecif_res;  //first element whether it is signed or unsigned second element the type 
     int unsigned_signed; //signed = 0 default unsigned 1
-    int typespecif_res_flag;
     struct astnode *next;
 };
     

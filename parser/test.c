@@ -1,3 +1,3 @@
 int main() {
-long x;
+sizeof(main);
 } 

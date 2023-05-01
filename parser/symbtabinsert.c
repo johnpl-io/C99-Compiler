@@ -6,7 +6,8 @@
 #include "symbtab.h"
 #include "ast.h"
 #include "symbtabinsert.h"
-
+extern lineno;
+extern filename_buf;
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
@@ -251,26 +252,28 @@ void symbent_struct_reset(struct astnode *declspecs, int lineno, char *filename_
 
 int compare_arrays(unsigned char arr1[], unsigned char arr2[]) {
     int size = 9;
-    //  printf("Array 1: ");
-    //for (int i = 0; i < size; i++) {
-     //   printf("%d ", arr1[i]);
-  //  }
+  /*    printf("Array 1: ");
+    for (int i = 0; i < size; i++) {
+       printf("%d ", arr1[i]);
+    }
  
     
-    //printf("Array 2: ");
-  //  for (int i = 0; i < size; i++) {
-   //     printf("%d ", arr2[i]);
-   // }
-   
+    printf("Array 2: ");
+    for (int i = 0; i < size; i++) {
+       printf("%d ", arr2[i]);
+    }
+   printf("\n");
+   */
     for (int i = 0; i < size; i++) {
         if (arr1[i] != arr2[i]) {
             return 1; // arrays are not the same
         }
     }
     return 0; // arrays are the same
+
 }    
 void resolve_type(struct astnode *declspec) {
-  unsigned char type_bitmask[9] = {0}; // [void, char, short, int, long, float, struct, union]
+  unsigned char type_bitmask[9] = {0, 0, 0, 0, 0, 0, 0, 0,0} ; // [void, char, short, int, long, float, struct, union]
     int unsigned_type;
     struct astnode *head = declspec->declspec.typespecif;
     struct astnode *orig = declspec->declspec.typespecif; //kept to be put in resolved
@@ -301,7 +304,7 @@ void resolve_type(struct astnode *declspec) {
                     case DOUBLE:
                     type_bitmask[5]++;
                     break;
-                    case FLOAT_T:
+                    case FLOAT:
                     type_bitmask[6]++;
                     break;
                     case UNSIGNED_T:
@@ -348,15 +351,15 @@ void resolve_type(struct astnode *declspec) {
         unsigned char type_double[9] = {0, 0, 0, 0, 0, 1 , 0, 0, 0};
          unsigned char type_long_double[9] = {0, 0, 0, 0, 1, 1 , 0, 0, 0};
  
-         unsigned char type_float[9] = {0, 0, 0, 0, 0, 0 ,0, 1, 0, 0};
+         unsigned char type_float[9] = {0, 0, 0, 0, 0, 0 , 1, 0, 0};
 
 if (compare_arrays(type_void, type_bitmask) == 0) {
     if(!unsigned_type)
        {
-        printf("Type is void.\n");
            declspec->declspec.typespecif_res = VOID;
+           return;
        } else {
-          fprintf(stderr, "Error\n");
+          fprintf(stderr, "%s:%d Error 'signed' or 'unsigned' value with 'void' in declaration specifiers.\n", filename(filename_buf), lineno);
        }
 }
 else if (compare_arrays(type_char, type_bitmask) == 0) {
@@ -364,33 +367,69 @@ else if (compare_arrays(type_char, type_bitmask) == 0) {
    declspec->declspec.unsigned_signed = 1;
    }
     declspec->declspec.typespecif_res = CHAR;
+    return;
+    
     
 }
-else if (compare_arrays(type_short, type_bitmask) == 0) {
-    printf("Type is short int.\n");
+else if ((compare_arrays(type_short, type_bitmask) == 0) || compare_arrays(type_short_int, type_bitmask) == 0){
+   // printf("Type is short int.\n");
+       if(unsigned_type == 1) {
+   declspec->declspec.unsigned_signed = 1;
+   }
+    declspec->declspec.typespecif_res = SHORT;
+    return;
 }
 else if (compare_arrays(type_int, type_bitmask) == 0) {
-    printf("Type is int.\n");
+   // printf("Type is int.\n");
+        if(unsigned_type == 1) {
+   declspec->declspec.unsigned_signed = 1;
+   }
+    declspec->declspec.typespecif_res = INT;
+    return;
 }
-else if (compare_arrays(type_long, type_bitmask) == 0) {
-    printf("Type is long.\n");
+else if ((compare_arrays(type_long, type_bitmask) == 0) ||(compare_arrays(type_long_int, type_bitmask) == 0) ) {
+   // printf("Type is long.\n");
+            if(unsigned_type == 1) {
+   declspec->declspec.unsigned_signed = 1;
+   }
+    declspec->declspec.typespecif_res = LONG;
+    return;
 }
-else if (compare_arrays(type_long_int, type_bitmask) == 0) {
-    printf("Type is long int.\n");
-}
-else if (compare_arrays(type_long_long_int, type_bitmask) == 0) {
-    printf("Type is long long.\n");
-}
-else if (compare_arrays(type_long_long, type_bitmask) == 0) {
-    printf("Type is long long.\n");
+else if ( (compare_arrays(type_long_long_int, type_bitmask) == 0) ||(compare_arrays(type_long_long, type_bitmask) == 0)) {
+  //  printf("Type is long long.\n");
+                if(unsigned_type == 1) {
+   declspec->declspec.unsigned_signed = 1;
+   }
+    declspec->declspec.typespecif_res = LONG_LONG;
+    return;
 }
 else if (compare_arrays(type_double, type_bitmask) == 0) {
-    printf("Type is double.\n");
+ //   printf("Type is double.\n");    
+    if(!unsigned_type) {
+           declspec->declspec.typespecif_res = DOUBLE;
+           return;
+       } else {
+          fprintf(stderr, "%s:%d Error in declaration specifiers.\n", filename(filename_buf), lineno);
+       }
+    
 }
 else if (compare_arrays(type_long_double, type_bitmask) == 0) {
-    printf("Type is long double.\n");
+  //  printf("Type is long double.\n");
+       if(!unsigned_type) {
+           declspec->declspec.typespecif_res = LONG_DOUBLE;
+           return;
+       } else {
+          fprintf(stderr, "%s:%d Error in declaration specifiers.\n", filename(filename_buf), lineno);
+       }
 }
 else if (compare_arrays(type_float, type_bitmask) == 0) {
     printf("Type is float.\n");
+ if(!unsigned_type) {
+           declspec->declspec.typespecif_res = FLOAT;
+           return;
+       } else {
+          fprintf(stderr, "%s:%d Error in declaration specifiers.\n", filename(filename_buf), lineno);
+       }
 }
+fprintf(stderr, "Error with types\n");
 }

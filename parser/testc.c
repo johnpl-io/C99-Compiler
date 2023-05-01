@@ -11,5 +11,5 @@ int compare_arrays(int arr1[], int arr2[]) {
 int main() {
     int test[2] = {0, 1};
     int test2[2] = {0, 1};
-    printf("%d\n", compare_arrays(test, test2));
+    printf("%zu\n", sizeof(double));
 }

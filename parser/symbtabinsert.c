@@ -6,6 +6,7 @@
 #include "symbtab.h"
 #include "ast.h"
 #include "symbtabinsert.h"
+#include "quads/sizeof.h"
 extern lineno;
 extern filename_buf;
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
@@ -25,6 +26,8 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
      struct symbol *lookup;
      struct symbol *structlookup;  //maybe wrong type !
     resolve_type(declspecs);
+    printf("%d\n", sizeof_ast(declspecs));
+    
     if(!declspecs->declspec.typespecif) {
         declspecs->declspec.typespecif = newType(AST_NODE_TYPE_SCALAR, INT);
     }

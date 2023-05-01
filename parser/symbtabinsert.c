@@ -25,12 +25,13 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isAnonStructdefine = false;
      struct symbol *lookup;
      struct symbol *structlookup;  //maybe wrong type !
-    resolve_type(declspecs);
-    printf("%d\n", sizeof_ast(declspecs));
+    
+    
     
     if(!declspecs->declspec.typespecif) {
         declspecs->declspec.typespecif = newType(AST_NODE_TYPE_SCALAR, INT);
     }
+    resolve_type(declspecs);
     if( (isStruct = declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_STRUCT) || (isUnion =  declspecs->declspec.typespecif->nodetype == AST_NODE_TYPE_UNION) )  {
             if(outscopeforstruct) {
           //      printf("struct in struct");
@@ -180,6 +181,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                 define_func(type, curscope, lineno, filename_buf, strgclass, name);
             } else {
               define_var(type, curscope, lineno, filename_buf, strgclass, name);
+                printf("%d", sizeof_ast(type));
                 
             }
             }

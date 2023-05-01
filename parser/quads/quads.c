@@ -84,6 +84,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             return target;
            
            }  
+           case AST_NODE_TYPE_POINTER:
+           {
+            target->types = VARIABLE_TYPE;
+           target->ident_symbol = rexpr->ident.symbol;
+           target->value.ident = strdup(rexpr->ident.string);
+            return target;
+           }
            case AST_NODE_TYPE_ARRAYDCL:
            {
     
@@ -100,6 +107,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            default:
            
             fprintf(stderr, "UHOHH! IDENT CASE NOT SUPPORTED YET %d\n ", rexpr->ident.symbol->var.type->nodetype);
+          astwalk_impl(rexpr->ident.symbol->var.type, 0);
            break;
            }
         }
@@ -116,9 +124,15 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
     case AST_NODE_TYPE_BINOP: 
            //type checking would take place before this to ensure that left and right types are proper
-            struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL);
-            struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL);
+        
             
+            struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL);
+           
+            
+            struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL);
+            struct generic_node *temp = new_temporary();
+               emit_quads(MULT_OC, right, right, temp);
+               right = temp;    
             if(!addr) {
 
               addr = new_temporary(); 
@@ -149,10 +163,10 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 }
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
-    astwalk_impl(lexpr, 0);
+    
  switch(lexpr->nodetype) {
     case AST_NODE_TYPE_IDENT: {
-    //check symbol thgen insert 
+    //check symbol thgen insert //probably should check if symbol exists as well 
         *mode = DIRECT;
         struct generic_node *target = malloc(sizeof(struct generic_node));
             target->types = VARIABLE_TYPE;

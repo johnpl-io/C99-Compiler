@@ -1,3 +1,6 @@
 int main() {
-sizeof(main);
+int *p;
+int x;
+x = p + 1;
+
 } 

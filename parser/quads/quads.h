@@ -40,7 +40,7 @@ struct generic_node {
         int immediate;
         int regid;
     } value;
-    struct symbol *ident_symbol; //store type information for checking
+    struct astnode *declspec; //store type information for checking
 };
 
 

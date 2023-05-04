@@ -5,8 +5,12 @@
 #include "../parser.tab.h"
 #include <stdio.h>
 #include <string.h>
+#include "../symbtab.h"
+#include "sizeof.h"
 #define DIRECT 1
 #define INDIRECT 0
+
+
 struct basic_block *cur_bb; //current basic block
 struct basic_block *head_bb; //head of linked list of basic block 
 struct basic_block *gen_quads(struct astnode *stmtlist){
@@ -36,12 +40,56 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
        gen_assign(stmt);
         }
        break;
+       case AST_NODE_TYPE_LL: 
+       printf("{ } statement\n");
+       
+       break;
+
        default:
        fprintf(stderr, "stmt no supported yet s%d \n", stmt->nodetype);
        break;
     }
 
  }
+ struct generic_node *new_immediate(int value) {
+    struct generic_node *target = malloc(sizeof(struct generic_node));
+                    target->types = IMMEDIATE_TYPE;
+                target->value.immediate = value;
+                return target;
+ }
+//this function checks left and right emits mult if necessary promotes and demotes arrays
+struct generic_node* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
+
+
+
+    if ((*left)->declspec->nodetype == AST_NODE_TYPE_POINTER && (*right)->declspec->nodetype == AST_NODE_TYPE_DECLSPEC) {
+        if ((*right)->declspec->declspec.typespecif_res == INT) {
+            struct generic_node* location = new_temporary();
+            int sizeofleft = sizeof_ast((*left)->declspec->ptr.next);
+            struct generic_node *mult_val = new_immediate(sizeofleft);
+            emit_quads(MULT_OC, *right, mult_val, location);
+            location->declspec = (*left)->declspec;
+            *right = location;
+            return;
+        }
+    }
+
+    if ((*right)->declspec->nodetype == AST_NODE_TYPE_POINTER) {
+    if ((*left)->declspec->declspec.typespecif_res == INT) {
+        struct generic_node* location = new_temporary();
+        int sizeofright = sizeof_ast((*right)->declspec->ptr.next);
+        struct generic_node *mult_val = new_immediate(sizeofright);
+        emit_quads(MULT_OC, *left, mult_val, location);
+          location->declspec = (*right)->declspec;
+        *left = location;
+        return;
+    }
+
+}
+
+    
+}
+
 int get_opcode(struct astnode *opcode) {
     switch(opcode->binop.operator) {
         case '+':
@@ -76,10 +124,10 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         //check types
         } else {
           //check if it is a scalar variable 
-           switch(rexpr->ident.symbol->var.type->nodetype) {
+           switch(rexpr->ident.symbol->var.type->nodetype) { //probably should check if it a function call 
             case AST_NODE_TYPE_DECLSPEC: {
            target->types = VARIABLE_TYPE;
-           target->ident_symbol = rexpr->ident.symbol;
+           target->declspec= rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
             return target;
            
@@ -87,7 +135,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            case AST_NODE_TYPE_POINTER:
            {
             target->types = VARIABLE_TYPE;
-           target->ident_symbol = rexpr->ident.symbol;
+           target->declspec = rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
             return target;
            }
@@ -96,7 +144,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     
             struct generic_node *temp = new_temporary();
             target->types = VARIABLE_TYPE;
-           target->ident_symbol = rexpr->ident.symbol;
+           target->declspec = rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
               emit_quads(LEA_OC, target, NULL , temp);
               return temp;
@@ -118,6 +166,10 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         if(rexpr->num.number.type == INT_SIGNED || rexpr->num.number.type == INT_UNSIGNED) {
                 target->types = IMMEDIATE_TYPE;
                 target->value.immediate = rexpr->num.number.integer;
+                struct astnode *declspecs = malloc(sizeof(struct astnode));
+              declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
+               declspecs->declspec.typespecif_res = INT;
+                 target->declspec = declspecs;
                return target;
         }
      break;
@@ -130,9 +182,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            
             
             struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL);
-            struct generic_node *temp = new_temporary();
-               emit_quads(MULT_OC, right, right, temp);
-               right = temp;    
+                 check_type(&left, &right, rexpr->binop.operator);
             if(!addr) {
 
               addr = new_temporary(); 
@@ -140,7 +190,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             } 
                      
                      emit_quads(get_opcode(rexpr), left, right, addr);     
-           
+                 
             return addr;
         break;
     case AST_NODE_TYPE_UNOP:
@@ -170,7 +220,7 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
         *mode = DIRECT;
         struct generic_node *target = malloc(sizeof(struct generic_node));
             target->types = VARIABLE_TYPE;
-           target->ident_symbol = lexpr->ident.symbol;
+           target->declspec = lexpr->ident.symbol->var.type;
            target->value.ident = strdup(lexpr->ident.string);
             return target;
 
@@ -207,7 +257,11 @@ struct generic_node *gen_assign(struct astnode *expr) {
         printf("error");
     }
     if(destmode == DIRECT) {
-        gen_rvalue(expr->binop.right, dst);
+        struct generic_node *test = gen_rvalue(expr->binop.right, dst);
+        if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
+            if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
+            emit_quads(MOV_OC, test, NULL, dst);
+        }
 
     } else {
        emit_quads(STORE_OC, gen_rvalue(expr->binop.right, NULL), dst, NULL);

@@ -181,7 +181,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                 define_func(type, curscope, lineno, filename_buf, strgclass, name);
             } else {
               define_var(type, curscope, lineno, filename_buf, strgclass, name);
-                printf("%d", sizeof_ast(type));
+               fprintf(stderr, "%d\n", sizeof_ast(type));
                 
             }
             }

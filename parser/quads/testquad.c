@@ -13,6 +13,8 @@
 
 struct basic_block *cur_bb; //current basic block
 struct basic_block *head_bb; //head of linked list of basic block 
+
+
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
  //create current basic block keep  
@@ -57,7 +59,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
                 target->value.immediate = value;
                 return target;
  }
-  struct astnode *demote_array(struct astnode *declspec) {
+ struct astnode *demote_array(struct astnode *declspec) {
         struct astnode *newptr = newType(AST_NODE_TYPE_POINTER, 0);
         newptr->ptr.next = declspec->arraydecl.next;
         return newptr;
@@ -65,7 +67,9 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 //this function checks left and right emits mult if necessary promotes and demotes arrays
 struct generic_node* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
                if((*left)->declspec->nodetype == AST_NODE_TYPE_ARRAYDCL){
+                fprintf(stderr, "ARRAY HERE");
                 (*left)->declspec = demote_array((*left)->declspec);
+                exit(-1);
                }
     switch (get_opcode) {
 
@@ -176,7 +180,9 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            target->declspec = rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
               emit_quads(LEA_OC, target, NULL , temp);
-                temp->declspec = target->declspec;
+              temp->declspec = target->declspec;
+           
+             temp->declspec = target->declspec;
               return temp;
            }
         
@@ -209,8 +215,8 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         
             
             struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL);
-           
-            
+                
+             //   astwalk_impl(left->declspec, 0);
             struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL);
                  check_type(&left, &right, rexpr->binop.operator);
             if(!addr) {
@@ -218,20 +224,20 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
               addr = new_temporary(); 
              
             } 
-                 if(left != right) {
+                     if(left != right) {
                               emit_quads(get_opcode(rexpr), left, right, addr);   
                      } else {
                         emit_quads(MOV_OC, left, NULL, addr);
                      }
-                          
-                 addr->declspec = left->declspec; //need to change!!
-                    
+                     
+                 addr->declspec = left->declspec;
             return addr;
         break;
     case AST_NODE_TYPE_UNOP:
    
        if(rexpr->unop.operator == '*') //pointer deference
     {
+        
        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
        if(!addr) {
         addr = new_temporary();
@@ -309,9 +315,12 @@ struct generic_node *gen_assign(struct astnode *expr) {
     }
     if(destmode == DIRECT) {
         struct generic_node *test = gen_rvalue(expr->binop.right, dst);
+    
         if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
             if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
+           dst->declspec = test->declspec;
             emit_quads(MOV_OC, test, NULL, dst);
+          
         }
 
     } else {

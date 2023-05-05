@@ -1,5 +1,5 @@
 int main() {
-int x;
-int y;
-y = x + 2;
+int x[10][20];
+int y,i,j;
+y = x[i][j];
 } 

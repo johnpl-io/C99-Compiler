@@ -225,17 +225,25 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                      }
                           
                  addr->declspec = left->declspec; //need to change!!
-                    
+                  //  astwalk_impl(left->declspec, 0);
             return addr;
         break;
     case AST_NODE_TYPE_UNOP:
    
        if(rexpr->unop.operator == '*') //pointer deference
-    {
+    { 
+  
+  
        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
+        int flag;
+           if(address->declspec->nodetype == AST_NODE_TYPE_POINTER && address->declspec->ptr.next->nodetype == AST_NODE_TYPE_ARRAYDCL) {
+               address->declspec = address->declspec->ptr.next;
+               return address;
+                }
        if(!addr) {
         addr = new_temporary();
        }    
+
        if(address->declspec->nodetype == AST_NODE_TYPE_DECLSPEC) {
         fprintf(stderr, "Error deferencing pointer type incompotabile.\n");
        }
@@ -248,12 +256,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             
        }
        emit_quads(LOAD_OC, address, NULL, addr);
+    
+            return addr;
       
-     
       
      
     
-       return addr;
+   
     }
         break;
     default:

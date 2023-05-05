@@ -234,7 +234,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             return addr;
         break;
     case AST_NODE_TYPE_UNOP:
-   
+        printf("%c", rexpr->unop.operator );
        if(rexpr->unop.operator == '*') //pointer deference
     {
         
@@ -261,6 +261,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     
        return addr;
     }
+   
         break;
     default:
         fprintf(stderr, "PROBLEM!! %d");

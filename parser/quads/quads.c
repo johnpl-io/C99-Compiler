@@ -62,6 +62,11 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
         newptr->ptr.next = declspec->arraydecl.next;
         return newptr;
  }
+   struct astnode *mkptr(struct astnode *declspec) {
+        struct astnode *newptr = newType(AST_NODE_TYPE_POINTER, 0);
+        newptr->ptr.next = declspec;
+        return newptr;
+ }
 //this function checks left and right emits mult if necessary promotes and demotes arrays
 struct generic_node* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
                if((*left)->declspec->nodetype == AST_NODE_TYPE_ARRAYDCL){
@@ -256,13 +261,29 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             
        }
        emit_quads(LOAD_OC, address, NULL, addr);
-    
+        
             return addr;
       
       
      
     
    
+    }
+    if(rexpr->unop.operator == '&') {
+             
+        if(rexpr->unop.right->nodetype == AST_NODE_TYPE_UNOP && rexpr->unop.right->unop.operator== '*'  ) {
+           return gen_rvalue(rexpr->unop.right->unop.right, addr);
+        }
+     else {
+
+        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
+        if(!addr) {
+            addr = new_temporary();
+        }
+        emit_quads(LEA_OC,address, NULL, addr );
+        addr->declspec = mkptr(address->declspec);
+        return addr;
+    }
     }
         break;
     default:

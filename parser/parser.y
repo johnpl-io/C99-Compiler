@@ -21,7 +21,6 @@
     extern int lineno;
     int isFunc; 
     struct astnode *fn_parameters;
-
     // keep track of current scope, initially at global scope
     struct symbtab *current_scope;
     struct struct_stack *curstruct_scope;
@@ -528,6 +527,6 @@ decl_or_stmt:
  yyparse();
   
         
-        return 1;
+        return 0;
         
     }

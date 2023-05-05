@@ -7,8 +7,10 @@
 #include "ast.h"
 #include "symbtabinsert.h"
 #include "quads/sizeof.h"
-extern lineno;
-extern filename_buf;
+extern int lineno;
+ extern char filename_buf[256];
+ char *current_fn;
+
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
@@ -178,7 +180,10 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             if(name) {
             if (isFunc){
                 //append types //no checking yet 
+                //current_fn
                 define_func(type, curscope, lineno, filename_buf, strgclass, name);
+                current_fn = name;
+
             } else {
               define_var(type, curscope, lineno, filename_buf, strgclass, name);
                fprintf(stderr, "%d\n", sizeof_ast(type));

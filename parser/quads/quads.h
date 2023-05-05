@@ -22,9 +22,10 @@ struct quad {
 struct basic_block {
     char *bbname;
     int bb_no;
-   struct quad *listquadbeg;
+    struct quad *listquadbeg;
     struct basic_block *next;
     struct quad *listquadend;
+   // enum condcode cc;
     int regidcount; //keep track of temp register number per basic block
 };
 
@@ -34,16 +35,16 @@ struct generic_node {
     REGISTER_TYPE,
     IMMEDIATE_TYPE,
     VARIABLE_TYPE,
+    BLOCK_TYPE,
  } types;
     union addr {
         char *ident;
         int immediate;
         int regid;
+        struct basic_block *value;
     } value;
     struct astnode *declspec; //store type information for checking
 };
-
-
 
 struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr);
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode);
@@ -54,8 +55,9 @@ void gen_stmt(struct astnode *stmt);
 void emit_quads(int opcode, struct generic_node *result, struct generic_node *src1, struct generic_node *src2);
 void print_quads(struct quad *quad);
 void print_basicblock(struct basic_block *basic_block);
-link_bb(); //like hak lecture notes
+void link_bb(struct basic_block *new_bb); //like hak lecture notes
 struct generic_node *new_temporary();
 int get_opcode(struct astnode *opcode);
 char* opcode_to_string(enum opcode op);
+struct basic_block *new_bb();
 #endif

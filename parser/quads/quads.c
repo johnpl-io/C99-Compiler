@@ -7,6 +7,7 @@
 #include <string.h>
 #include "../symbtab.h"
 #include "sizeof.h"
+ extern char *current_fn;
 #define DIRECT 1
 #define INDIRECT 0
 
@@ -16,7 +17,8 @@ struct basic_block *head_bb; //head of linked list of basic block
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
  //create current basic block keep  
-    head_bb = malloc(sizeof (struct basic_block));
+   
+    head_bb = new_bb();
     head_bb->regidcount = 0;
     cur_bb = head_bb;
 
@@ -67,6 +69,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
         newptr->ptr.next = declspec;
         return newptr;
  }
+
 //this function checks left and right emits mult if necessary promotes and demotes arrays
 struct generic_node* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
                if((*left)->declspec->nodetype == AST_NODE_TYPE_ARRAYDCL){
@@ -117,10 +120,7 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
                 fprintf(stderr, "Error with pointer operation using '%c\n", get_opcode);
          }
         break;
-
-
         // add other cases for different operations here
-
     }
 }
 
@@ -184,14 +184,11 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                 temp->declspec = target->declspec;
               return temp;
            }
-        
-        
-
            default:
            
             fprintf(stderr, "UHOHH! IDENT CASE NOT SUPPORTED YET %d\n ", rexpr->ident.symbol->var.type->nodetype);
-          astwalk_impl(rexpr->ident.symbol->var.type, 0);
-           break;
+            astwalk_impl(rexpr->ident.symbol->var.type, 0);
+            break;
            }
         }
 
@@ -455,6 +452,22 @@ char* opcode_to_string(enum opcode op) {
     }
 }
 
-void print_basicblock(struct basic_block *basic_block) {
+struct basic_block *new_bb(){ 
+    struct basic_block *newbb = malloc(sizeof(struct basic_block));
+    if(cur_bb) {
+  newbb->bb_no = cur_bb->bb_no + 1;
+    } else {
+        newbb->bb_no = 0;
+    }
+ newbb->bbname = current_fn;
+    return newbb;
 
+};
+void print_basicblock(struct basic_block *basic_block) {
+   
+}
+
+void link_bb(struct basic_block *new_bb){
+    cur_bb->next = new_bb;
+    cur_bb = new_bb;
 }

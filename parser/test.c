@@ -1,5 +1,9 @@
 int main() {
-int a;
+int a[10];
 int x;
-a =  &x;
+x = a + 2;
+
+
+x = 2 + 3;
+
 } 

@@ -32,7 +32,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 
  llstmtlist = llstmtlist->ll.next;
  }
-
+    print_func(head_bb);
 }
  void gen_stmt(struct astnode *stmt) {
      switch(stmt->nodetype)  {
@@ -44,7 +44,14 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
        break;
        case AST_NODE_TYPE_LL: 
        printf("{ } statement\n");
-       
+          struct astnode *ll_nodell = stmt->ll.head;
+          
+            
+            while (ll_nodell != NULL) {
+                gen_stmt(ll_nodell->ll.data);
+                ll_nodell = ll_nodell->ll.next;
+           
+            }
        break;
 
        default:
@@ -353,14 +360,14 @@ quad->opcode = opcode;
 quad->result = result;
 quad->src1 = src1;
 quad->src2 = src2;
-if(!cur_bb->listquadbeg) {
-    cur_bb->listquadbeg = quad;
-     cur_bb->listquadend = quad;
-}
-else {
-    //append quad to end of list 
-    cur_bb->listquadend->next = quad;
-}
+quad->next = NULL;
+  if (!cur_bb->listquadbeg) {
+        cur_bb->listquadbeg = quad;
+        cur_bb->listquadend = quad;
+    } else {
+        cur_bb->listquadend->next = quad;
+        cur_bb->listquadend = quad;
+    }
 
 print_quads(quad);
 printf("\n");
@@ -452,6 +459,12 @@ char* opcode_to_string(enum opcode op) {
     }
 }
 
+
+void gen_if(struct astnode *if_node) {
+    struct basic_block *Bt = new_bb();
+    struct basic_block *Bf = new_bb();
+
+}
 struct basic_block *new_bb(){ 
     struct basic_block *newbb = malloc(sizeof(struct basic_block));
     if(cur_bb) {
@@ -464,9 +477,26 @@ struct basic_block *new_bb(){
 
 };
 void print_basicblock(struct basic_block *basic_block) {
-   
+      
+            struct quad *head = basic_block->listquadbeg;
+           while(head) {
+           printf("    "); print_quads(head);
+            printf("\n");
+           head = head->next;
+           }
+        
 }
-
+//pass head basic block and print all of them inside
+void print_func(struct basic_block *basic_block) {
+  printf("%s:\n", current_fn);
+  struct basic_block *head = basic_block;
+  while(head) {
+  printf(".BB%d.%d \n", basic_block->bb_no, basic_block->bb_fn);
+   print_basicblock(head);
+   head = head->next;
+  }
+    
+}
 void link_bb(struct basic_block *new_bb){
     cur_bb->next = new_bb;
     cur_bb = new_bb;

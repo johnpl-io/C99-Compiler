@@ -22,6 +22,7 @@ struct quad {
 struct basic_block {
     char *bbname;
     int bb_no;
+    int bb_fn; 
     struct quad *listquadbeg;
     struct basic_block *next;
     struct quad *listquadend;

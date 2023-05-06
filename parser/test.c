@@ -1,6 +1,6 @@
+
 int main() {
-int x;
-{
-    x = 5;
+    int a;
+if(a) 
+  a = 5;
 }
-} 

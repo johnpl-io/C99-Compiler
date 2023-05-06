@@ -47,7 +47,7 @@ struct generic_node {
     struct astnode *declspec; //store type information for checking
 };
 
-struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr);
+struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr, int *condcode);
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode);
 struct generic_node *gen_assign(struct astnode *expr);
 struct basic_block *gen_quads(struct astnode *stmtlist);

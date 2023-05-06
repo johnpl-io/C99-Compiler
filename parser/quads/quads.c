@@ -10,7 +10,7 @@
  extern char *current_fn;
 #define DIRECT 1
 #define INDIRECT 0
-
+#define UNSPECIFIED -2
 
 struct basic_block *cur_bb; //current basic block
 struct basic_block *head_bb; //head of linked list of basic block 
@@ -53,7 +53,9 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
            
             }
        break;
-
+    case AST_NODE_TYPE_IFELSE:
+       gen_if(stmt);
+       break;
        default:
        fprintf(stderr, "stmt no supported yet s%d \n", stmt->nodetype);
        break;
@@ -156,7 +158,7 @@ int get_opcode(struct astnode *opcode) {
    
 }
 
-struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr) {
+struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr, int *condcode) {
     struct generic_node *target = malloc(sizeof(struct generic_node)); //designate target 
    switch(rexpr->nodetype) {
     case AST_NODE_TYPE_IDENT: 
@@ -170,6 +172,9 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            target->types = VARIABLE_TYPE;
            target->declspec= rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
+            if(condcode) {
+                    *condcode = UNSPECIFIED;
+                    }
             return target;
            
            }  
@@ -209,6 +214,9 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
               declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
                declspecs->declspec.typespecif_res = INT;
                  target->declspec = declspecs;
+                    if(condcode) {
+            *condcode = UNSPECIFIED;
+                    }
                return target;
         }
      break;
@@ -217,10 +225,10 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            //type checking would take place before this to ensure that left and right types are proper
         
             
-            struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL);
+            struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL, NULL);
            
             
-            struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL);
+            struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL, NULL);
                  check_type(&left, &right, rexpr->binop.operator);
             if(!addr) {
 
@@ -243,7 +251,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     { 
   
   
-       struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
+       struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL, NULL);
         int flag;
            if(address->declspec->nodetype == AST_NODE_TYPE_POINTER && address->declspec->ptr.next->nodetype == AST_NODE_TYPE_ARRAYDCL) {
                address->declspec = address->declspec->ptr.next;
@@ -276,11 +284,11 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     if(rexpr->unop.operator == '&') {
              
         if(rexpr->unop.right->nodetype == AST_NODE_TYPE_UNOP && rexpr->unop.right->unop.operator== '*'  ) {
-           return gen_rvalue(rexpr->unop.right->unop.right, addr);
+           return gen_rvalue(rexpr->unop.right->unop.right, addr, NULL);
         }
      else {
 
-        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL);
+        struct generic_node * address = gen_rvalue(rexpr->unop.right, NULL, NULL);
         if(!addr) {
             addr = new_temporary();
         }
@@ -318,7 +326,7 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
         if(lexpr->unop.operator == '*') {
             *mode = INDIRECT;
             fprintf(stderr, "hrere\n");
-            return gen_rvalue(lexpr->unop.right, NULL);
+            return gen_rvalue(lexpr->unop.right, NULL, NULL);
         }
     }
 
@@ -342,14 +350,14 @@ struct generic_node *gen_assign(struct astnode *expr) {
         printf("error");
     }
     if(destmode == DIRECT) {
-        struct generic_node *test = gen_rvalue(expr->binop.right, dst);
+        struct generic_node *test = gen_rvalue(expr->binop.right, dst, NULL);
         if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
             if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
             emit_quads(MOV_OC, test, NULL, dst);
         }
 
     } else {
-       emit_quads(STORE_OC, gen_rvalue(expr->binop.right, NULL), dst, NULL);
+       emit_quads(STORE_OC, gen_rvalue(expr->binop.right, NULL, NULL), dst, NULL);
 
     }
 }
@@ -369,8 +377,7 @@ quad->next = NULL;
         cur_bb->listquadend = quad;
     }
 
-print_quads(quad);
-printf("\n");
+
 };
  
 
@@ -460,11 +467,35 @@ char* opcode_to_string(enum opcode op) {
 }
 
 
+void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_block *Bf) {
+    int condcode = -1;
+   struct generic_node *cond = gen_rvalue(expr, NULL, &condcode);
+   if(condcode == -2) {
+    
+    emit_quads(CMP_OC, cond, new_immediate(0), NULL);
+    condcode = NTEQ_OC;
+   }
+
+   
+   print_func(Bt);
+}
+
 void gen_if(struct astnode *if_node) {
     struct basic_block *Bt = new_bb();
     struct basic_block *Bf = new_bb();
+    struct basic_block *Bn;
+    if(if_node->ifelse.ELSE) {
+       Bn = new_bb();
+    }
+     else {
+        Bn = Bf;
+     }
+     gen_condexpr(if_node->ifelse.IF, Bt, Bf);
+
 
 }
+
+
 struct basic_block *new_bb(){ 
     struct basic_block *newbb = malloc(sizeof(struct basic_block));
     if(cur_bb) {
@@ -491,13 +522,14 @@ void print_func(struct basic_block *basic_block) {
   printf("%s:\n", current_fn);
   struct basic_block *head = basic_block;
   while(head) {
-  printf(".BB%d.%d \n", basic_block->bb_no, basic_block->bb_fn);
+  printf(".BB%d.%d \n", basic_block->bb_fn, basic_block->bb_no);
    print_basicblock(head);
    head = head->next;
   }
     
 }
-void link_bb(struct basic_block *new_bb){
+//void link_bb()
+void push_bb(struct basic_block *new_bb){
     cur_bb->next = new_bb;
     cur_bb = new_bb;
 }

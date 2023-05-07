@@ -1,4 +1,6 @@
-#include <stdio.h>
-
-printf("hi");
-
+int square() {
+ int x = 5;
+}
+int main() {
+    printf("%d", square());
+}

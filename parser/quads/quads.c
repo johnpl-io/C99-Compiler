@@ -11,8 +11,9 @@
 #define DIRECT 1
 #define INDIRECT 0
 #define UNSPECIFIED -2
-
+#define ALWAYS -3
 struct basic_block *cur_bb; //current basic block
+int bbnocount;
 struct basic_block *head_bb; //head of linked list of basic block 
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
@@ -35,6 +36,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
     print_func(head_bb);
 }
  void gen_stmt(struct astnode *stmt) {
+    if(stmt) {
      switch(stmt->nodetype)  {
        case AST_NODE_TYPE_BINOP:
         if(stmt->binop.operator == '=') {
@@ -56,12 +58,22 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
     case AST_NODE_TYPE_IFELSE:
        gen_if(stmt);
        break;
+    case AST_NODE_TYPE_WHILE:
+        gen_while(stmt);
+       break;
        default:
-       fprintf(stderr, "stmt no supported yet s%d \n", stmt->nodetype);
+       fprintf(stderr, "stmt not supported yet s%d \n", stmt->nodetype);
        break;
     }
-
+    }
  }
+ struct generic_node *newbb_node(struct basic_block *basic_block) {
+    struct generic_node *bb = malloc(sizeof(struct generic_node));
+    bb->types = BLOCK_TYPE;
+    bb->value.bb = basic_block;
+    return bb;
+
+}
  struct generic_node *new_immediate(int value) {
     struct generic_node *target = malloc(sizeof(struct generic_node));
                     target->types = IMMEDIATE_TYPE;
@@ -221,9 +233,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         }
      break;
 
-    case AST_NODE_TYPE_BINOP: 
+    case AST_NODE_TYPE_BINOP: {
            //type checking would take place before this to ensure that left and right types are proper
-        
+           switch(rexpr->binop.operator) {
+            case '+':
+            case '/':
+            case '*':
+            case '-':
             
             struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL, NULL);
            
@@ -242,12 +258,39 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                      }
                           
                  addr->declspec = left->declspec; //need to change!!
-                  //  astwalk_impl(left->declspec, 0);
+                  //  astwalk_impl(left->declspec, 0);\
+                
             return addr;
         break;
+         case EQEQ:
+         case GTEQ:
+         case NOTEQ:
+         case LTEQ:
+         case '>':
+         case '<':
+
+               left = gen_rvalue(rexpr->binop.left, NULL, NULL);
+               right = gen_rvalue(rexpr->binop.right, NULL, NULL);
+
+               emit_quads(CMP_OC, left, right, NULL);
+               if(condcode) {
+                *condcode = rexpr->binop.operator;
+
+               } else  {
+                if(!addr)
+                addr = new_temporary();
+               emit_quads(get_set_opcode(rexpr), left, right, addr);
+               }
+                
+               return addr;
+
+           }
+            
+    }
     case AST_NODE_TYPE_UNOP:
    
        if(rexpr->unop.operator == '*') //pointer deference
+   
     { 
   
   
@@ -273,7 +316,9 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             
        }
        emit_quads(LOAD_OC, address, NULL, addr);
-        
+               if(condcode) {
+                    *condcode = UNSPECIFIED;
+                    }
             return addr;
       
       
@@ -332,6 +377,26 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
 
  }
 }
+int get_set_opcode(struct astnode *opcode) {
+    switch (opcode->binop.operator) {
+        case EQEQ:
+            return SETEQ_OC;
+        case GTEQ:
+            return GTEQ_OC;
+        case LTEQ:
+            return LTEQ_OC;
+        case '>':
+            return GT_OC;
+        case '<':
+            return LT_OC;
+        case NOTEQ:
+            return SETNEQ_OC;
+        default:
+            fprintf(stderr, "binop %d not supported yet \n", opcode->binop.operator);
+            return -1;
+    }
+}
+
 //generates new temporaring register and returns
 struct generic_node *new_temporary() {
 struct generic_node *target = malloc(sizeof(struct generic_node));
@@ -392,6 +457,8 @@ void print_genericnode(struct generic_node *generic_node) {
        printf("%d ", generic_node->value.immediate); break;
     case VARIABLE_TYPE :
      printf("%s  ", generic_node->value.ident); break;
+     case BLOCK_TYPE:
+   printf(".BB%d.%d", generic_node->value.bb->bb_fn, generic_node->value.bb->bb_no); break;
     default:
   }
     }
@@ -457,27 +524,72 @@ char* opcode_to_string(enum opcode op) {
             return "EQEQ_OC";
         case NTEQ_OC:
             return "NTEQ_OC";
+        case SETNEQ_OC:
+            return "SETNEQ";
+        case SETEQ_OC:
+            return "SETEQ";
         case CALL_OC:
             return "CALL_OC";
         case RET_OC:
             return "RET_OC";
+        case SETLT_OC:
+            return "SETLT";
+        case SETGT_OC:
+            return "SETGT";
+        case SETLTEQ_OC:
+            return "SETLTEQ";
+        case SETGTEQ_OC:
+            return "SETGTEQ";
+        case NOTEQ_OC:
+            return "NOTEQ";
+        case BR_OC:
+            return "BR_OC";
         default:
+        fprintf(stderr, "%d\n", op);
             return "UNKNOWN_OC";
+            
     }
 }
 
 
-void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_block *Bf) {
+
+void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_block *Bf, int flipcond) {
     int condcode = -1;
+    int resultcondcode = -1;
    struct generic_node *cond = gen_rvalue(expr, NULL, &condcode);
    if(condcode == -2) {
     
     emit_quads(CMP_OC, cond, new_immediate(0), NULL);
     condcode = NTEQ_OC;
    }
-
-   
-   print_func(Bt);
+   // flip opcodes
+switch (condcode) {
+    case EQEQ:
+        condcode = flipcond ? NOTEQ_OC : EQEQ_OC;
+        break;
+    case GTEQ:
+        condcode = flipcond ? LT_OC : GTEQ_OC;
+        break;
+    case NOTEQ:
+        condcode = flipcond ? EQEQ_OC : NOTEQ_OC;
+        break;
+    case LTEQ:
+        condcode = flipcond ? GTEQ_OC : LTEQ_OC;
+        break;
+    case '>':
+        condcode = flipcond ? LTEQ_OC : GT_OC;
+        break;
+    case '<':
+        condcode = flipcond ? GTEQ_OC : LT_OC;
+        break;
+    default:
+        break;
+}
+    if(flipcond) {
+     link_bb(condcode, Bt, Bf);
+    } else {
+          link_bb(condcode, Bf, Bt);
+    }
 }
 
 void gen_if(struct astnode *if_node) {
@@ -490,19 +602,41 @@ void gen_if(struct astnode *if_node) {
      else {
         Bn = Bf;
      }
-     gen_condexpr(if_node->ifelse.IF, Bt, Bf);
+     gen_condexpr(if_node->ifelse.IF, Bt, Bf, 1);
+    push_bb(Bt);
+    gen_stmt(if_node->ifelse.THEN);
 
+    link_bb(ALWAYS, Bn, NULL);
+    if(if_node->ifelse.ELSE) {
+        push_bb(Bf);
+        gen_stmt(if_node->ifelse.ELSE);
+        link_bb(ALWAYS, Bn, NULL);
+    }
+    push_bb(Bn);
 
 }
-
-
+//alternate implementation in the lecture notes
+void gen_while(struct astnode *while_loop) {
+    struct basic_block *body, *cond, *next;
+    body = new_bb();
+    cond = new_bb();
+    next = new_bb();
+    
+    link_bb(ALWAYS, cond, NULL);
+    push_bb(body);
+    
+    gen_stmt(while_loop->whilestmt.body);
+    link_bb(ALWAYS, cond, NULL);
+    
+    push_bb(cond);
+    gen_condexpr(while_loop->whilestmt.expression, body, next, 0);
+    push_bb(next);
+}
 struct basic_block *new_bb(){ 
     struct basic_block *newbb = malloc(sizeof(struct basic_block));
-    if(cur_bb) {
-  newbb->bb_no = cur_bb->bb_no + 1;
-    } else {
-        newbb->bb_no = 0;
-    }
+
+  newbb->bb_no = bbnocount++;
+
  newbb->bbname = current_fn;
     return newbb;
 
@@ -517,18 +651,26 @@ void print_basicblock(struct basic_block *basic_block) {
            }
         
 }
+
 //pass head basic block and print all of them inside
 void print_func(struct basic_block *basic_block) {
   printf("%s:\n", current_fn);
   struct basic_block *head = basic_block;
   while(head) {
-  printf(".BB%d.%d \n", basic_block->bb_fn, basic_block->bb_no);
+  printf(".BB%d.%d \n", head->bb_fn, head->bb_no);
    print_basicblock(head);
    head = head->next;
   }
     
 }
-//void link_bb()
+void link_bb(int condcode, struct basic_block *def, struct basic_block *cond) {
+    if(condcode == ALWAYS) {
+       emit_quads(BR_OC, newbb_node(def), NULL, NULL);
+        return;
+    }
+    emit_quads(condcode, newbb_node(cond), newbb_node(def), NULL); //def is fall through
+}
+
 void push_bb(struct basic_block *new_bb){
     cur_bb->next = new_bb;
     cur_bb = new_bb;

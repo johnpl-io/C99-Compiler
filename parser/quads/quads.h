@@ -8,10 +8,12 @@ enum opcode {
     MOV_OC,
     LOGAND_OC, LOGOR_OC, LOGNOT_OC,
     NOT_OC, AND_OC, OR_OC, SHL_OC, SHR_OC, XOR_OC,
-    CMP_OC, LTEQ_OC, GTEQ_OC, LT_OC, GT_OC, EQEQ_OC, NTEQ_OC,
+    CMP_OC, LTEQ_OC, NOTEQ_OC, GTEQ_OC, LT_OC, GT_OC, EQEQ_OC, NTEQ_OC, SETNEQ_OC, SETEQ_OC,
     CALL_OC,
     RET_OC,
+    SETLT_OC, SETGT_OC, SETLTEQ_OC, SETGTEQ_OC, BR_OC //unconditional branch
 };
+
 
 struct quad {
     struct quad *next;
@@ -42,7 +44,7 @@ struct generic_node {
         char *ident;
         int immediate;
         int regid;
-        struct basic_block *value;
+        struct basic_block *bb;
     } value;
     struct astnode *declspec; //store type information for checking
 };
@@ -56,7 +58,7 @@ void gen_stmt(struct astnode *stmt);
 void emit_quads(int opcode, struct generic_node *result, struct generic_node *src1, struct generic_node *src2);
 void print_quads(struct quad *quad);
 void print_basicblock(struct basic_block *basic_block);
-void link_bb(struct basic_block *new_bb); //like hak lecture notes
+void link_bb(int condcode, struct basic_block *bbtrue, struct basic_block *bbfalse); //like hak lecture notes
 struct generic_node *new_temporary();
 int get_opcode(struct astnode *opcode);
 char* opcode_to_string(enum opcode op);

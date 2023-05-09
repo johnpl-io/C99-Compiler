@@ -16,6 +16,7 @@ struct basic_block *cur_bb; //current basic block
 int bbnocount;
 struct basic_block *break_bb, *continue_bb; // for loops continue points
 struct basic_block *head_bb; //head of linked list of basic block 
+struct basic_block *truestuff, *falsestuff;
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
  //create current basic block keep  
@@ -312,12 +313,37 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
      *condcode = UNSPECIFIED;
      //not really working
     struct basic_block *Bt = new_bb();
+    gen_condexpr(rexpr->binop.left, Bt, falsestuff, 1);
+    push_bb(Bt);void gen_if(struct astnode *if_node) {
+    struct basic_block *Bt = new_bb();
     struct basic_block *Bf = new_bb();
-    struct basic_block *Bn = new_bb();
-    gen_condexpr(rexpr->binop.left, Bt, Bf, 1);
+    struct basic_block *Bn;
+    
+    if(if_node->ifelse.ELSE) {
+       Bn = new_bb();
+       
+    }
+     else {
+        Bn = Bf;
+       
+     }
+    
+
+     gen_condexpr(if_node->ifelse.IF, Bt, Bf, 1);
     push_bb(Bt);
-    gen_condexpr(rexpr->binop.right, Bn, Bf, 1);
+    gen_stmt(if_node->ifelse.THEN);
+
+    link_bb(ALWAYS, Bn, NULL);
+    if(if_node->ifelse.ELSE) {
+        push_bb(Bf);
+        gen_stmt(if_node->ifelse.ELSE);
+        link_bb(ALWAYS, Bn, NULL);
+    }
     push_bb(Bn);
+
+}
+    gen_condexpr(rexpr->binop.right, truestuff, falsestuff, 1);
+
        return addr;
       break;
     case LOGOR:    
@@ -610,7 +636,9 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
     int resultcondcode = -1;
    struct generic_node *cond = gen_rvalue(expr, NULL, &condcode);
    if(condcode == -2) {
-    
+    if(!cond) {
+        return;
+    }
     emit_quads(CMP_OC, cond, new_immediate(0), NULL);
     
     condcode = NTEQ_OC;
@@ -649,12 +677,21 @@ void gen_if(struct astnode *if_node) {
     struct basic_block *Bt = new_bb();
     struct basic_block *Bf = new_bb();
     struct basic_block *Bn;
+    int falseflag = 0;
     if(if_node->ifelse.ELSE) {
        Bn = new_bb();
     }
      else {
+
         Bn = Bf;
      }
+ 
+   if(falseflag) {
+    falsestuff = Bf;
+   } else {
+    falsestuff = Bn;
+   }
+    truestuff = Bt;
      gen_condexpr(if_node->ifelse.IF, Bt, Bf, 1);
     push_bb(Bt);
     gen_stmt(if_node->ifelse.THEN);

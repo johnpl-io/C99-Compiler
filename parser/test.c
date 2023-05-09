@@ -3,7 +3,11 @@ int main() {
     int b;
     int c;
 
-while(a && b) {
+if(c && a) {
  a = 0;
+if(a && c) {
+  a = 1;
 }
+} 
+
 }

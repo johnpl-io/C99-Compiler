@@ -1,13 +1,8 @@
 
 int main() {
-    int a;
-    int b;
-    a =0;
-while(a > 0) {
-    if(b > 0) {
-        a = 1;
-    }
-    a = 2;
+int a;
+int b;
+if(a == b) {
+ a + 1;
 }
- a = 3;
 }

@@ -236,6 +236,11 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     case AST_NODE_TYPE_BINOP: {
            //type checking would take place before this to ensure that left and right types are proper
            switch(rexpr->binop.operator) {
+            case '=':
+                return gen_assign(rexpr);
+                        return;
+
+                    break;
             case '+':
             case '/':
             case '*':
@@ -279,13 +284,14 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                } else  {
                 if(!addr)
                 addr = new_temporary();
-               emit_quads(get_set_opcode(rexpr), left, right, addr);
+               emit_quads(get_set_opcode(rexpr), NULL, NULL, addr);
                }
                 
                return addr;
 
            }
-            
+  
+
     }
     case AST_NODE_TYPE_UNOP:
    
@@ -366,6 +372,7 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
     case AST_NODE_TYPE_NUM: {
         return NULL;
     }
+
     case AST_NODE_TYPE_UNOP: {
         
         if(lexpr->unop.operator == '*') {
@@ -374,7 +381,8 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
             return gen_rvalue(lexpr->unop.right, NULL, NULL);
         }
     }
-
+        default:
+        fprintf(stderr, "Error with lvalue\n");
  }
 }
 int get_set_opcode(struct astnode *opcode) {
@@ -386,9 +394,9 @@ int get_set_opcode(struct astnode *opcode) {
         case LTEQ:
             return LTEQ_OC;
         case '>':
-            return GT_OC;
+            return SETGT_OC;
         case '<':
-            return LT_OC;
+            return SETLT_OC;
         case NOTEQ:
             return SETNEQ_OC;
         default:
@@ -410,21 +418,29 @@ return target;
 
 struct generic_node *gen_assign(struct astnode *expr) {
     int destmode;
+  
     struct generic_node *dst = gen_lvalue(expr->binop.left, &destmode);
+   
+    
     if(!dst) {
         printf("error");
     }
     if(destmode == DIRECT) {
+  
         struct generic_node *test = gen_rvalue(expr->binop.right, dst, NULL);
-        if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
-            if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
+  
+      // if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
+        //    if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
+          if(dst != test) {
             emit_quads(MOV_OC, test, NULL, dst);
-        }
+     }
 
     } else {
+        
        emit_quads(STORE_OC, gen_rvalue(expr->binop.right, NULL, NULL), dst, NULL);
 
     }
+    return dst;
 }
 void emit_quads(int opcode, struct generic_node *src1, struct generic_node *src2, struct generic_node *result) {
 struct quad *quad = malloc(sizeof (struct quad));

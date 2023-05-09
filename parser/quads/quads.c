@@ -252,8 +252,11 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            //type checking would take place before this to ensure that left and right types are proper
            switch(rexpr->binop.operator) {
             case '=':
+                            if(condcode) {
+                                *condcode = UNSPECIFIED;
+                            }
                 return gen_assign(rexpr);
-                        return;
+                      
 
                     break;
             case '+':
@@ -303,10 +306,27 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                }
                 
                return addr;
-
+        break;
+    case LOGAND:
+    if(condcode)
+     *condcode = UNSPECIFIED;
+     //not really working
+    struct basic_block *Bt = new_bb();
+    struct basic_block *Bf = new_bb();
+    struct basic_block *Bn = new_bb();
+    gen_condexpr(rexpr->binop.left, Bt, Bf, 1);
+    push_bb(Bt);
+    gen_condexpr(rexpr->binop.right, Bn, Bf, 1);
+    push_bb(Bn);
+       return addr;
+      break;
+    case LOGOR:    
+        break;
+     default:
+        fprintf(stderr, "Error with binop operator\n");
            }
   
-
+   
     }
     case AST_NODE_TYPE_UNOP:
    
@@ -592,6 +612,7 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
    if(condcode == -2) {
     
     emit_quads(CMP_OC, cond, new_immediate(0), NULL);
+    
     condcode = NTEQ_OC;
    }
    // flip opcodes

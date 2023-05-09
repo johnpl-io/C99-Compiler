@@ -1,14 +1,9 @@
 int main() {
     int a;
     int b;
+    int c;
 
-while(a < 0) {
-
-while(a) {
-  a = 0;
-  continue;
-
-}
-a = 4;
+while(a && b) {
+ a = 0;
 }
 }

@@ -42,6 +42,7 @@ enum AstNodeType {
 };
 struct astnode_linkedlist {
     int nodetype;
+    int element_count; //for function parameter 
     struct astnode *data;
     struct astnode *next;
     struct astnode *head;

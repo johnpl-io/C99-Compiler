@@ -170,10 +170,41 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
 }
 struct generic_node *function_call(struct astnode *functioncall) {
     struct astnode *funcname = functioncall->fn.left;
-    astwalk_impl( functioncall->fn.ll, 0);
+    struct astnode *functype;
     if(funcname->nodetype == AST_NODE_TYPE_IDENT) {
-          
+          if(funcname->ident.symbol) {
+             if(funcname->ident.symbol->attr_type != SYMB_FUNCTION_NAME ) {
+                fprintf(stderr, "Error calling '%s' that is not declared as function.\n", funcname->ident.string);
+             } else {
+                //get return type of function
+                    functype = funcname->ident.symbol->fn.type;
+                if(functype->nodetype == AST_NODE_TYPE_FNDCL) {  
+                 //check return type
+                              astwalk_impl(functype->fndcl.next, 0);
+                 if(functype->fndcl.next->nodetype == AST_NODE_TYPE_DECLSPEC) {
+                            if (functype->fndcl.next->declspec.typespecif_res == VOID || functype->fndcl.next->declspec.typespecif_res ==  INT ) {
+                              //set return type
+                            } else {
+                                fprintf(stderr, "Error function call of '%s' has a return type that is not supported \n", funcname->ident.string);
+                            }
+                 }
+                          
+                }
+
+                
+             
+             }
+
+          } else {
+                    printf("default to int");
+          }
+          if(functioncall->fn.ll) { //otherwise no parameters
+        struct astnode *elements[functioncall->fn.ll->ll.head->ll.element_count + 1]; //fill in list in reverse
+        
+          }
     }
+
+    
 }
 int get_opcode(struct astnode *opcode) {
     switch(opcode->binop.operator) {

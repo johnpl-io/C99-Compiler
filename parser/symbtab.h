@@ -210,4 +210,5 @@ struct struct_stack *struct_pop(struct struct_stack *current_struct);
 void print_type(struct astnode *type);
 char *print_storage_class(int storageclass);
 char* getTypeName(int index);
+void print_symb(struct symbol *cur_sym );
 #endif

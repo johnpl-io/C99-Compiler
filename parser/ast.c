@@ -123,8 +123,6 @@ struct astnode *insertElementorig(int nodetype, struct astnode *astnode) {
     struct astnode *n = malloc(sizeof(struct astnode));
         n->ll.head = n;
         n->ll.data = astnode;
-
-        
             n->nodetype = AST_NODE_TYPE_LL;
     return n;
 }
@@ -137,8 +135,9 @@ struct astnode *insertElement(int nodetype, struct astnode *astnode, struct astn
   
      //   printf("astnode %p \n", astnode->ll.head);
             //printf("astnode    next %s \n", next->ident.string);
+    ++astnode->ll.head->ll.element_count;
         n->ll.head = astnode->ll.head;
-      
+        
         n->nodetype = AST_NODE_TYPE_LL;
         n->ll.data = next;
          astnode->ll.next = n;
@@ -628,10 +627,11 @@ void astwalk_impl(struct astnode *ast, int depth) {
             printf("STRING %s\n", ast->ident.string);
             break;
         case AST_NODE_TYPE_FN:
-            printf("FN\n");
+            printf("FN call\n");
             astwalk_impl(ast->fn.left, depth + 1);
             if(ast->fn.ll) {
             struct astnode *ll_node = ast->fn.ll->ll.head;
+            printf("%d\n",ll_node->ll.element_count); 
             while (ll_node != NULL) {
                 astwalk_impl(ll_node->ll.data, depth + 1);
                 ll_node = ll_node->ll.next;

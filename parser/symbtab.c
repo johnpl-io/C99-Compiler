@@ -220,7 +220,24 @@ void print_symbtab(struct symbtab *table) {
         cur_sym = cur_sym->next;
     }
 }
+void print_symb(struct symbol *cur_sym ) {
+     printf("%s\t %d\t   %d\t     %s      %d\n", cur_sym->name, cur_sym->attr_type, cur_sym->namespace, cur_sym->filename_buf, cur_sym->lineno);
+     switch(cur_sym->attr_type) {
+            case SYMB_FUNCTION_NAME:
+                astwalk_impl(cur_sym->fn.type, 0);
+                break;
+            case SYMB_VARIABLE_NAME:
+                 astwalk_impl(cur_sym->var.type, 0);
+                 break;
+            case SYMB_STRUCT_UNION_TAG:
+                // astwalk_impl(cur_sym->struct_union_tag.type, 0);
+                break;    
 
+            default:
+            printf("NOOO  %d", cur_sym->attr_type);
+                break;
+        }
+}
 struct struct_stack *struct_stack_init(struct astnode *struct_astnode){
     struct struct_stack *struct_stack = calloc(1, sizeof(struct struct_stack));
     struct_stack->astnode = struct_astnode;

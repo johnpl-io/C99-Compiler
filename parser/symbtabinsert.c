@@ -186,7 +186,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
 
             } else {
               define_var(type, curscope, lineno, filename_buf, strgclass, name);
-               fprintf(stderr, "%d\n", sizeof_ast(type));
+              
                 
             }
             }
@@ -262,18 +262,18 @@ void symbent_struct_reset(struct astnode *declspecs, int lineno, char *filename_
 
 int compare_arrays(unsigned char arr1[], unsigned char arr2[]) {
     int size = 9;
-  /*    printf("Array 1: ");
-    for (int i = 0; i < size; i++) {
-       printf("%d ", arr1[i]);
-    }
+    //  printf("Array 1: ");
+   // for (int i = 0; i < size; i++) {
+      // printf("%d ", arr1[i]);
+   // }
  
     
-    printf("Array 2: ");
-    for (int i = 0; i < size; i++) {
-       printf("%d ", arr2[i]);
-    }
-   printf("\n");
-   */
+//    printf("Array 2: ");
+   // for (int i = 0; i < size; i++) {
+     //  printf("%d ", arr2[i]);
+   // }
+ //  printf("\n");
+   
     for (int i = 0; i < size; i++) {
         if (arr1[i] != arr2[i]) {
             return 1; // arrays are not the same
@@ -362,7 +362,8 @@ void resolve_type(struct astnode *declspec) {
          unsigned char type_long_double[9] = {0, 0, 0, 0, 1, 1 , 0, 0, 0};
  
          unsigned char type_float[9] = {0, 0, 0, 0, 0, 0 , 1, 0, 0};
-
+        unsigned char type_struct[9]  = {0, 0, 0, 0, 0, 0 , 0, 1, 0};
+                unsigned char type_union[9]  = {0, 0, 0, 0, 0, 0 , 0, 0, 1};
 if (compare_arrays(type_void, type_bitmask) == 0) {
     if(!unsigned_type)
        {
@@ -440,7 +441,17 @@ else if (compare_arrays(type_float, type_bitmask) == 0) {
        } else {
           fprintf(stderr, "%s:%d Error in declaration specifiers.\n", filename(filename_buf), lineno);
        }
-} //add struct or union to do this
+} else if(compare_arrays(type_struct, type_bitmask) == 0) {
+  
+        declspec->declspec.typespecif_res = STRUCT;
+        return;
+    
+    
+} else if(compare_arrays(type_union, type_bitmask) == 0) {
+  
+        declspec->declspec.typespecif_res = UNION;
+        return;
+}
 
 fprintf(stderr, "Error with types\n");
 }

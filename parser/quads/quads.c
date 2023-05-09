@@ -75,6 +75,14 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
        }
        emit_quads(BR_OC, newbb_node(continue_bb), NULL, NULL);
        break;
+    case AST_NODE_TYPE_FN:
+        function_call(stmt);
+        break;
+    case AST_NODE_TYPE_RETURN:
+    //probably should check if return matches some where
+        emit_quads(RET_OC, gen_rvalue(stmt->returnstmt.statement, NULL, NULL), NULL, NULL);
+    break;
+
        default:
  
 
@@ -160,7 +168,13 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
         // add other cases for different operations here
     }
 }
-
+struct generic_node *function_call(struct astnode *functioncall) {
+    struct astnode *funcname = functioncall->fn.left;
+    astwalk_impl( functioncall->fn.ll, 0);
+    if(funcname->nodetype == AST_NODE_TYPE_IDENT) {
+          
+    }
+}
 int get_opcode(struct astnode *opcode) {
     switch(opcode->binop.operator) {
         case '+':
@@ -308,40 +322,18 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                 
                return addr;
         break;
+    case AST_NODE_TYPE_FNDCL:
+        break;
     case LOGAND:
     if(condcode)
      *condcode = UNSPECIFIED;
      //not really working
     struct basic_block *Bt = new_bb();
     gen_condexpr(rexpr->binop.left, Bt, falsestuff, 1);
-    push_bb(Bt);void gen_if(struct astnode *if_node) {
-    struct basic_block *Bt = new_bb();
-    struct basic_block *Bf = new_bb();
-    struct basic_block *Bn;
-    
-    if(if_node->ifelse.ELSE) {
-       Bn = new_bb();
-       
-    }
-     else {
-        Bn = Bf;
-       
-     }
-    
-
-     gen_condexpr(if_node->ifelse.IF, Bt, Bf, 1);
     push_bb(Bt);
-    gen_stmt(if_node->ifelse.THEN);
 
-    link_bb(ALWAYS, Bn, NULL);
-    if(if_node->ifelse.ELSE) {
-        push_bb(Bf);
-        gen_stmt(if_node->ifelse.ELSE);
-        link_bb(ALWAYS, Bn, NULL);
-    }
-    push_bb(Bn);
+ 
 
-}
     gen_condexpr(rexpr->binop.right, truestuff, falsestuff, 1);
 
        return addr;
@@ -734,6 +726,7 @@ void gen_while(struct astnode *while_loop) {
     gen_condexpr(while_loop->whilestmt.expression, body, next, 0);
     push_bb(next);
 }
+
 
 struct basic_block *new_bb(){ 
     struct basic_block *newbb = malloc(sizeof(struct basic_block));

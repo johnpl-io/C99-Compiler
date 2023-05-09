@@ -3370,7 +3370,7 @@ yyreduce:
 
   case 243: /* function_definition: declaration-specifiers declarator $@7 compound-statement  */
 #line 518 "parser.y"
-                                                                                                     { printf("Ast Dump for function [ \n"); astwalk_impl((yyvsp[0].astnode_p),0); printf(" ] \n"); gen_quads((yyvsp[0].astnode_p)); }
+                                                                                                     { printf("Ast Dump for function [ \n"); astwalk_impl((yyvsp[0].astnode_p),0); printf(" ] \n"); gen_quads((yyvsp[0].astnode_p));  }
 #line 3375 "parser.tab.c"
     break;
 

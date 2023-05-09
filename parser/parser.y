@@ -515,7 +515,7 @@ decl_or_stmt:
     function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                             symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
                                                             isFunc = 1; 
-                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n"); gen_quads($4); }
+                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n"); gen_quads($4);  }
         ;
 
 %%       

@@ -10,8 +10,8 @@ enum opcode {
     NOT_OC, AND_OC, OR_OC, SHL_OC, SHR_OC, XOR_OC,
     CMP_OC, LTEQ_OC, NOTEQ_OC, GTEQ_OC, LT_OC, GT_OC, EQEQ_OC, NTEQ_OC, SETNEQ_OC, SETEQ_OC,
     CALL_OC,
-    RET_OC,
-    SETLT_OC, SETGT_OC, SETLTEQ_OC, SETGTEQ_OC, BR_OC //unconditional branch
+    RET_OC, 
+    SETLT_OC, SETGT_OC, SETLTEQ_OC, SETGTEQ_OC, BR_OC, ARG, ARGBEGIN, //unconditional branch
 };
 
 

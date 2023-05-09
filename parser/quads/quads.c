@@ -175,6 +175,7 @@ struct generic_node *function_call(struct astnode *functioncall) {
           if(funcname->ident.symbol) {
              if(funcname->ident.symbol->attr_type != SYMB_FUNCTION_NAME ) {
                 fprintf(stderr, "Error calling '%s' that is not declared as function.\n", funcname->ident.string);
+                return NULL;
              } else {
                 //get return type of function
                     functype = funcname->ident.symbol->fn.type;
@@ -199,8 +200,25 @@ struct generic_node *function_call(struct astnode *functioncall) {
                     printf("default to int");
           }
           if(functioncall->fn.ll) { //otherwise no parameters
+          int size = functioncall->fn.ll->ll.head->ll.element_count + 1;
+          emit_quads(ARGBEGIN, new_immediate(size), NULL, NULL);
         struct astnode *elements[functioncall->fn.ll->ll.head->ll.element_count + 1]; //fill in list in reverse
-        
+        struct astnode *ll_node =functioncall->fn.ll->ll.head;
+    int count = size;
+            size -= 1;
+           
+            while (ll_node != NULL) {
+               elements[size--] = ll_node->ll.data;
+          
+                ll_node = ll_node->ll.next;
+            }
+
+            int countstart = 0;
+            while(countstart != count) {
+              
+            emit_quads(ARG, new_immediate(countstart - 1), gen_rvalue(elements[countstart++],NULL, NULL), NULL);
+            }
+
           }
     }
 
@@ -645,6 +663,10 @@ char* opcode_to_string(enum opcode op) {
             return "NOTEQ";
         case BR_OC:
             return "BR_OC";
+        case ARG:
+            return "ARG";
+        case ARGBEGIN:
+            return "ARGBEGIN";
         default:
         fprintf(stderr, "%d\n", op);
             return "UNKNOWN_OC";

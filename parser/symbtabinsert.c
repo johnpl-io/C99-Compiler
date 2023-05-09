@@ -440,6 +440,7 @@ else if (compare_arrays(type_float, type_bitmask) == 0) {
        } else {
           fprintf(stderr, "%s:%d Error in declaration specifiers.\n", filename(filename_buf), lineno);
        }
-}
+} //add struct or union to do this
+
 fprintf(stderr, "Error with types\n");
 }

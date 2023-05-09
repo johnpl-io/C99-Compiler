@@ -306,4 +306,5 @@ struct astnode *newDefault(struct astnode *stmt);
 struct astnode *newLabel(char *ident, struct astnode *stmt);
 char * filename(char * filename);
 struct astnode *newGoTo(char *ident);
+struct astnode *newContinue();
 #endif

@@ -1,8 +1,14 @@
-
 int main() {
-int a;
-int b;
-if(a == b) {
- a + 1;
+    int a;
+    int b;
+
+while(a < 0) {
+
+while(a) {
+  a = 0;
+  continue;
+
+}
+a = 4;
 }
 }

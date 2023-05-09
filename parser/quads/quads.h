@@ -63,4 +63,5 @@ struct generic_node *new_temporary();
 int get_opcode(struct astnode *opcode);
 char* opcode_to_string(enum opcode op);
 struct basic_block *new_bb();
+ struct generic_node *newbb_node(struct basic_block *basic_block);
 #endif

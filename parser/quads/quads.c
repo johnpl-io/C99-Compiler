@@ -14,6 +14,7 @@
 #define ALWAYS -3
 struct basic_block *cur_bb; //current basic block
 int bbnocount;
+struct basic_block *break_bb, *continue_bb; // for loops continue points
 struct basic_block *head_bb; //head of linked list of basic block 
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
@@ -61,8 +62,22 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
     case AST_NODE_TYPE_WHILE:
         gen_while(stmt);
        break;
+    case AST_NODE_TYPE_BREAK:
+    if(!break_bb) {
+        fprintf(stderr, "Error break not in loop.\n");
+    }
+        emit_quads(BR_OC, newbb_node(break_bb), NULL, NULL);
+        break;
+       case AST_NODE_TYPE_CONTINUE:
+       if(!continue_bb) {
+         fprintf(stderr, "Error continue not in loop.\n");
+       }
+       emit_quads(BR_OC, newbb_node(continue_bb), NULL, NULL);
+       break;
        default:
-       fprintf(stderr, "stmt not supported yet s%d \n", stmt->nodetype);
+ 
+
+       fprintf(stderr, "stmt not supported yet nodetype%d \n", stmt->nodetype);
        break;
     }
     }
@@ -350,7 +365,8 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
     }
         break;
     default:
-        fprintf(stderr, "PROBLEM!! %d");
+        fprintf(stderr, "PROBLEM with rvalue!! \n");
+        astwalk_impl(rexpr, 0);
     break;
 
 }
@@ -602,9 +618,9 @@ switch (condcode) {
         break;
 }
     if(flipcond) {
-     link_bb(condcode, Bt, Bf);
-    } else {
-          link_bb(condcode, Bf, Bt);
+     link_bb(condcode, Bf, Bt);  //Bt is the new false fall through 
+    } else {           
+          link_bb(condcode, Bt, Bf); //standard
     }
 }
 
@@ -634,20 +650,33 @@ void gen_if(struct astnode *if_node) {
 //alternate implementation in the lecture notes
 void gen_while(struct astnode *while_loop) {
     struct basic_block *body, *cond, *next;
-    body = new_bb();
+    body = new_bb(); // push on stack
     cond = new_bb();
-    next = new_bb();
-    
+    next = new_bb(); // push
+    struct basic_block *prev_break_bb = break_bb; 
+    struct basic_block *prev_cont_bb = continue_bb; 
+
+    break_bb = next;
+    continue_bb = cond;
+
     link_bb(ALWAYS, cond, NULL);
     push_bb(body);
-    
+
     gen_stmt(while_loop->whilestmt.body);
+        //restore
+    if (prev_break_bb) {
+        break_bb = prev_break_bb;
+    }
+    if (prev_cont_bb) {
+        continue_bb = prev_cont_bb;
+    }
+
     link_bb(ALWAYS, cond, NULL);
-    
     push_bb(cond);
     gen_condexpr(while_loop->whilestmt.expression, body, next, 0);
     push_bb(next);
 }
+
 struct basic_block *new_bb(){ 
     struct basic_block *newbb = malloc(sizeof(struct basic_block));
 
@@ -658,7 +687,7 @@ struct basic_block *new_bb(){
 
 };
 void print_basicblock(struct basic_block *basic_block) {
-      
+      int isbranch;
             struct quad *head = basic_block->listquadbeg;
            while(head) {
            printf("    "); print_quads(head);
@@ -679,12 +708,12 @@ void print_func(struct basic_block *basic_block) {
   }
     
 }
-void link_bb(int condcode, struct basic_block *def, struct basic_block *cond) {
+void link_bb(int condcode, struct basic_block *Bt, struct basic_block *Bf) {
     if(condcode == ALWAYS) {
-       emit_quads(BR_OC, newbb_node(def), NULL, NULL);
+       emit_quads(BR_OC, newbb_node(Bt), NULL, NULL);
         return;
     }
-    emit_quads(condcode, newbb_node(cond), newbb_node(def), NULL); //def is fall through
+    emit_quads(condcode, newbb_node(Bt), newbb_node(Bf), NULL); //def is fall through
 }
 
 void push_bb(struct basic_block *new_bb){

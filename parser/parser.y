@@ -110,9 +110,9 @@ expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_
                 ; 
 
 
-unary-expression: postfix-expression {$$ = $1; }
-                | PLUSPLUS   unary-expression { struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
-                | MINUSMINUS unary-expression {struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = newast(AST_NODE_TYPE_BINOP, $2, newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
+unary-expression: postfix-expression {$$ = $1; }  
+                | PLUSPLUS   unary-expression { struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = handleassign($2, newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
+                | MINUSMINUS unary-expression {struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = handleassign($2, newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
                 | unary-operator cast-expression { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $2, $1); }
                 | SIZEOF '(' expression ')' { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $3, SIZEOF);  }
                 ;
@@ -182,7 +182,7 @@ conditional-expression: logical-or-expression {  $$ = $1; }
                         ;
 
 assignment-expression: conditional-expression { $$ =  $1; }
-                        | unary-expression assignment-operator assignment-expression {$$ = newast(AST_NODE_TYPE_BINOP, $1, $3, $2); }
+                        | unary-expression assignment-operator assignment-expression {$$ = handleassign($1, $3, $2); }
                         ;
                
 

@@ -341,7 +341,48 @@ struct astnode *newCase(struct astnode *condexpr, struct astnode *stmt) {
 struct astnode *newDefault(struct astnode *stmt) {
      struct astnode *defaultstmt = malloc(sizeof(struct astnode));
       defaultstmt->defaultlabel.statement = stmt;
-      return defaultstmt;;
+      return defaultstmt;
+}
+struct astnode *handleassign(struct astnode *assignment, struct astnode *expression, int operator) {
+    if(operator == '=') 
+        return newast(AST_NODE_TYPE_BINOP, assignment, expression, operator);
+
+    switch(operator) {
+        case PLUSEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '+'), '=');
+        case MINUSEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '-'), '=');
+        case DIVEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '/'), '=');
+        case TIMESEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '*'), '=');
+        case MODEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '%'), '=');
+        case SHLEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, SHL), '=');
+        case SHREQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, SHR), '=');
+        case ANDEQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '&'), '=');
+        case OREQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '|'), '=');
+        case XOREQ:
+            return newast(AST_NODE_TYPE_BINOP, assignment, 
+                          newast(AST_NODE_TYPE_BINOP, assignment, expression, '^'), '=');
+        default:
+            // handle unknown operator
+            break;
+    }
+    return NULL;
 }
 
 struct astnode *newLabel(char *ident, struct astnode *stmt) {

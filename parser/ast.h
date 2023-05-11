@@ -308,4 +308,5 @@ struct astnode *newLabel(char *ident, struct astnode *stmt);
 char * filename(char * filename);
 struct astnode *newGoTo(char *ident);
 struct astnode *newContinue();
+struct astnode *handleassign(struct astnode *assignment, struct astnode *expression, int operator);
 #endif

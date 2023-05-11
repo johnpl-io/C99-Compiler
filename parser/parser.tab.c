@@ -2172,13 +2172,13 @@ yyreduce:
 
   case 20: /* unary-expression: PLUSPLUS unary-expression  */
 #line 114 "parser.y"
-                                              { struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
+                                              { struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = handleassign((yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), PLUSEQ );  }
 #line 2177 "parser.tab.c"
     break;
 
   case 21: /* unary-expression: MINUSMINUS unary-expression  */
 #line 115 "parser.y"
-                                              {struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
+                                              {struct Num num; num.type = INT_SIGNED; num.integer = 1; (yyval.astnode_p) = handleassign((yyvsp[0].astnode_p), newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
 #line 2183 "parser.tab.c"
     break;
 
@@ -2430,7 +2430,7 @@ yyreduce:
 
   case 63: /* assignment-expression: unary-expression assignment-operator assignment-expression  */
 #line 185 "parser.y"
-                                                                                     {(yyval.astnode_p) = newast(AST_NODE_TYPE_BINOP, (yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), (yyvsp[-1].op)); }
+                                                                                     {(yyval.astnode_p) = handleassign((yyvsp[-2].astnode_p), (yyvsp[0].astnode_p), (yyvsp[-1].op)); }
 #line 2435 "parser.tab.c"
     break;
 

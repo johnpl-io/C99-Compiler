@@ -1,5 +1,7 @@
 
 void main() {
-  int a;
-a =f(3, 2) + 2;
+int x, y, a;
+if(x&&y) {
+  x = y;
+}
 }

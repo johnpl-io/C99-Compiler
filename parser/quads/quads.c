@@ -16,7 +16,7 @@ struct basic_block *cur_bb; //current basic block
 int bbnocount;
 struct basic_block *break_bb, *continue_bb; // for loops continue points
 struct basic_block *head_bb; //head of linked list of basic block 
-struct basic_block *truestuff, *falsestuff;
+//struct basic_block *truestuff, *falsestuff;
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
  //create current basic block keep  
@@ -403,22 +403,48 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         break;
     case AST_NODE_TYPE_FNDCL:
         break;
-    case LOGAND:
-    if(condcode)
-     *condcode = UNSPECIFIED;
-     //not really working
-    struct basic_block *Bt = new_bb();
-    gen_condexpr(rexpr->binop.left, Bt, falsestuff, 1);
+ case LOGAND:
+
+  struct basic_block *Bt = new_bb();
+    struct basic_block *Bf = new_bb();
+    struct basic_block *Bn = new_bb();
+
+    gen_condexpr(rexpr->binop.left, Bt, Bf, 1);
     push_bb(Bt);
+   gen_condexpr(rexpr->binop.right, Bn, Bf, 1 );
+    push_bb(Bf);
+    link_bb(ALWAYS, Bn, NULL);
+    push_bb(Bn);
+        if(*condcode) {
+            
+        *condcode = EQEQ_OC;
+    }
+    
+  return addr;
+    break;
+
+case LOGOR:
+    Bt = new_bb();
+   Bf = new_bb();
+  Bn = new_bb();
+
+    gen_condexpr(rexpr->binop.left, Bn, Bf, 0);
+    push_bb(Bf);
+    gen_condexpr(rexpr->binop.right, Bn, Bt, 0);
+    push_bb(Bt);
+    link_bb(ALWAYS, Bn, NULL);
+    push_bb(Bn);
+    if(*condcode) {
+        *condcode = NTEQ_OC;
+    }
+    break;
 
  
+  
+  
 
-    gen_condexpr(rexpr->binop.right, truestuff, falsestuff, 1);
-
-       return addr;
-      break;
-    case LOGOR:    
-        break;
+     
+  return addr;
      default:
         fprintf(stderr, "Error with binop operator\n");
            }
@@ -426,7 +452,15 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
    
     }
     case AST_NODE_TYPE_UNOP:
-   
+     if(rexpr->unop.operator == '-') {
+        struct generic_node *address = gen_rvalue(rexpr->unop.right, NULL , NULL);
+        if(!addr) {
+            addr = new_temporary();
+        }
+        emit_quads(MULT_OC, new_immediate(-1), address, addr);
+        addr->declspec = address->declspec;
+        return addr;
+    }
        if(rexpr->unop.operator == '*') //pointer deference
    
     { 
@@ -485,9 +519,10 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
         fprintf(stderr, "PROBLEM with rvalue!! \n");
         astwalk_impl(rexpr, 0);
     break;
+  
 
 }
-
+    
 }
 struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
     
@@ -590,7 +625,7 @@ quad->next = NULL;
     }
 
 
-};
+}
  
 
  //TODO: ARRAYS [NEED SIZE OF TYPES]
@@ -708,13 +743,14 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
     int condcode = -1;
     int resultcondcode = -1;
    struct generic_node *cond = gen_rvalue(expr, NULL, &condcode);
+   fprintf(stderr, "%d", condcode);
    if(condcode == -2) {
     if(!cond) {
         return;
     }
     emit_quads(CMP_OC, cond, new_immediate(0), NULL);
-    
-    condcode = NTEQ_OC;
+
+    condcode = EQEQ_OC;
    }
    // flip opcodes
 switch (condcode) {
@@ -750,7 +786,7 @@ void gen_if(struct astnode *if_node) {
     struct basic_block *Bt = new_bb();
     struct basic_block *Bf = new_bb();
     struct basic_block *Bn;
-    int falseflag = 0;
+
     if(if_node->ifelse.ELSE) {
        Bn = new_bb();
     }
@@ -758,13 +794,7 @@ void gen_if(struct astnode *if_node) {
 
         Bn = Bf;
      }
- 
-   if(falseflag) {
-    falsestuff = Bf;
-   } else {
-    falsestuff = Bn;
-   }
-    truestuff = Bt;
+
      gen_condexpr(if_node->ifelse.IF, Bt, Bf, 1);
     push_bb(Bt);
     gen_stmt(if_node->ifelse.THEN);
@@ -845,6 +875,10 @@ void link_bb(int condcode, struct basic_block *Bt, struct basic_block *Bf) {
        emit_quads(BR_OC, newbb_node(Bt), NULL, NULL);
         return;
     }
+    if(condcode == -2) {
+        emit_quads(NOTEQ, newbb_node(Bt), newbb_node(Bf), NULL);
+    }
+  
     emit_quads(condcode, newbb_node(Bt), newbb_node(Bf), NULL); //def is fall through
 }
 

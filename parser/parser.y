@@ -115,6 +115,7 @@ unary-expression: postfix-expression {$$ = $1; }
                 | MINUSMINUS unary-expression {struct Num num; num.type = INT_SIGNED; num.integer = 1; $$ = handleassign($2, newNum(AST_NODE_TYPE_NUM, num), MINUSEQ); }
                 | unary-operator cast-expression { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $2, $1); }
                 | SIZEOF '(' expression ')' { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $3, SIZEOF);  }
+                | SIZEOF '(' type-name ')' { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $3, SIZEOF); astwalk_impl($$, 0); }
                 ;
 
 unary-operator: '-' { $$ = '-'; }
@@ -125,7 +126,6 @@ unary-operator: '-' { $$ = '-'; }
                 | '*' {$$ = '*'; } 
                 ;
 cast-expression: unary-expression {$$ = $1; }
-               | SIZEOF '(' type-name ')' { }
                ;
 
 
@@ -391,7 +391,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     
     /* 6.7.6 */
     type-name: specifier-qualifier-list { $$ = $1; }
-        | specifier-qualifier-list abstract-declarator
+        | specifier-qualifier-list abstract-declarator {  }
         ;
     
     abstract-declarator: pointer { $$ = insertElement(AST_NODE_TYPE_DECL, newDeclar(AST_NODE_TYPE_DECL, NULL), $1);  }

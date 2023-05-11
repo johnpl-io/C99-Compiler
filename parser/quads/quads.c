@@ -515,6 +515,11 @@ case LOGOR:
     }
     }
         break;
+    case AST_NODE_TYPE_STRING:
+            target->types = STRING_TYPE;
+            target->value.string = rexpr->ident.string;
+            return target;
+
     default:
         fprintf(stderr, "PROBLEM with rvalue!! \n");
         astwalk_impl(rexpr, 0);
@@ -640,7 +645,10 @@ void print_genericnode(struct generic_node *generic_node) {
     case VARIABLE_TYPE :
      printf("%s  ", generic_node->value.ident); break;
      case BLOCK_TYPE:
+   
    printf(".BB%d.%d", generic_node->value.bb->bb_fn, generic_node->value.bb->bb_no); break;
+     case STRING_TYPE: 
+         printf("\"%s\"  ", generic_node->value.string); break;
     default:
   }
     }
@@ -751,6 +759,7 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
     emit_quads(CMP_OC, cond, new_immediate(0), NULL);
 
     condcode = EQEQ_OC;
+ 
    }
    // flip opcodes
 switch (condcode) {

@@ -1,7 +1,7 @@
 
 void main() {
-int x, y, a;
-if(x&&y) {
-  x = y;
+int x,y;
+if(y || x) {
+x = 5;
 }
 }

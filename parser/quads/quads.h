@@ -38,12 +38,14 @@ struct generic_node {
     REGISTER_TYPE,
     IMMEDIATE_TYPE,
     VARIABLE_TYPE,
-    BLOCK_TYPE,
+    BLOCK_TYPE,       
+    STRING_TYPE,                
  } types;
     union addr {
         char *ident;
         int immediate;
         int regid;
+        char *string;
         struct basic_block *bb;
     } value;
     struct astnode *declspec; //store type information for checking

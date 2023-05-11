@@ -1,5 +1,5 @@
 
 void main() {
-    int a,b;
-++a;
+  int a;
+a =f(3, 2) + 2;
 }

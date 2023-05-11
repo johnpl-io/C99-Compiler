@@ -76,7 +76,8 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
        emit_quads(BR_OC, newbb_node(continue_bb), NULL, NULL);
        break;
     case AST_NODE_TYPE_FN:
-        function_call(stmt);
+        struct generic_node *target = function_call(stmt);
+        emit_quads(CALL_OC, target, NULL, NULL);
         break;
     case AST_NODE_TYPE_RETURN:
     //probably should check if return matches some where
@@ -171,7 +172,12 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
 struct generic_node *function_call(struct astnode *functioncall) {
     struct astnode *funcname = functioncall->fn.left;
     struct astnode *functype;
+
+       struct generic_node *target = malloc(sizeof(struct generic_node));
+        struct astnode *declspecs = malloc(sizeof(struct astnode));
+           
     if(funcname->nodetype == AST_NODE_TYPE_IDENT) {
+     
           if(funcname->ident.symbol) {
              if(funcname->ident.symbol->attr_type != SYMB_FUNCTION_NAME ) {
                 fprintf(stderr, "Error calling '%s' that is not declared as function.\n", funcname->ident.string);
@@ -184,7 +190,9 @@ struct generic_node *function_call(struct astnode *functioncall) {
                               astwalk_impl(functype->fndcl.next, 0);
                  if(functype->fndcl.next->nodetype == AST_NODE_TYPE_DECLSPEC) {
                             if (functype->fndcl.next->declspec.typespecif_res == VOID || functype->fndcl.next->declspec.typespecif_res ==  INT ) {
-                              //set return type
+                        declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
+                        declspecs->declspec.typespecif_res = functype->fndcl.next->declspec.typespecif_res;
+                        target->declspec = declspecs;
                             } else {
                                 fprintf(stderr, "Error function call of '%s' has a return type that is not supported \n", funcname->ident.string);
                             }
@@ -197,7 +205,9 @@ struct generic_node *function_call(struct astnode *functioncall) {
              }
 
           } else {
-                    printf("default to int");
+                     declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
+                        declspecs->declspec.typespecif_res = INT;
+                        target->declspec = declspecs;
           }
           if(functioncall->fn.ll) { //otherwise no parameters
           int size = functioncall->fn.ll->ll.head->ll.element_count + 1;
@@ -220,6 +230,10 @@ struct generic_node *function_call(struct astnode *functioncall) {
             }
 
           }
+
+       target->value.ident = funcname->ident.string;
+       target->types = VARIABLE_TYPE;
+       return target;
     }
 
     
@@ -260,12 +274,16 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
           //check if it is a scalar variable 
            switch(rexpr->ident.symbol->var.type->nodetype) { //probably should check if it a function call 
             case AST_NODE_TYPE_DECLSPEC: {
+                if(rexpr->ident.symbol->attr_type == SYMB_FUNCTION_NAME) {
+                    fprintf(stderr, "Error using a variable declared as a function in an expression\n");
+                }  else {
            target->types = VARIABLE_TYPE;
            target->declspec= rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
             if(condcode) {
                     *condcode = UNSPECIFIED;
                     }
+                }
             return target;
            
            }  
@@ -311,7 +329,19 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                return target;
         }
      break;
+    case AST_NODE_TYPE_FN:
+        if(!addr) {
 
+              addr = new_temporary(); 
+             
+            } 
+            //should prob check before as well 
+            struct generic_node *target = function_call(rexpr);
+            emit_quads(CALL_OC, target, addr, NULL);
+           addr->declspec = target->declspec;
+            return addr;
+
+        break;
     case AST_NODE_TYPE_BINOP: {
            //type checking would take place before this to ensure that left and right types are proper
            switch(rexpr->binop.operator) {
@@ -480,7 +510,7 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
         
         if(lexpr->unop.operator == '*') {
             *mode = INDIRECT;
-            fprintf(stderr, "hrere\n");
+      //      fprintf(stderr, "hrere\n");
             return gen_rvalue(lexpr->unop.right, NULL, NULL);
         }
     }
@@ -532,8 +562,6 @@ struct generic_node *gen_assign(struct astnode *expr) {
   
         struct generic_node *test = gen_rvalue(expr->binop.right, dst, NULL);
   
-      // if((expr->binop.right->nodetype != 0) && (expr->binop.right->nodetype != AST_NODE_TYPE_UNOP) ) {
-        //    if((expr->binop.left->nodetype != 0) && (expr->binop.left->nodetype != AST_NODE_TYPE_UNOP))
           if(dst != test) {
             emit_quads(MOV_OC, test, NULL, dst);
      }

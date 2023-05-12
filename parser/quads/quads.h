@@ -51,6 +51,7 @@ struct generic_node {
     } value;
     struct astnode *declspec; //store type information for checking
    int storage_class;
+   int stack_offset; //for variable types offaset
 };
 
 struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr, int *condcode);

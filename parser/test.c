@@ -1,6 +1,9 @@
+int main() {
+int x, y;
 
+if(x&&y) {
+	x = 4;
 
-int test() {
- int a;
- a =  f(2, 3);
 }
+}
+

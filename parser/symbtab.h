@@ -196,7 +196,7 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
 // void define_var(struct astnode *var, struct symbtab *table);
 // define function
 struct symbol *define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
-void define_var(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset);
+int define_var(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset);
 // define label
 void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf, bool replace);
 // do later: stuct definition (forward declaration) and declaration (members, own symbtab).

@@ -1,21 +1,44 @@
+#include <stddef.h>
+#include "quads.h"
+#include "../ast.h"
+#include <stdlib.h>
+#include "../parser.tab.h"
+#include <stdio.h>
+#include <string.h>
+#include "../symbtab.h"
+#include "sizeof.h"
 #include "codegen.h"
-
-
 extern struct symbtab *current_scope;
-int stack_os = 0;
+int string_num = 0 ;
+extern FILE *outputfile;
+extern int stack_offset;
+extern char *current_fn;
+extern int max_regid;
 
 void code_generation(struct basic_block *head){
-    // int string_num = 0 ;
-    // temporary looping through every basic block in the function
-    // printf("test"); 
-    // while (head) {
-    //     struct quad *quad = head->listquadbeg;
-    //     while (quad){
-    //         translate_quad(quad);
-    //         quad = quad->next;
-    //     }
-    // head = head->next;
-    // }
+    int flag;
+    fprintf(outputfile, "\t.global %s\n", current_fn);
+    fprintf(outputfile, "\t.type %s, \@function\n", current_fn);
+    fprintf(outputfile, "%s:\n", current_fn);
+    fprintf(outputfile, "\tpushl %%ebp\n");
+    fprintf(outputfile, "\tmovl %%esp, %%ebp\n");
+    if(stack_offset != 0 || max_regid != 0) {
+        int flag = 1;
+        fprintf(outputfile, "\tsubl $%d, %%esp\n",((-1*(stack_offset) + 4*max_regid - 1) / 16 + 1) * 16);
+    }
+    
+     while (head) {
+      struct quad *quad = head->listquadbeg;
+       fprintf(outputfile, ".BB%d%d:\n", head->bb_fn, head->bb_no);
+        while (quad){
+            translate_quad(quad);
+            quad = quad->next;
+        }
+        head = head->next;
+    }
+    if (flag){
+        fprintf(outputfile, "\tleave\n");
+    }
 }
 
 void translate_quad(struct quad *quad) {
@@ -26,186 +49,199 @@ void translate_quad(struct quad *quad) {
     //stdout is the file we're writing to
     switch (quad->opcode) {
         case LOAD_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl (%%eax), %%ebx\n");
-            fprintf(stdout, "movl %%ebx, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl (%%eax), %%edx\n");
+            fprintf(outputfile, "\tmovl %%edx, %s\n", checkGenericNode(result));
             break;
         case STORE_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl %s, %%ebx\n", checkGenericNode(result));
-            fprintf(stdout, "movl %%eax, (%%ebx)\n");
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %s, %%edx\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tmovl %%eax, (%%edx)\n");
             break;
-        // case LEA_OC:
-        //     fprintf(stdout, "leal %s, %%eax\n", checkGenericNode(src1));
-        //     fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
-        //     break;
+        case LEA_OC:
+            fprintf(outputfile, "\tleal %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
+            break;
         case MULT_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl %s, %%ebp\n", checkGenericNode(src2));
-            fprintf(stdout, "imull %%ebp, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %s, %%edx\n", checkGenericNode(src2));
+            fprintf(outputfile, "\timull %%edx, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case ADD_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl %s, %%ebp\n", checkGenericNode(src2));
-            fprintf(stdout, "addl %%ebp, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %s, %%edx\n", checkGenericNode(src2));
+            fprintf(outputfile, "\taddl %%edx, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SUB_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl %s, %%ebp\n", checkGenericNode(src2));
-            fprintf(stdout, "subl %%ebp, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %s, %%edx\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tsubl %%edx, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case DIV_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "cltd\n");
-            fprintf(stdout, "idivl %s\n", checkGenericNode(src2));
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcltd\n");
+            fprintf(outputfile, "\tidivl %s\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case MOD_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "cltd\n");
-            fprintf(stdout, "idivl %s\n", checkGenericNode(src2));
-            fprintf(stdout, "movl %%edx, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcltd\n");
+            fprintf(outputfile, "\tidivl %s\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tmovl %%edx, %s\n", checkGenericNode(result));
             break;
         case MOV_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case CMP_OC: 
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "cmpl %s, %%eax\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
             break;
         case LTEQ_OC:
-            fprintf(stdout, "jle %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjle %s", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s", checkGenericNode(src2));
             break;
         case NOTEQ_OC:
-            fprintf(stdout, "jne %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjne %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case GTEQ_OC:
-            fprintf(stdout, "jge %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjge %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case LT_OC:
-            fprintf(stdout, "jl %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjl %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case GT_OC:
-            fprintf(stdout, "jg %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjg %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         // right
         case EQEQ_OC:
-            fprintf(stdout, "je %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tje %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case NTEQ_OC:
-            fprintf(stdout, "jne %s", checkGenericNode(src1));
-            fprintf(stdout, "jmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjne %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case SETNEQ_OC:
-            fprintf(stdout, "cmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
-            fprintf(stdout, "setne %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
+            fprintf(outputfile, "\tsetne %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETEQ_OC:
-            fprintf(stdout, "cmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
-            fprintf(stdout, "sete %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
+            fprintf(outputfile, "\tsete %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case ARGBEGIN:
             num_arg = src1->value.immediate;
             break;
         case ARG:
-            fprintf(stdout, "pushl %s\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tpushl %s\n", checkGenericNode(src2));
             break;
         case CALL_OC:
-            fprintf(stdout, "call %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcall %s\n", checkGenericNode(src1));
+              fprintf(outputfile, "\taddl $%d, %%esp\n", 4*num_arg);
             if (src2){
-                fprintf(stdout, "addl %d, %%esp\n", 4*num_arg);
-                fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(src2));
+              
+                fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(src2));
             }
-            breakl
+            break;
         case RET_OC: 
             if (src1 != NULL) {
-                fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
+                fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
             }
-            fprintf(stdout, "ret\n");
+            fprintf(outputfile, "\tret\n");
             break;
         case SETLT_OC:
-            fprintf(stdout, "cmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
-            fprintf(stdout, "setl %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
+            fprintf(outputfile, "\tsetl %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETGT_OC:
-            fprintf(stdout, "cmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
-            fprintf(stdout, "setg %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
+            fprintf(outputfile, "\tsetg %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETLTEQ_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "cmpl %s, %%eax\n", checkGenericNode(src2));
-            fprintf(stdout, "setle %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tsetle %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETGTEQ_OC:
-            fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(stdout, "cmpl %s, %%eax\n", checkGenericNode(src2));
-            fprintf(stdout, "setge %%al\n");
-            fprintf(stdout, "movzbl %%al, %%eax\n");
-            fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            fprintf(outputfile, "\tmov %s, %%eax\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
+            fprintf(outputfile, "\tsetge %%al\n");
+            fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
+            fprintf(outputfile, "\tmov %%eax, %s\n", checkGenericNode(result));
             break;
         case BR_OC:
-            fprintf(stdout, "jmp %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src1));
             break;
         default:
-            printf("dripto");
+            printf("\tdripto");
             break;
     }
 }
 
 char *checkGenericNode(struct generic_node *node){
-    char* buf = (char*)malloc(50);
+    char* buf = (char*)malloc(1000);
     switch (node->types){
-        case CONSTANT_TYPE:
+        case IMMEDIATE_TYPE:
             // sprintf()
             // Handle the CONSTANT_TYPE case, not sure about this
-            return node->value.ident;
+            sprintf(buf, "$%d", node->value.immediate);
+            return buf;
             break;
         case REGISTER_TYPE:
             // Handle the REGISTER_TYPE case
             // would need to look both at the stack offset and the regid
-            sprintf(buf, "%d(%%ebp)", (stack_os - (4 * node->value.regid)));
+            sprintf(buf, "%d(%%ebp)", (-(-1*(stack_offset) + 4*(node->value.regid + 1))));
+            return buf;
             break;
-
-        case IMMEDIATE_TYPE:
-            // Handle the IMMEDIATE_TYPE case
-            return node->value.immediate;
-            break;
-
+            
         case VARIABLE_TYPE:
             // Handle the VARIABLE_TYPE case
-            sprintf(buf, "%d(%%ebp)", stack_os);
+            if(node->storage_class == AUTO_S){
+                sprintf(buf, "%d(%%ebp)", node->stack_offset);
+            } else {
+                sprintf(buf, "%s", node->value.string);   
+            }
+        
             return buf;
             break;
 
         case BLOCK_TYPE:
             // Handle the BLOCK_TYPE c
             // dont know if this is what we're supposed to be returning
-            return node->value.bb->bbname;
+            sprintf(buf, ".BB%d%d", node->value.bb->bb_fn, node->value.bb->bb_no);
+            return buf;
             break;
 
         case STRING_TYPE:
             // more to it do strings later
-            return node->value.string;
+            // 
+            fprintf(outputfile, "\t.section .rodata\n");
+            fprintf(outputfile, ".LC%d:\n", string_num);
+            sprintf(buf, "$.LC%d\n", string_num);
+            fprintf(outputfile, "\t.string \"%s\"\n", node->value.string);
+            fprintf(outputfile, "\t.text\n");
+    
+            string_num++;
+            // what do I return
+            return buf;
             break;
 
         default:

@@ -28,6 +28,8 @@
     extern  struct symbol *cur_funcsymb;
     struct symbtab *current_functionscope; //for labels;
     extern int stack_offset;
+    extern int stack_offset_param;
+   FILE* outputfile;
 %}
 
 %union{
@@ -208,7 +210,7 @@ expression: assignment-expression         { $$ = $1; }
 
 /* 6.7.0 ? */
 declaration: declaration-specifiers init-declarator-list ';' {  if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL);   }
+                                                          symbent_combine($1, $2, lineno, filename_buf, current_scope, NULL, 0);   }
     | declaration-specifiers ';'  { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);} symbent_struct_reset($1, lineno, filename_buf, current_scope); }
     ;
 
@@ -299,7 +301,7 @@ struct-declaration-list: struct-declaration {
                         | struct-declaration-list struct-declaration
                           ;
                         
-struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, curstruct_scope->astnode->structunion.minitable, current_scope);    } ;
+struct-declaration: specifier-qualifier-list struct-declarator-list ';' { symbent_combine($1, $2, lineno, filename_buf, curstruct_scope->astnode->structunion.minitable, current_scope, 0);    } ;
                     
 
 specifier-qualifier-list: type-specifier specifier-qualifier-list { $$ = newast(AST_NODE_TYPE_DECLSPEC, $1, $2, 0); }
@@ -515,17 +517,21 @@ decl_or_stmt:
                     ;
     
     function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
-                                                            symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL);   
+                                                            symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL, 0);   
                                                             isFunc = 1; 
-                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n"); gen_quads($4);  cur_funcsymb = NULL; stack_offset = 0; }
+                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n"); gen_quads($4);  cur_funcsymb = NULL; stack_offset = 0; stack_offset_param = 8; }
         ;
 
 %%       
 
     int main() {
         yydebug = 0;
+ outputfile = fopen("output.s", "w");
+  if ( outputfile  == NULL) {
+        printf("Error opening file\n");
+        return 1;
+    }
 
-  
  yyparse();
   
         

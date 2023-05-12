@@ -112,13 +112,14 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
     return new_symb;
 }
 
-void define_var(struct astnode *var, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset){
+int define_var(struct astnode *var, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset){
     struct symbol *symbol = create_symbol_entry(name, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
     symbol->var.type = var;
     symbol->var.stor_class = storage_class;
-    symbol->var.sf_offset = 0;
+    symbol->var.sf_offset = stackoffset;
     if(!symbtab_insert(table, symbol, false)){
-        fprintf(stderr, "Variable already exists");
+        fprintf(stderr, "Variable already exists\n");
+        return 1;
     } else {
         if(debugtable) {
         printf("%s is defined at %s:%d [in %s scope starting at %s:%d] as a variable with stgclass %s of type:",
@@ -133,7 +134,9 @@ void define_var(struct astnode *var, struct symbtab *table, int lineno, char *fi
        printf("\n");
      astwalk_impl(var, 0);
     }
+
     }
+    return 0;
 }
 
 void define_struct(struct astnode *struct_union, struct symbtab *table, int lineno, char *filename_buf, char * name, bool replace){

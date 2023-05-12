@@ -6,7 +6,7 @@ int sizeof_ast(struct astnode *node) {
 	switch(node->nodetype) {
 		case AST_NODE_TYPE_POINTER:
         case AST_NODE_TYPE_FNDCL:
-			return 8;
+			return 4;
 		case AST_NODE_TYPE_ARRAYDCL:
             if(node->arraydecl.array_size->num.number.type == INT_SIGNED || node->arraydecl.array_size->num.number.type == INT_UNSIGNED ) {
                     return ((node->arraydecl.array_size->num.number.integer)*sizeof_ast(node->arraydecl.next));

@@ -1,5 +1,5 @@
-
-int y = 5;
-int test() {
-    printf("%d", y);
+int f() {
+int x[1];
+int y;
+x[2] = 2;
 }

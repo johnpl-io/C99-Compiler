@@ -12,9 +12,10 @@ extern char filename_buf[256];
 #define FUNCPARAM 1
 char *current_fn;
 int stack_offset;
+int stack_offset_param = 8; //stack offset for parameters
 struct symbol *cur_funcsymb; //symbol to current funtion
 
-void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
+void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct, int isFuncParam){
 
     //extract correct storage class tytpe qualifier //check if type specifier is struct 
     char *name = NULL;
@@ -190,12 +191,19 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
 
 
             } else {
-                
-              define_var(type, curscope, lineno, filename_buf, strgclass, name, stack_offset);
-                  if(strgclass == AUTO_S)  {
+                 if(strgclass == AUTO_S && isFuncParam == 0)  {
 
                    stack_offset -= sizeof_ast(type);
+                   define_var(type, curscope, lineno, filename_buf, strgclass, name, stack_offset);
+                  } else if(strgclass == AUTO_S && isFuncParam) {
+                     define_var(type, curscope, lineno, filename_buf, strgclass, name, stack_offset_param);
+                     stack_offset_param +=  sizeof_ast(type);
+                  } else {
+                     define_var(type, curscope, lineno, filename_buf, strgclass, name, 0);
                   }
+                  
+             
+                   
             }
             }
             ll_nodell = ll_nodell->ll.next;
@@ -224,7 +232,7 @@ void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filenam
                 struct astnode *declspecs =  ll_nodell->ll.data->declaration.declspec;
                 struct astnode *declarator = ll_nodell->ll.data->declaration.decl;
                 if(declarator->head) {
-                     symbent_combine(declspecs, insertElementorig(AST_NODE_TYPE_LL, declarator), lineno, filename_buf, curscopefn, NULL);
+                     symbent_combine(declspecs, insertElementorig(AST_NODE_TYPE_LL, declarator), lineno, filename_buf, curscopefn, NULL, 1);
                 }
     
 

@@ -8,6 +8,13 @@
         "string_view": "c",
         "ast.h": "c",
         "string.h": "c",
-        "sizeof.h": "c"
+        "sizeof.h": "c",
+        "compare": "c",
+        "functional": "c",
+        "ratio": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "variant": "c"
     }
 }

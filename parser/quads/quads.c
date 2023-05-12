@@ -7,7 +7,9 @@
 #include <string.h>
 #include "../symbtab.h"
 #include "sizeof.h"
+#include "codegen.h"
  extern char *current_fn;
+  extern int stack_offset;
 #define DIRECT 1
 #define INDIRECT 0
 #define UNSPECIFIED -2
@@ -20,8 +22,8 @@ struct basic_block *head_bb; //head of linked list of basic block
 struct basic_block *gen_quads(struct astnode *stmtlist){
  struct astnode *llstmtlist = stmtlist->ll.head;
  //create current basic block keep  
-   
     head_bb = new_bb();
+    head_bb->stack_offset = stack_offset;
     head_bb->regidcount = 0;
     cur_bb = head_bb;
 
@@ -278,6 +280,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
                     fprintf(stderr, "Error using a variable declared as a function in an expression\n");
                 }  else {
            target->types = VARIABLE_TYPE;
+                target->storage_class = rexpr->ident.symbol->var.stor_class;
            target->declspec= rexpr->ident.symbol->var.type;
            target->value.ident = strdup(rexpr->ident.string);
             if(condcode) {
@@ -291,6 +294,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
            {
             target->types = VARIABLE_TYPE;
            target->declspec = rexpr->ident.symbol->var.type;
+                     target->storage_class = rexpr->ident.symbol->var.stor_class;
            target->value.ident = strdup(rexpr->ident.string);
             return target;
            }
@@ -300,6 +304,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
             struct generic_node *temp = new_temporary();
             target->types = VARIABLE_TYPE;
            target->declspec = rexpr->ident.symbol->var.type;
+            target->storage_class = rexpr->ident.symbol->var.stor_class;
            target->value.ident = strdup(rexpr->ident.string);
               emit_quads(LEA_OC, target, NULL , temp);
                 temp->declspec = target->declspec;
@@ -535,10 +540,13 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode){
     case AST_NODE_TYPE_IDENT: {
     //check symbol thgen insert //probably should check if symbol exists as well 
         *mode = DIRECT;
+
         struct generic_node *target = malloc(sizeof(struct generic_node));
             target->types = VARIABLE_TYPE;
            target->declspec = lexpr->ident.symbol->var.type;
+           
            target->value.ident = strdup(lexpr->ident.string);
+                target->storage_class = lexpr->ident.symbol->var.stor_class;
             return target;
 
     }
@@ -643,7 +651,7 @@ void print_genericnode(struct generic_node *generic_node) {
     case IMMEDIATE_TYPE :
        printf("%d ", generic_node->value.immediate); break;
     case VARIABLE_TYPE :
-     printf("%s  ", generic_node->value.ident); break;
+     printf("%s  ", generic_node->value.ident);  break;
      case BLOCK_TYPE:
    
    printf(".BB%d.%d", generic_node->value.bb->bb_fn, generic_node->value.bb->bb_no); break;
@@ -870,11 +878,12 @@ void print_basicblock(struct basic_block *basic_block) {
 
 //pass head basic block and print all of them inside
 void print_func(struct basic_block *basic_block) {
-  printf("%s:\n", current_fn);
+  printf("%s: %d\n", current_fn, stack_offset);
   struct basic_block *head = basic_block;
   while(head) {
   printf(".BB%d.%d \n", head->bb_fn, head->bb_no);
    print_basicblock(head);
+   code_generation(head);
    head = head->next;
   }
     

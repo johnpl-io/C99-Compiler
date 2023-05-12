@@ -1,8 +1,8 @@
 	.file	"test.c"
 	.text
-	.globl	square
-	.type	square, @function
-square:
+	.globl	main
+	.type	main, @function
+main:
 .LFB0:
 	.cfi_startproc
 	pushl	%ebp
@@ -13,17 +13,15 @@ square:
 	subl	$16, %esp
 	call	__x86.get_pc_thunk.ax
 	addl	$_GLOBAL_OFFSET_TABLE_, %eax
-	movl	$3, -8(%ebp)
-	movl	$4, -4(%ebp)
-	movl	$1802255206, 8(%ebp)
-	nop
+	movl	$0, -4(%ebp)
+	movl	$0, %eax
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
 .LFE0:
-	.size	square, .-square
+	.size	main, .-main
 	.section	.text.__x86.get_pc_thunk.ax,"axG",@progbits,__x86.get_pc_thunk.ax,comdat
 	.globl	__x86.get_pc_thunk.ax
 	.hidden	__x86.get_pc_thunk.ax
@@ -35,5 +33,5 @@ __x86.get_pc_thunk.ax:
 	ret
 	.cfi_endproc
 .LFE1:
-	.ident	"GCC: (GNU) 12.2.1 20230201"
+	.ident	"GCC: (GNU) 12.2.1 20230111"
 	.section	.note.GNU-stack,"",@progbits

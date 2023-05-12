@@ -9,6 +9,7 @@
 // extern int lineno;
 extern struct symbtab *current_scope;
 int debugtable = 0;
+
 // initialize new symbol table
 struct symbtab *symbtab_init(int scope, int lineno, char *filename_buf) {
     struct symbtab *table = calloc(1, sizeof(struct symbtab));
@@ -111,7 +112,7 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
     return new_symb;
 }
 
-void define_var(struct astnode *var, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name){
+void define_var(struct astnode *var, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset){
     struct symbol *symbol = create_symbol_entry(name, SYMB_VARIABLE_NAME, NAMESPACE_ALT, lineno, filename_buf);
     symbol->var.type = var;
     symbol->var.stor_class = storage_class;
@@ -151,7 +152,7 @@ void define_struct(struct astnode *struct_union, struct symbtab *table, int line
 }
 
 // define function attributes within function symb
-void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name){
+struct symbol *define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name){
     if(table->scope != SCOPE_GLOBAL){
         fprintf(stderr, "Cannot define function outside of global scope");
     }
@@ -179,6 +180,7 @@ void define_func(struct astnode *func, struct symbtab *table, int lineno, char *
            printf("\n");
        astwalk_impl(func, 0);
     }
+    return symbol;
     }
 }
 

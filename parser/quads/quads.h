@@ -28,6 +28,7 @@ struct basic_block {
     struct quad *listquadbeg;
     struct basic_block *next;
     struct quad *listquadend;
+    int stack_offset; //for head basic block 
    // enum condcode cc;
     int regidcount; //keep track of temp register number per basic block
 };
@@ -49,6 +50,7 @@ struct generic_node {
         struct basic_block *bb;
     } value;
     struct astnode *declspec; //store type information for checking
+   int storage_class;
 };
 
 struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr, int *condcode);

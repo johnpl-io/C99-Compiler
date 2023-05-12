@@ -1,7 +1,5 @@
 
-void main() {
-int x,y;
-if(y || x) {
-x = 5;
-}
+int x;
+int test() {
+  extern int x;
 }

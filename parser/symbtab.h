@@ -95,6 +95,7 @@ struct fn_name_atr{
     int stor_class;
     bool is_inline;
     bool def_seen;
+    int total_stackoffset;
 };
 
 // equivalent type
@@ -194,8 +195,8 @@ struct symbol *create_symbol_entry(char *name, int type, int namespace, int line
 // define variable
 // void define_var(struct astnode *var, struct symbtab *table);
 // define function
-void define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
-void define_var(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
+struct symbol *define_func(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name);
+void define_var(struct astnode *func, struct symbtab *table, int lineno, char *filename_buf, int storage_class, char *name, int stackoffset);
 // define label
 void define_label(struct astnode *label, struct symbtab *table, int lineno, char *filename_buf, bool replace);
 // do later: stuct definition (forward declaration) and declaration (members, own symbtab).
@@ -211,4 +212,5 @@ void print_type(struct astnode *type);
 char *print_storage_class(int storageclass);
 char* getTypeName(int index);
 void print_symb(struct symbol *cur_sym );
+
 #endif

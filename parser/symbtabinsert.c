@@ -8,8 +8,10 @@
 #include "symbtabinsert.h"
 #include "quads/sizeof.h"
 extern int lineno;
- extern char filename_buf[256];
- char *current_fn;
+extern char filename_buf[256];
+char *current_fn;
+int stack_offset;
+struct symbol *cur_funcsymb; //symbol to current funtion
 
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct){
 
@@ -181,13 +183,18 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
             if (isFunc){
                 //append types //no checking yet 
                 //current_fn
-                define_func(type, curscope, lineno, filename_buf, strgclass, name);
+                
+              cur_funcsymb =   define_func(type, curscope, lineno, filename_buf, strgclass, name);
                 current_fn = name;
 
+
             } else {
-              define_var(type, curscope, lineno, filename_buf, strgclass, name);
-              
                 
+              define_var(type, curscope, lineno, filename_buf, strgclass, name, stack_offset);
+                  if(strgclass == AUTO_S)  {
+
+                   stack_offset -= sizeof_ast(type);
+                  }
             }
             }
             ll_nodell = ll_nodell->ll.next;

@@ -9,6 +9,7 @@
 #include "quads/sizeof.h"
 extern int lineno;
 extern char filename_buf[256];
+#define FUNCPARAM 1
 char *current_fn;
 int stack_offset;
 struct symbol *cur_funcsymb; //symbol to current funtion

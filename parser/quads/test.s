@@ -14,7 +14,7 @@ main:
 	.text
         pushl   $.LC0
         call    printf
-		addl $8, %esp
+		addl $16, %esp
 		movl %eax, -4(%ebp)
 
         nop

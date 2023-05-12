@@ -1,5 +1,6 @@
 
-int x;
+
 int test() {
-  extern int x;
+ int a;
+ a =  f(2, 3);
 }

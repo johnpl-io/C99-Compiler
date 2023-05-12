@@ -22,6 +22,7 @@ void translate_quad(struct quad *quad) {
     struct generic_node *result = quad->result;
     struct generic_node *src1 = quad->src1;
     struct generic_node *src2 = quad->src2;
+    static int num_arg = 0;
     //stdout is the file we're writing to
     switch (quad->opcode) {
         case LOAD_OC:
@@ -117,12 +118,19 @@ void translate_quad(struct quad *quad) {
             fprintf(stdout, "movzbl %%al, %%eax\n");
             fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
             break;
+        case ARGBEGIN:
+            num_arg = src1->value.immediate;
+            break;
+        case ARG:
+            fprintf(stdout, "pushl %s\n", checkGenericNode(src2));
+            break;
         case CALL_OC:
             fprintf(stdout, "call %s\n", checkGenericNode(src1));
-            if (result != NULL) {
-                fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(result));
+            if (src2){
+                fprintf(stdout, "addl %d, %%esp\n", 4*num_arg);
+                fprintf(stdout, "movl %%eax, %s\n", checkGenericNode(src2));
             }
-            break;
+            breakl
         case RET_OC: 
             if (src1 != NULL) {
                 fprintf(stdout, "movl %s, %%eax\n", checkGenericNode(src1));

@@ -14,6 +14,7 @@ char *current_fn;
 int stack_offset;
 int stack_offset_param = 8; //stack offset for parameters
 struct symbol *cur_funcsymb; //symbol to current funtion
+extern FILE *outputfile;
 
 void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf, struct symbtab *curscope, struct symbtab *outscopeforstruct, int isFuncParam){
 
@@ -199,7 +200,13 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
                      define_var(type, curscope, lineno, filename_buf, strgclass, name, stack_offset_param);
                      stack_offset_param +=  sizeof_ast(type);
                   } else {
+
+                     
                      define_var(type, curscope, lineno, filename_buf, strgclass, name, 0);
+
+                  }
+                  if(strgclass == EXTERN_S &&  curscope->scope == SCOPE_GLOBAL) {
+                    fprintf(outputfile, "\t.comm %s, %d, %d\n", name, sizeof_ast(type), 4);
                   }
                   
              

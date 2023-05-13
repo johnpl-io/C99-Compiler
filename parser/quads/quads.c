@@ -47,6 +47,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 	print_func(head_bb);
     code_generation(head_bb);
         fn_no++;
+        bbnocount = 0;
         max_regid = 0;
     head_bb, break_bb, continue_bb = NULL;
 }
@@ -802,7 +803,7 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
 			condcode = flipcond ? EQEQ_OC : NOTEQ_OC;
 			break;
 		case LTEQ:
-			condcode = flipcond ? GTEQ_OC : LTEQ_OC;
+			condcode = flipcond ? GT_OC : LTEQ_OC;
 			break;
 		case '>':
 			condcode = flipcond ? LTEQ_OC : GT_OC;

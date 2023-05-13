@@ -16,14 +16,12 @@ extern char *current_fn;
 extern int max_regid;
 
 void code_generation(struct basic_block *head){
-    int flag;
     fprintf(outputfile, "\t.global %s\n", current_fn);
     fprintf(outputfile, "\t.type %s, \@function\n", current_fn);
     fprintf(outputfile, "%s:\n", current_fn);
     fprintf(outputfile, "\tpushl %%ebp\n");
     fprintf(outputfile, "\tmovl %%esp, %%ebp\n");
     if(stack_offset != 0 || max_regid != 0) {
-        int flag = 1;
         fprintf(outputfile, "\tsubl $%d, %%esp\n",((-1*(stack_offset) + 4*max_regid - 1) / 16 + 1) * 16);
     }
     
@@ -36,9 +34,11 @@ void code_generation(struct basic_block *head){
         }
         head = head->next;
     }
-    if (flag){
+   
+    
         fprintf(outputfile, "\tleave\n");
-    }
+    
+    fprintf(outputfile, "\tret\n");
 }
 
 void translate_quad(struct quad *quad) {
@@ -130,13 +130,11 @@ void translate_quad(struct quad *quad) {
             fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case SETNEQ_OC:
-            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
             fprintf(outputfile, "\tsetne %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETEQ_OC:
-            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
             fprintf(outputfile, "\tsete %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
@@ -159,7 +157,6 @@ void translate_quad(struct quad *quad) {
             if (src1 != NULL) {
                 fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
             }
-            fprintf(outputfile, "\tret\n");
             break;
         case SETLT_OC:
             fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
@@ -168,7 +165,6 @@ void translate_quad(struct quad *quad) {
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETGT_OC:
-            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
             fprintf(outputfile, "\tsetg %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
@@ -235,7 +231,7 @@ char *checkGenericNode(struct generic_node *node){
             // 
             fprintf(outputfile, "\t.section .rodata\n");
             fprintf(outputfile, ".LC%d:\n", string_num);
-            sprintf(buf, "$.LC%d\n", string_num);
+            sprintf(buf, "$.LC%d", string_num);
             fprintf(outputfile, "\t.string \"%s\"\n", node->value.string);
             fprintf(outputfile, "\t.text\n");
     

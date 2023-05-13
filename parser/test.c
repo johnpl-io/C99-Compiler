@@ -1,9 +1,15 @@
-int main() {
-int x, y;
 
-if(x&&y) {
-	x = 4;
 
+
+
+int a[10];
+void  test() {
+	a[1] = 2; 
 }
+int main() {
+
+a[0] = 1;
+test();
+return a[1];
 }
 

@@ -1,24 +1,51 @@
-	.comm a, 40, 4
-	.global test
-	.type test, @function
-test:
+	.global towerOfHanoi
+	.type towerOfHanoi, @function
+towerOfHanoi:
 	pushl %ebp
 	movl %esp, %ebp
 	subl $16, %esp
 .BB00:
-	leal a, %eax
+	movl 8(%ebp), %eax
+	cmpl $0, %eax
+	jne .BB02
+	jmp .BB01
+.BB01:
+	movl $0, %eax
+	jmp .BB03
+.BB02:
+	pushl 16(%ebp)
+	pushl 20(%ebp)
+	pushl 12(%ebp)
+	movl 8(%ebp), %eax
+	movl $1, %edx
+	subl %edx, %eax
 	movl %eax, -4(%ebp)
-	movl $1, %eax
-	movl $4, %edx
-	imull %edx, %eax
+	pushl -4(%ebp)
+	call towerOfHanoi
+	addl $16, %esp
+	pushl 16(%ebp)
+	pushl 12(%ebp)
+	pushl 8(%ebp)
+	.section .rodata
+.LC0:
+	.string "Move disk %d from rod %d to rod %d
+"
+	.text
+	pushl $.LC0
+	call printf
+	addl $16, %esp
+	pushl 12(%ebp)
+	pushl 16(%ebp)
+	pushl 20(%ebp)
+	movl 8(%ebp), %eax
+	movl $1, %edx
+	subl %edx, %eax
 	movl %eax, -8(%ebp)
-	movl -4(%ebp), %eax
-	movl -8(%ebp), %edx
-	addl %edx, %eax
-	movl %eax, -12(%ebp)
-	movl $2, %eax
-	movl -12(%ebp), %edx
-	movl %eax, (%edx)
+	pushl -8(%ebp)
+	call towerOfHanoi
+	addl $16, %esp
+	jmp .BB03
+.BB03:
 	leave
 	ret
 	.global main
@@ -26,36 +53,16 @@ test:
 main:
 	pushl %ebp
 	movl %esp, %ebp
-	subl $32, %esp
+	subl $16, %esp
 .BB10:
-	leal a, %eax
+	movl $3, %eax
 	movl %eax, -4(%ebp)
+	pushl $2
+	pushl $3
+	pushl $1
+	pushl -4(%ebp)
+	call towerOfHanoi
+	addl $16, %esp
 	movl $0, %eax
-	movl $4, %edx
-	imull %edx, %eax
-	movl %eax, -8(%ebp)
-	movl -4(%ebp), %eax
-	movl -8(%ebp), %edx
-	addl %edx, %eax
-	movl %eax, -12(%ebp)
-	movl $1, %eax
-	movl -12(%ebp), %edx
-	movl %eax, (%edx)
-	call test
-	addl $0, %esp
-	leal a, %eax
-	movl %eax, -16(%ebp)
-	movl $1, %eax
-	movl $4, %edx
-	imull %edx, %eax
-	movl %eax, -20(%ebp)
-	movl -16(%ebp), %eax
-	movl -20(%ebp), %edx
-	addl %edx, %eax
-	movl %eax, -24(%ebp)
-	movl -24(%ebp), %eax
-	movl (%eax), %edx
-	movl %edx, -28(%ebp)
-	movl -28(%ebp), %eax
 	leave
 	ret

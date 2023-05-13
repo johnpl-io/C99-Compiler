@@ -45,7 +45,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 		llstmtlist = llstmtlist->ll.next;
 	}
 	print_func(head_bb);
-    code_generation(head_bb);
+   code_generation(head_bb);
         fn_no++;
         bbnocount = 0;
         max_regid = 0;
@@ -377,6 +377,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 							  case '/':
 							  case '*':
 							  case '-':
+							  case '%':
 
 								  struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL, NULL);
 

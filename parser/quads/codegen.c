@@ -17,7 +17,7 @@ extern int max_regid;
 
 void code_generation(struct basic_block *head){
     fprintf(outputfile, "\t.global %s\n", current_fn);
-    fprintf(outputfile, "\t.type %s, \@function\n", current_fn);
+    fprintf(outputfile, "\t.type %s, @function\n", current_fn);
     fprintf(outputfile, "%s:\n", current_fn);
     fprintf(outputfile, "\tpushl %%ebp\n");
     fprintf(outputfile, "\tmovl %%esp, %%ebp\n");
@@ -101,8 +101,8 @@ void translate_quad(struct quad *quad) {
             fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
             break;
         case LTEQ_OC:
-            fprintf(outputfile, "\tjle %s", checkGenericNode(src1));
-            fprintf(outputfile, "\tjmp %s", checkGenericNode(src2));
+            fprintf(outputfile, "\tjle %s\n", checkGenericNode(src1));
+            fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src2));
             break;
         case NOTEQ_OC:
             fprintf(outputfile, "\tjne %s\n", checkGenericNode(src1));
@@ -159,7 +159,6 @@ void translate_quad(struct quad *quad) {
             }
             break;
         case SETLT_OC:
-            fprintf(outputfile, "\tcmpl %s, %s\n", checkGenericNode(src1), checkGenericNode(src2));
             fprintf(outputfile, "\tsetl %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
@@ -170,15 +169,11 @@ void translate_quad(struct quad *quad) {
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETLTEQ_OC:
-            fprintf(outputfile, "\tmovl %s, %%eax\n", checkGenericNode(src1));
-            fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
             fprintf(outputfile, "\tsetle %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(result));
             break;
         case SETGTEQ_OC:
-            fprintf(outputfile, "\tmov %s, %%eax\n", checkGenericNode(src1));
-            fprintf(outputfile, "\tcmpl %s, %%eax\n", checkGenericNode(src2));
             fprintf(outputfile, "\tsetge %%al\n");
             fprintf(outputfile, "\tmovzbl %%al, %%eax\n");
             fprintf(outputfile, "\tmov %%eax, %s\n", checkGenericNode(result));
@@ -187,7 +182,7 @@ void translate_quad(struct quad *quad) {
             fprintf(outputfile, "\tjmp %s\n", checkGenericNode(src1));
             break;
         default:
-            printf("\tdripto");
+            fprintf(stderr, "Error generating assembly.\n");
             break;
     }
 }

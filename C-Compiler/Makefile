@@ -58,6 +58,6 @@ $(CODEGEN_O): $(CODEGEN_SRCS)
 
 debug: CFLAGS += -g
 debug: CC = gcc -g
-
+debug: jcc
 clean:
-	rm -f jcc $(PARSER_TAB_C) $(LEXER_YY_C) $(PARSER_TAB_O) $(LEXER_YY_O) $(AST_DIR)/$(AST_O) $(SYMBTAB_DIR)/$(SYMBTAB_O) $(SYMBTAB_DIR)/$(SYMBTABINSERT_O) $(QUADS_DIR)/$(QUADS_O) $(QUADS_DIR)/sizeof.o $(CODEGEN_DIR)/$(CODEGEN_O)
+	rm -f jcc $(PARSER_TAB_C) $(LEXER_YY_C) $(PARSER_TAB_O) $(LEXER_YY_O) $(AST_O) $(SYMBTAB_O) $(SYMBTABINSERT_O) $(QUADS_O) quads/sizeof.o $(CODEGEN_O)

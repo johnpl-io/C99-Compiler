@@ -3060,7 +3060,7 @@ yyreduce:
 
   case 174: /* type-name: specifier-qualifier-list abstract-declarator  */
 #line 398 "parser/parser.y"
-                                                       {  }
+                                                       { (yyval.astnode_p) = sizeofresolve((yyvsp[-1].astnode_p), (yyvsp[0].astnode_p), lineno, filename_buf); astwalk_impl((yyval.astnode_p), 0); }
 #line 3065 "parser/parser.tab.c"
     break;
 

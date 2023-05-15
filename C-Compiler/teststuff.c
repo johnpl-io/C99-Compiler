@@ -1,1 +1,4 @@
-int x[10][2];
+int main() {
+int a;
+sizeof(a+0);
+}

@@ -304,7 +304,109 @@ int compare_arrays(unsigned char arr1[], unsigned char arr2[]) {
     }
     return 0; // arrays are the same
 
-}    
+}  
+struct astnode *sizeofresolve(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf){
+
+    //extract correct storage class tytpe qualifier //check if type specifier is struct 
+    char *name = NULL;
+    struct astnode *type;
+
+    bool isFunc = false;
+    bool isArr = false;
+    bool isNeither = false;
+    bool isPtr = false;
+    bool isStruct = false;
+    bool isUnion = false;
+    bool isInsideStruct = false;
+    bool isAnonStructdefine = false;
+
+    resolve_type(declspecs);
+
+    // check if type struct
+    // do lookup and see if struct already exists in symbtab
+    // if it doesn't exist in the symbtab, and we aren't defining it, it's in the form struct a *b( check if pointer if not, error)
+    // install into symbtab
+    
+        
+        
+    //extract storage class check for semantics error
+
+    
+ 
+
+    struct astnode *ll_nodell = declars;
+   
+
+        // get head of decl
+        struct astnode *headdecl =  ll_nodell->head;
+        struct astnode *taildecl =  ll_nodell;
+        //loop through to set proper structs and check for errors
+        if (!(type = headdecl->decl.next)){
+            isFunc = false;
+            isNeither = true;
+        } else {
+            switch (type->nodetype){
+                // check if function
+                case AST_NODE_TYPE_FNDCL:
+                    //is function
+                    isFunc = true;
+                    break;
+                case AST_NODE_TYPE_ARRAYDCL:
+                    isArr = true;
+                    break;
+                case AST_NODE_TYPE_POINTER:
+              
+                    isPtr = true;
+                    break;
+
+                // default is variable
+                default:
+                 
+                        isFunc = false;
+                    break;
+            }
+        }
+
+
+
+           if(type) {
+                //second element of list
+                
+                switch(taildecl->nodetype) {
+                    case AST_NODE_TYPE_POINTER:
+                        taildecl->ptr.next = declspecs;
+                        break;
+                    case AST_NODE_TYPE_DECL:
+                          taildecl->decl.next = declspecs;
+                          break;
+                    case AST_NODE_TYPE_FNDCL:
+                            taildecl->fndcl.next = declspecs;
+                            break;
+                   case AST_NODE_TYPE_ARRAYDCL:
+                        taildecl->arraydecl.next = declspecs;
+                    
+                        break;
+                    default:
+                       printf("UHOH %d", taildecl->nodetype);
+                        break;
+                }
+            } else {
+                type = declspecs;
+            }
+ 
+
+  
+  
+  
+    
+        return type;
+         
+           
+           
+        }
+        
+
+        
 void resolve_type(struct astnode *declspec) {
   unsigned char type_bitmask[9] = {0, 0, 0, 0, 0, 0, 0, 0,0} ; // [void, char, short, int, long, float, struct, union]
     int unsigned_type;
@@ -379,7 +481,7 @@ void resolve_type(struct astnode *declspec) {
        unsigned char type_int[9] = {0, 0, 0, 1, 0, 0, 0, 0, 0}; //int
         unsigned char type_long[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0}; //long
         unsigned char type_long_int[9] = {0, 0, 0, 1, 1, 0, 0, 0, 0, 0}; //long
-        unsigned char type_long_long_int[9] = {0, 0, 0, 1, 2, 0, 0, 0, 0}; //long long
+        unsigned char type_long_long_int[9] = {0, 0, 0, 1, 2, 0, 0, 0}; //long long
         unsigned char type_long_long[9] = {0, 0, 0, 0, 2, 0, 0, 0};
         unsigned char type_double[9] = {0, 0, 0, 0, 0, 1 , 0, 0, 0};
          unsigned char type_long_double[9] = {0, 0, 0, 0, 1, 1 , 0, 0, 0};

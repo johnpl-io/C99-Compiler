@@ -6,4 +6,5 @@ void symbent_struct(struct struct_stack *curstruct_scope, struct symbtab *table,
 void symbent_combine_fn(struct astnode *fn_parameters, int lineno, char *filename_buf, struct symbtab *curscopefn);
 void symbent_struct_reset(struct astnode *declspecs, int lineno, char *filename_buf, struct symbtab *curscope);
 void resolve_type(struct astnode *declspec);
+struct astnode *sizeofresolve(struct astnode *declspecs, struct astnode *declars, int lineno, char *filename_buf);
 #endif

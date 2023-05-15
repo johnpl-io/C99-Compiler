@@ -70,4 +70,8 @@ char* opcode_to_string(enum opcode op);
 struct basic_block *new_bb();
 struct generic_node *function_call(struct astnode *functioncall);
  struct generic_node *newbb_node(struct basic_block *basic_block);
+ void gen_for(struct astnode *for_loop);
+ void print_quads(struct quad *quad);
+ void print_genericnode(struct generic_node *generic_node);
+ char* opcode_to_string(enum opcode op);
 #endif

@@ -47,7 +47,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 		llstmtlist = llstmtlist->ll.next;
 	}
 	print_func(head_bb);
-  //code_generation(head_bb);
+    code_generation(head_bb);
         fn_no++;
         bbnocount = 0;
         max_regid = 0;
@@ -78,6 +78,9 @@ void gen_stmt(struct astnode *stmt) {
 				break;
 			case AST_NODE_TYPE_WHILE:
 				gen_while(stmt);
+				break;
+			case AST_NODE_TYPE_FOR:
+				gen_for(stmt);
 				break;
 			case AST_NODE_TYPE_BREAK:
 				if(!break_bb) {
@@ -440,7 +443,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 								  gen_condexpr(rexpr->binop.left, Bt, Bf, 1);
 								  push_bb(Bt);
-								  gen_condexpr(rexpr->binop.right, Bn, Bf, 1 );
+								  gen_condexpr(rexpr->binop.right, Bn, Bf, 1);
 								  push_bb(Bf);
 								  link_bb(ALWAYS, Bn, NULL);
 								  push_bb(Bn);
@@ -546,7 +549,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 					  if(rexpr->unop.operator == POSTINC) {
 						struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
 						struct generic_node *temp = new_temporary(); //new temp for moving value
-					    emit_quads(MOV_OC, val, temp, NULL );
+					    emit_quads(MOV_OC, val, NULL, temp );
 						struct Num one;
 						one.integer = 1;
 						one.type = INT_SIGNED;
@@ -555,6 +558,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 						struct astnode *type = check_type(&val, &inc, '+');
 						emit_quads(ADD_OC, val, inc, val);
 						temp->declspec = val->declspec;
+						
 						if(!addr)
 							return temp;
 						return val;
@@ -562,7 +566,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 					  if(rexpr->unop.operator == POSTDEC) {
 						struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
 						struct generic_node *temp = new_temporary(); //new temp for moving value
-					    emit_quads(MOV_OC, val, temp, NULL );
+					    emit_quads(MOV_OC, val, NULL, temp);
 						emit_quads(SUB_OC, val, new_immediate(1), val);
 						temp->declspec = val->declspec;
 						if(!addr)
@@ -808,7 +812,7 @@ char* opcode_to_string(enum opcode op) {
 }
 
 
-
+																											//for for loop
 void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_block *Bf, int flipcond) {
 	int condcode = -1;
 	int resultcondcode = -1;
@@ -850,6 +854,7 @@ void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_blo
 			break;
 	}
 	}
+
 	if(flipcond) {
 
 		link_bb(condcode, Bf, Bt);  //Bt is the new false fall through 
@@ -915,6 +920,32 @@ void gen_while(struct astnode *while_loop) {
 	push_bb(next);
 }
 
+void gen_for(struct astnode *for_loop) {
+	struct basic_block *body, *cond, *next;
+	body = new_bb(); // push on stack
+	cond = new_bb();
+	next = new_bb(); // push
+	struct basic_block *prev_break_bb = break_bb; 
+	struct basic_block *prev_cont_bb = continue_bb; 
+
+	break_bb = next;
+	continue_bb = cond;
+	gen_stmt(for_loop->forstmt.init);
+	gen_condexpr(for_loop->forstmt.cond, body, next, 1);
+	push_bb(body);
+	gen_stmt(for_loop->forstmt.body);
+		if (prev_break_bb) {
+		break_bb = prev_break_bb;
+	}
+	if (prev_cont_bb) {
+		continue_bb = prev_cont_bb;
+	}
+	link_bb(ALWAYS, cond, NULL);
+	push_bb(cond);
+	gen_stmt(for_loop->forstmt.incr);
+	gen_condexpr(for_loop->forstmt.cond, body, next, 0);
+	push_bb(next);
+}
 
 struct basic_block *new_bb(){ 
 	struct basic_block *newbb = malloc(sizeof(struct basic_block));

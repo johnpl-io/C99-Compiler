@@ -46,7 +46,7 @@ struct generic_node {
         char *ident;
         int immediate;
         int regid;
-        char *string;
+        struct String *string;
         struct basic_block *bb;
     } value;
     struct astnode *declspec; //store type information for checking

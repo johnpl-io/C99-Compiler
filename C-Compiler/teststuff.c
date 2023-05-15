@@ -1,4 +1,7 @@
+
+int x;
 int main() {
-int a;
-sizeof(a+0);
+
+ printf("hi\n");
+ return 0;
 }

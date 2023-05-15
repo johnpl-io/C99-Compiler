@@ -5,7 +5,7 @@
 #define LONG_LONG 502
 #define LONG_DOUBLE 503
 #include "parser.tab.h"
-
+#include <stdio.h>
 enum AstNodeType {
     AST_NODE_TYPE_BINOP,
     AST_NODE_TYPE_TENOP,
@@ -77,7 +77,12 @@ struct astnode_tenop {
     int operator;
     struct astnode *left, *middle, *right;
 };
+struct astnode_string {
+    int nodetype;
+    struct String *string;
+    struct astnode *left, *right;
 
+};
 struct astnode_num {
     int nodetype;
     struct Num number;
@@ -274,6 +279,7 @@ union {
      struct astnode_continue continuestmt;
      struct astnode_return returnstmt;
      struct astnode_default defaultlabel;
+     struct astnode_string string;
      
     };  
    struct astnode *head, *tail;
@@ -309,4 +315,7 @@ char * filename(char * filename);
 struct astnode *newGoTo(char *ident);
 struct astnode *newContinue();
 struct astnode *handleassign(struct astnode *assignment, struct astnode *expression, int operator);
+struct astnode *newString(struct String *string);
+void charhelper(char val, FILE *fp);
+void stringprinter(struct String *string, FILE *fp);
 #endif

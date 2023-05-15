@@ -51,6 +51,33 @@ const char* qualifier_types_string(int qualifier_types) {
 		default:
 			return "Unknown qualifier type";
 	}
+}	
+void charhelper(char val, FILE *fp) {
+    switch(val) {
+        case '\a': fprintf(fp, "\\a"); break;
+        case '\b': printf(fp, "\\b"); break;
+        case '\f': fprintf(fp, "\\f"); break;
+        case '\n': fprintf(fp, "\\n"); break;
+        case '\r': fprintf(fp, "\\r"); break;
+        case '\t': fprintf(fp, "\\t"); break;
+        case '\v': fprintf(fp, "\\v"); break;
+        default: fprintf(fp, "\\%03o", val);
+    }
+}
+void stringprinter(struct String *string, FILE *fp) {
+        for(int i = 0; i < string->len; i++) {
+                if(isprint(string->str_literal[i])) {
+            if(string->str_literal[i]== '\'' || string->str_literal[i] == '\'' || string->str_literal[i] == '\"' || string->str_literal[i] == '\\') {
+                fprintf(fp, "\\%c", string->str_literal[i]);
+            } else {
+            fprintf(fp, "%c", string->str_literal[i]); 
+            }
+          } else {
+            charhelper(string->str_literal[i], fp);
+        
+          }
+              
+        }
 }
 struct astnode *newNum(int nodetype, struct Num num) {
 
@@ -67,6 +94,15 @@ struct astnode *newCharlit(int nodetype, char val) {
 	numast->charl.val = val;
 	numast->num.nodetype = nodetype;
 	return numast;
+}
+struct astnode *newString(struct String *string) {
+    struct astnode *stringast = malloc(sizeof(struct astnode));
+    stringast->nodetype = AST_NODE_TYPE_STRING;
+    stringast->string.string = malloc(sizeof(struct String));
+    stringast->string.string->str_literal = malloc(string->len + 1);
+    memcpy(stringast->string.string->str_literal, string->str_literal, string->len + 1);  // copy entire string (including null terminator)
+    stringast->string.string->len = string->len;
+    return stringast;
 }
 
 struct astnode *newIdent(int nodetype, char *ident) { 
@@ -665,7 +701,7 @@ void astwalk_impl(struct astnode *ast, int depth) {
 			printf("CHARLIT %c\n", ast->charl.val);
 			break;
 		case AST_NODE_TYPE_STRING:
-			printf("STRING %s\n", ast->ident.string);
+			printf("STRING "); stringprinter(ast->string.string, stdout); printf("\n");
 			break;
 		case AST_NODE_TYPE_FN:
 			printf("FN call\n");

@@ -35,7 +35,7 @@
 %union{
     char *string_literal;
     char charlit;
-    struct Num {
+     struct Num {
         unsigned long long integer;
         long double fvalue;
         enum {
@@ -50,11 +50,16 @@
             DOUBLE_LONG,
         } type;
     } num;
+        struct String {
+            char *str_literal;
+            int len;
+    } string;
     int op;
     struct astnode *astnode_p;
+    
 }
 
-%token <string_literal> IDENT <charlit> CHARLIT <string_literal> STRING <num> NUMBER  
+%token <string_literal> IDENT <charlit> CHARLIT <string> STRING <num> NUMBER  
 %token INDSEL PLUSPLUS MINUSMINUS SHL SHR LTEQ GTEQ EQEQ NOTEQ LOGAND LOGOR ELLIPSIS TIMESEQ DIVEQ MODEQ PLUSEQ MINUSEQ SHLEQ SHREQ ANDEQ OREQ XOREQ AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC <op> STRUCT SWITCH TYPEDEF <op> UNION UNSIGNED VOID VOLATILE WHILE _BOOL _COMPLEX _IMAGINARY
 %token '!' '^' '&' '*' '-' '+' '=' '~' '|' '.' '<' '>' '/' '?' '(' ')' '[' ']' '{' '}' '%' ',' ';' ':'
 %type <astnode_p> primary-expression assignment-expression
@@ -92,7 +97,7 @@ start: declaration_or_fndef  { }
 
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);   }
                 |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
-                |   STRING                  { $$ = newIdent(AST_NODE_TYPE_STRING, $1); /*
+                |   STRING                  { $$ = newString(&$1);  astwalk_impl($$, 0);/*
                 this needs to be changed to some string type after lexer is fixed with this (see hak email) */
                  }  
                 |   CHARLIT                 { $$ = newCharlit(AST_NODE_TYPE_CHARLIT, $1);  }
@@ -519,22 +524,22 @@ decl_or_stmt:
     function_definition: declaration-specifiers declarator { if (!current_scope) {current_scope = symbtab_push(SCOPE_GLOBAL, current_scope, lineno, filename_buf);}
                                                             symbent_combine($1, insertElementorig(AST_NODE_TYPE_LL, $2), lineno, filename_buf, current_scope, NULL, 0);   
                                                             isFunc = 1; 
-                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n");  /*gen_quads($4); */ cur_funcsymb = NULL; stack_offset = 0; stack_offset_param = 8; }
+                                                            fn_parameters = $2;} compound-statement  { printf("Ast Dump for function [ \n"); astwalk_impl($4,0); printf(" ] \n");  gen_quads($4);   cur_funcsymb = NULL; stack_offset = 0; stack_offset_param = 8; }
         ;
 
 %%       
 
-    int main() {
-        yydebug = 0;
+   int main() {
+       yydebug = 0;
  outputfile = fopen("output.s", "w");
-  if ( outputfile  == NULL) {
-        printf("Error opening file\n");
-        return 1;
+ if ( outputfile  == NULL) {
+       printf("Error opening file\n");
+       return 1;
     }
 
- yyparse();
+yyparse();
   
         
-        return 0;
+       return 0;
         
     }

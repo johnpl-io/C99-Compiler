@@ -129,7 +129,7 @@ union YYSTYPE
 
     char *string_literal;
     char charlit;
-    struct Num {
+     struct Num {
         unsigned long long integer;
         long double fvalue;
         enum {
@@ -144,10 +144,15 @@ union YYSTYPE
             DOUBLE_LONG,
         } type;
     } num;
+        struct String {
+            char *str_literal;
+            int len;
+    } string;
     int op;
     struct astnode *astnode_p;
+    
 
-#line 151 "parser/parser.tab.h"
+#line 156 "parser/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

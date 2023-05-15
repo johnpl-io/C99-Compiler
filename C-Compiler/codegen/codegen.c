@@ -211,7 +211,7 @@ char *checkGenericNode(struct generic_node *node){
             if(node->storage_class == AUTO_S){
                 sprintf(buf, "%d(%%ebp)", node->stack_offset);
             } else {
-                sprintf(buf, "%s", node->value.string);   
+                sprintf(buf, "%s", node->value.ident);   
             }
         
             return buf;
@@ -230,7 +230,7 @@ char *checkGenericNode(struct generic_node *node){
             fprintf(outputfile, "\t.section .rodata\n");
             fprintf(outputfile, ".LC%d:\n", string_num);
             sprintf(buf, "$.LC%d", string_num);
-            fprintf(outputfile, "\t.string \"%s\"\n", node->value.string);
+            fprintf(outputfile, "\t.string \"");	stringprinter(node->value.string, outputfile);  fprintf(outputfile, "\"\n");
             fprintf(outputfile, "\t.text\n");
     
             string_num++;

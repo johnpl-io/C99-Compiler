@@ -190,10 +190,12 @@ ANYTHING                         [.]
 \"  {string_buf_ptr = string_buf; BEGIN(str);}
 
 <str>\" {BEGIN(INITIAL); 
-    *string_buf_ptr = '\0';
-  //printf("%s\n", string_buf);
-  string_buf_len = string_buf_ptr - string_buf;
-  yylval.string_literal = strdup(string_buf);
+*string_buf_ptr = '\0';
+string_buf_len = string_buf_ptr - string_buf;
+yylval.string.str_literal = malloc(string_buf_len + 1);  // +1 for the null terminator
+
+memcpy(yylval.string.str_literal, string_buf, string_buf_len + 1);  // copy entire string (including null terminator)
+    yylval.string.len = string_buf_len;
   return STRING;
    }
 <str>{OCTESC} {
@@ -319,7 +321,7 @@ ANYTHING                         [.]
 ";"                 { return ';'; }
 ":"                 { return ':'; }     
 
-[_A-Za-z][_a-zA-Z0-9]*      { yylval.string_literal = strdup(yytext); return IDENT; /* put somewhere */ }
+[_A-Za-z][_a-zA-Z0-9]*      { yylval.string.str_literal = strdup(yytext); return IDENT; /* put somewhere */ }
 .                           { fprintf(stderr, "Error unrecognized token : %s\n", yytext); }
 %%
 
@@ -332,18 +334,18 @@ int get_line_info(){
 // int handle_error(){
 //     fprintf(stderr, "Error in file %s on line number %d: %s\n", filename, lineno, yytext);
 // }
-void charhelper(char val) {
-    switch(val) {
-        case '\a': printf("\\a"); break;
-        case '\b': printf("\\b"); break;
-        case '\f': printf("\\f"); break;
-        case '\n': printf("\\n"); break;
-        case '\r': printf("\\r"); break;
-        case '\t': printf("\\t"); break;
-        case '\v': printf("\\v"); break;
-        default: printf("\\%03o", val);
-    }
-}
+//void charhelper(char val, FILE *fp) {
+   // switch(val) {
+       // case '\a': fprintf(fp, "\\a"); break;
+     //   case '\b': printf(fp, "\\b"); break;
+     //   case '\f': printf("\\f"); break;
+    //    case '\n': printf("\\n"); break;
+     //   case '\r': printf("\\r"); break;
+     //   case '\t': printf("\\t"); break;
+     //   case '\v': printf("\\v"); break;
+     //   default: printf("\\%03o", val);
+  //  }
+//}
 int yywrap() {}
 
 /*
@@ -436,7 +438,7 @@ while(t = yylex())  {
         case '{':               printf("{\n"); break;
         case '}':               printf("{\n"); break;
         case '%':               printf("{\n"); break;
-        case IDENT:             printf("IDENT    %s\n", yylval.string_literal); break;
+        case IDENT:             printf("IDENT    %s\n", yylval.string.str_literal); break;
         case NUMBER:  printf("NUMBER:  "); switch(yylval.num.type) {
             case INT_SIGNED: printf(" \t INTEGER %d  \t INT\n", yylval.num.integer); break;
             case INT_LONG: printf(" \t INTEGER %d \t LONG INT\n", yylval.num.integer ); break;
@@ -466,14 +468,14 @@ while(t = yylex())  {
        case STRING: { 
         printf("\t STRING \t");
         for(int i = 0; i < string_buf_len; i++) {
-                if(isprint(yylval.string_literal[i])) {
-            if(yylval.string_literal[i]== '\'' || yylval.string_literal[i] == '\'' || yylval.string_literal[i] == '\"' || yylval.string_literal[i] == '\\') {
-                printf("\\%c", yylval.string_literal[i]);
+                if(isprint(yylval.string.str_literal[i])) {
+            if(yylval.string.str_literal[i]== '\'' || yylval.string.str_literal[i] == '\'' || yylval.string.str_literal[i] == '\"' || yylval.string.str_literal[i] == '\\') {
+                printf("\\%c", yylval.string.str_literal[i]);
             } else {
-            printf("%c", yylval.string_literal[i]); 
+            printf("%c", yylval.string.str_literal[i]); 
             }
           } else {
-            charhelper(yylval.string_literal[i]);
+            charhelper(yylval.string.str_literal[i]);
         
           }
               
@@ -491,4 +493,5 @@ while(t = yylex())  {
 }
 
 }
+
 */

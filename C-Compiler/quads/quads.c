@@ -3,6 +3,7 @@
 #include "../parser/ast.h"
 #include <stdlib.h>
 #include "../parser/parser.tab.h"
+#include "../parser/ast.h"
 #include <stdio.h>
 #include <string.h>
 #include "../parser/symbtab.h"
@@ -14,6 +15,7 @@ extern int stack_offset;
 #define INDIRECT 0
 #define UNSPECIFIED -2
 #define ALWAYS -3
+
 struct basic_block *cur_bb; //current basic block
 int bbnocount;
 struct basic_block *break_bb, *continue_bb; // for loops continue points
@@ -45,7 +47,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 		llstmtlist = llstmtlist->ll.next;
 	}
 	print_func(head_bb);
-   code_generation(head_bb);
+  code_generation(head_bb);
         fn_no++;
         bbnocount = 0;
         max_regid = 0;
@@ -538,7 +540,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 					  break;
 		case AST_NODE_TYPE_STRING:
 					  target->types = STRING_TYPE;
-					  target->value.string = strdup(rexpr->ident.string);
+					  target->value.string = rexpr->string.string;
                       
 					  return target;
                       break;
@@ -676,7 +678,7 @@ void print_genericnode(struct generic_node *generic_node) {
 
 				printf(".BB%d.%d", generic_node->value.bb->bb_fn, generic_node->value.bb->bb_no); break;
 			case STRING_TYPE: 
-				printf("\"%s\"  ", generic_node->value.string); break;
+				printf("\""); stringprinter(generic_node->value.string, stdout); printf("\"\n"); break;
 			default:
 		}
 	}

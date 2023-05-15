@@ -547,14 +547,20 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 						struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
 						struct generic_node *temp = new_temporary(); //new temp for moving value
 					    emit_quads(MOV_OC, val, temp, NULL );
-						emit_quads(ADD_OC, val, new_immediate(1), val);
+						struct Num one;
+						one.integer = 1;
+						one.type = INT_SIGNED;
+
+						struct generic_node *inc = gen_rvalue(newNum(AST_NODE_TYPE_NUM, one), NULL, NULL);
+						struct astnode *type = check_type(&val, &inc, '+');
+						emit_quads(ADD_OC, val, inc, val);
 						temp->declspec = val->declspec;
 						if(!addr)
 							return temp;
 						return val;
 					  }	
 					  if(rexpr->unop.operator == POSTDEC) {
-								struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
+						struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
 						struct generic_node *temp = new_temporary(); //new temp for moving value
 					    emit_quads(MOV_OC, val, temp, NULL );
 						emit_quads(SUB_OC, val, new_immediate(1), val);

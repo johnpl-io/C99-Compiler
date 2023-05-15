@@ -1,0 +1,39 @@
+i1 is defined at test.c:0 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ui1 is defined at test.c:1 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ui2 is defined at test.c:2 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ul1 is defined at test.c:3 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0i2 is defined at test.c:4 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+2i3 is defined at test.c:5 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ui3 is defined at test.c:6 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+4c1 is defined at test.c:7 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0c2 is defined at test.c:8 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0c3 is defined at test.c:9 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ll1 is defined at test.c:10 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ull1 is defined at test.c:11 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0s1 is defined at test.c:12 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0us1 is defined at test.c:13 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0s3 is defined at test.c:14 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+4d is defined at test.c:15 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0ld is defined at test.c:16 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0f is defined at test.c:17 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+0f2 is defined at test.c:18 [in global scope starting at test.c:0] as a
+function with stgclass static of type: 
+2

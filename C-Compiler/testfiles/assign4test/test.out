@@ -1,0 +1,40 @@
+Ast Dump for function [ 
+LINKED LIST {
+  FOR
+   INIT:
+    BINOP = 
+      stab_var name=a def @test.c:2
+      BINOP + 
+        stab_var name=b def @test.c:2
+        NUM INT_SIGNED 2
+   COND: 
+    BINOP < 
+      stab_var name=i def @test.c:0
+      stab_var name=a def @test.c:2
+   BODY: 
+    LINKED LIST {
+      BINOP = 
+        UNOP * 
+          BINOP + 
+            stab_var name=y def @test.c:0
+            stab_var name=i def @test.c:0
+        TENOP 
+        IF:
+          UNOP * 
+            BINOP + 
+              stab_var name=y def @test.c:0
+              BINOP - 
+                stab_var name=i def @test.c:0
+                NUM INT_SIGNED 1
+        THEN:
+          stab_var name=a def @test.c:2
+        ELSE:
+          BINOP + 
+            stab_var name=b def @test.c:2
+            stab_var name=i def @test.c:0
+    }
+   INCR: 
+    UNOP POSTINC
+      stab_var name=i def @test.c:0
+}
+ ] 

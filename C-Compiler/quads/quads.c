@@ -47,7 +47,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 		llstmtlist = llstmtlist->ll.next;
 	}
 	print_func(head_bb);
-  code_generation(head_bb);
+  //code_generation(head_bb);
         fn_no++;
         bbnocount = 0;
         max_regid = 0;
@@ -99,7 +99,12 @@ void gen_stmt(struct astnode *stmt) {
 				//probably should check if return matches some where
 				emit_quads(RET_OC, gen_rvalue(stmt->returnstmt.statement, NULL, NULL), NULL, NULL);
 				break;
+			case AST_NODE_TYPE_UNOP:
+					if(stmt->unop.operator == POSTINC || stmt->unop.operator == POSTDEC ) {
+						gen_rvalue(stmt, NULL, NULL);
 
+					}
+			break;
 			default:
 
 
@@ -133,7 +138,7 @@ struct astnode *mkptr(struct astnode *declspec) {
 }
 
 //this function checks left and right emits mult if necessary promotes and demotes arrays
-struct generic_node* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
+struct astnode* check_type(struct generic_node** left, struct generic_node** right, int get_opcode) {
 	if((*left)->declspec->nodetype == AST_NODE_TYPE_ARRAYDCL){
 		(*left)->declspec = demote_array((*left)->declspec);
 	}
@@ -148,7 +153,7 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
 					emit_quads(MULT_OC, *right, mult_val, location);
 					location->declspec = (*left)->declspec;
 					*right = location;
-					return;
+					return (*left)->declspec;
 				}
 			}
 
@@ -160,7 +165,7 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
 					emit_quads(MULT_OC, *left, mult_val, location);
 					location->declspec = (*right)->declspec;
 					*left = location;
-					return;
+					return (*right)->declspec;
 				}
 			}
 			break;
@@ -172,18 +177,19 @@ struct generic_node* check_type(struct generic_node** left, struct generic_node*
 				struct generic_node *size_val = new_immediate(sizeofleft);
 				emit_quads(DIV_OC, temp,  size_val, temp);
 				*right = *left = temp;
-				return;
+				return (*left)->declspec; //assume pointers are the same which can be dangerous
 			}
 			break;  //check for ptr subtraction
 		case '*':
 		case '/':
 		case '%':
 			if((*right)->declspec->nodetype == AST_NODE_TYPE_POINTER || (*left)->declspec->nodetype == AST_NODE_TYPE_POINTER) {
-				fprintf(stderr, "Error with pointer operation using '%c\n", get_opcode);
+				fprintf(stderr, "Error illegal pointer operation using '%c'.\n", get_opcode);
 			}
 			break;
-			// add other cases for different operations here
+			
 	}
+	return (*left)->declspec; //everything else we assune the same
 }
 struct generic_node *function_call(struct astnode *functioncall) {
 	struct astnode *funcname = functioncall->fn.left;
@@ -291,7 +297,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 				switch(rexpr->ident.symbol->var.type->nodetype) { //probably should check if it a function call 
 					case AST_NODE_TYPE_DECLSPEC: {
 									     if(rexpr->ident.symbol->attr_type == SYMB_FUNCTION_NAME) {
-										     fprintf(stderr, "Error using a variable declared as a function in an expression\n");
+										     fprintf(stderr, "Error using a variable declared as a function in an expression.\n");
 									     }  else {
 										     target->types = VARIABLE_TYPE;
 										     target->storage_class = rexpr->ident.symbol->var.stor_class;
@@ -385,7 +391,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 
 								  struct generic_node *right = gen_rvalue(rexpr->binop.right, NULL, NULL);
-								  check_type(&left, &right, rexpr->binop.operator);
+							struct astnode *declspectype = check_type(&left, &right, rexpr->binop.operator);
 								  if(!addr) {
 
 									  addr = new_temporary(); 
@@ -397,8 +403,8 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 									  emit_quads(MOV_OC, left, NULL, addr);
 								  }
 
-								  addr->declspec = left->declspec; //need to change!!
-												   //  astwalk_impl(left->declspec, 0);\
+								  addr->declspec =declspectype; 
+												   
 
 								  return addr;
 								  break;
@@ -536,6 +542,26 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 							  addr->declspec = mkptr(address->declspec);
 							  return addr;
 						  }
+					  }
+					  if(rexpr->unop.operator == POSTINC) {
+						struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
+						struct generic_node *temp = new_temporary(); //new temp for moving value
+					    emit_quads(MOV_OC, val, temp, NULL );
+						emit_quads(ADD_OC, val, new_immediate(1), val);
+						temp->declspec = val->declspec;
+						if(!addr)
+							return temp;
+						return val;
+					  }	
+					  if(rexpr->unop.operator == POSTDEC) {
+								struct generic_node *val = gen_rvalue(rexpr->unop.right, NULL, NULL);
+						struct generic_node *temp = new_temporary(); //new temp for moving value
+					    emit_quads(MOV_OC, val, temp, NULL );
+						emit_quads(SUB_OC, val, new_immediate(1), val);
+						temp->declspec = val->declspec;
+						if(!addr)
+							return temp;
+						return val;
 					  }
 					  break;
 		case AST_NODE_TYPE_STRING:

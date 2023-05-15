@@ -1,1 +1,0 @@
-This is some data written to a file using fprintf()

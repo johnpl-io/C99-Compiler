@@ -110,8 +110,8 @@ postfix-expression: primary-expression { $$ = $1; }
                 |   postfix-expression INDSEL IDENT { struct astnode *ast = newast(AST_NODE_TYPE_UNOP, $1, NULL, '*'); $$ = newast(AST_NODE_TYPE_BINOP, ast, newIdent(AST_NODE_TYPE_IDENT, $3), '.' ); }    
                 |   postfix-expression '(' expression-list ')' { $$ = newast(AST_NODE_TYPE_FN, $1, $3, '0'); } 
                 |   postfix-expression '(' ')' { $$ = newast(AST_NODE_TYPE_FN, $1, NULL, '0');  }
-                |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTINC); }
-                |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, $1, NULL, POSTDEC); }   
+                |   postfix-expression PLUSPLUS { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $1, POSTINC); }
+                |   postfix-expression MINUSMINUS { $$ = newast(AST_NODE_TYPE_UNOP, NULL, $1, POSTDEC); }   
                 ;
 
 expression-list: assignment-expression  { $$ =  insertElementorig(AST_NODE_TYPE_LL, $1); }

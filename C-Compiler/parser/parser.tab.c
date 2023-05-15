@@ -2144,13 +2144,13 @@ yyreduce:
 
   case 15: /* postfix-expression: postfix-expression PLUSPLUS  */
 #line 113 "parser/parser.y"
-                                                { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, (yyvsp[-1].astnode_p), NULL, POSTINC); }
+                                                { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, NULL, (yyvsp[-1].astnode_p), POSTINC); }
 #line 2149 "parser/parser.tab.c"
     break;
 
   case 16: /* postfix-expression: postfix-expression MINUSMINUS  */
 #line 114 "parser/parser.y"
-                                                  { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, (yyvsp[-1].astnode_p), NULL, POSTDEC); }
+                                                  { (yyval.astnode_p) = newast(AST_NODE_TYPE_UNOP, NULL, (yyvsp[-1].astnode_p), POSTDEC); }
 #line 2155 "parser/parser.tab.c"
     break;
 

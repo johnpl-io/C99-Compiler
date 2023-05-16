@@ -118,7 +118,7 @@ int define_var(struct astnode *var, struct symbtab *table, int lineno, char *fil
     symbol->var.stor_class = storage_class;
     symbol->var.sf_offset = stackoffset;
     if(!symbtab_insert(table, symbol, false)){
-        fprintf(stderr, "Variable already exists\n");
+        fprintf(stderr, "%s:%d Error '%s' already exists.\n", filename(filename_buf), lineno, name );
         return 1;
     } else {
         if(debugtable) {
@@ -167,7 +167,7 @@ struct symbol *define_func(struct astnode *func, struct symbtab *table, int line
     symbol->fn.stor_class = STG_EXTERN; // functions have storage class extern by default
     
     if(!symbtab_insert(table, symbol, false)){
-        fprintf(stderr, "Function already exists");
+        fprintf(stderr, "%s:%d Function '%s' already exists.", filename(filename_buf), lineno, name);
         free(symbol);
     } else {
         if(debugtable) {

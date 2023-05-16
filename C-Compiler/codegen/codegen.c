@@ -14,7 +14,26 @@ extern FILE *outputfile;
 extern int stack_offset;
 extern char *current_fn;
 extern int max_regid;
+#define MAX_NUM_ARGS 100
+int num_args_stack[MAX_NUM_ARGS];
+int num_args_top = -1;
 
+void push_num_args(int num_args) {
+    if (num_args_top < MAX_NUM_ARGS - 1) {
+        num_args_stack[++num_args_top] = num_args;
+    } else {
+        fprintf(stderr, "Error: Maximum number of arguments exceeded.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int pop_num_args() {
+    if (num_args_top >= 0) {
+        return num_args_stack[num_args_top--];
+    } else {
+       return 0;
+    }
+}
 void code_generation(struct basic_block *head){
     fprintf(outputfile, "\t.global %s\n", current_fn);
     fprintf(outputfile, "\t.type %s, @function\n", current_fn);
@@ -144,13 +163,15 @@ void translate_quad(struct quad *quad) {
             break;
         case ARGBEGIN:
             num_arg = src1->value.immediate;
+            push_num_args(num_arg);
             break;
         case ARG:
             fprintf(outputfile, "\tpushl %s\n", checkGenericNode(src2));
             break;
         case CALL_OC:
+            int num_args = pop_num_args();
             fprintf(outputfile, "\tcall %s\n", checkGenericNode(src1));
-              fprintf(outputfile, "\taddl $%d, %%esp\n", 4*num_arg);
+              fprintf(outputfile, "\taddl $%d, %%esp\n", 4*num_args);
             if (src2){
               
                 fprintf(outputfile, "\tmovl %%eax, %s\n", checkGenericNode(src2));

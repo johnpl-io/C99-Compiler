@@ -97,7 +97,7 @@ start: declaration_or_fndef  { }
 
 primary-expression: IDENT                   { $$ = newIdent(AST_NODE_TYPE_IDENT, $1);   }
                 |   NUMBER                  { $$ = newNum(AST_NODE_TYPE_NUM, $1);}
-                |   STRING                  { $$ = newString(&$1);  astwalk_impl($$, 0);/*
+                |   STRING                  { $$ = newString(&$1); /*
                 this needs to be changed to some string type after lexer is fixed with this (see hak email) */
                  }  
                 |   CHARLIT                 { $$ = newCharlit(AST_NODE_TYPE_CHARLIT, $1);  }
@@ -529,17 +529,47 @@ decl_or_stmt:
 
 %%       
 
-   int main() {
-       yydebug = 0;
- outputfile = fopen("output.s", "w");
- if ( outputfile  == NULL) {
-       printf("Error opening file\n");
-       return 1;
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char **argv) {
+    char *outputfilename = "output.s"; // Default output file
+    int c;
+
+    // Parse command line arguments using getopt()
+    while ((c = getopt(argc, argv, "o:")) != -1) {
+        switch (c) {
+            case 'o':
+                outputfilename = optarg;
+                break;
+            case '?':
+                if (optopt == 'o') {
+                    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+                } else {
+                    fprintf(stderr, "Unknown option -%c.\n", optopt);
+                }
+                return 1;
+            default:
+                abort();
+        }
     }
 
-yyparse();
-  
-        
-       return 0;
-        
+    // Check if filename was specified
+     
+
+    // Open output file
+    outputfile = fopen(outputfilename, "w");
+    if (outputfile == NULL) {
+        fprintf(stderr, "Error opening output file.\n");
+        return 1;
     }
+
+    yyparse();
+
+    // Close output file
+    fclose(outputfile);
+
+    return 0;
+}

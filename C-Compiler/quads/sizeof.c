@@ -1,7 +1,8 @@
 #include "../parser/ast.h"
 #include "../parser/symbtab.h"
 #include <limits.h>
-//get size of astnode
+//get size of astnode for 32 bit
+
 int sizeof_ast(struct astnode *node) {
 	switch(node->nodetype) {
 		case AST_NODE_TYPE_POINTER:
@@ -21,7 +22,7 @@ int sizeof_ast(struct astnode *node) {
     		     case FLOAT:
     			     return 4;
                 case LONG:
-                    return 8;
+                    return 4;
                 case LONG_LONG:
                     return 8;
                 case DOUBLE:

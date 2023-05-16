@@ -2088,7 +2088,7 @@ yyreduce:
 
   case 6: /* primary-expression: STRING  */
 #line 100 "parser/parser.y"
-                                            { (yyval.astnode_p) = newString(&(yyvsp[0].string));  astwalk_impl((yyval.astnode_p), 0);/*
+                                            { (yyval.astnode_p) = newString(&(yyvsp[0].string)); /*
                 this needs to be changed to some string type after lexer is fixed with this (see hak email) */
                  }
 #line 2095 "parser/parser.tab.c"
@@ -3616,17 +3616,47 @@ yyreturnlab:
 #line 530 "parser/parser.y"
        
 
-   int main() {
-       yydebug = 0;
- outputfile = fopen("output.s", "w");
- if ( outputfile  == NULL) {
-       printf("Error opening file\n");
-       return 1;
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char **argv) {
+    char *outputfilename = "output.s"; // Default output file
+    int c;
+
+    // Parse command line arguments using getopt()
+    while ((c = getopt(argc, argv, "o:")) != -1) {
+        switch (c) {
+            case 'o':
+                outputfilename = optarg;
+                break;
+            case '?':
+                if (optopt == 'o') {
+                    fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+                } else {
+                    fprintf(stderr, "Unknown option -%c.\n", optopt);
+                }
+                return 1;
+            default:
+                abort();
+        }
     }
 
-yyparse();
-  
-        
-       return 0;
-        
+    // Check if filename was specified
+     
+
+    // Open output file
+    outputfile = fopen(outputfilename, "w");
+    if (outputfile == NULL) {
+        fprintf(stderr, "Error opening output file.\n");
+        return 1;
     }
+
+    yyparse();
+
+    // Close output file
+    fclose(outputfile);
+
+    return 0;
+}

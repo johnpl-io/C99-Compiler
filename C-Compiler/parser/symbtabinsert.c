@@ -31,7 +31,7 @@ void symbent_combine(struct astnode *declspecs, struct astnode *declars, int lin
     bool isInsideStruct = false;
     bool isAnonStructdefine = false;
      struct symbol *lookup;
-     struct symbol *structlookup;  //maybe wrong type !
+     struct symbtab *structlookup;  //maybe wrong type !
     
     
     
@@ -480,7 +480,7 @@ void resolve_type(struct astnode *declspec) {
          unsigned char type_short_int[9] = {0, 0, 1, 1, 0, 0 , 0, 0}; 
        unsigned char type_int[9] = {0, 0, 0, 1, 0, 0, 0, 0, 0}; //int
         unsigned char type_long[9] = {0, 0, 0, 0, 1, 0, 0, 0, 0}; //long
-        unsigned char type_long_int[9] = {0, 0, 0, 1, 1, 0, 0, 0, 0, 0}; //long
+        unsigned char type_long_int[9] = {0, 0, 0, 1, 1, 0, 0, 0, 0}; //long
         unsigned char type_long_long_int[9] = {0, 0, 0, 1, 2, 0, 0, 0}; //long long
         unsigned char type_long_long[9] = {0, 0, 0, 0, 2, 0, 0, 0};
         unsigned char type_double[9] = {0, 0, 0, 0, 0, 1 , 0, 0, 0};

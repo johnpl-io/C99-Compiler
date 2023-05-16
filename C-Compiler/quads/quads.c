@@ -51,19 +51,20 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
         fn_no++;
         bbnocount = 0;
         max_regid = 0;
-    head_bb, break_bb, continue_bb = NULL;
+    head_bb = NULL;
+	break_bb = NULL;
+	continue_bb = NULL;
 }
 void gen_stmt(struct astnode *stmt) {
 	if(stmt) {
 		switch(stmt->nodetype)  {
 			case AST_NODE_TYPE_BINOP:
 				if(stmt->binop.operator == '=') {
-					printf("general assignment \n");
+			//		printf("general assignment \n");
 					gen_assign(stmt);
 				}
 				break;
 			case AST_NODE_TYPE_LL: 
-				printf("{ } statement\n");
 				struct astnode *ll_nodell = stmt->ll.head;
 
 
@@ -103,7 +104,7 @@ void gen_stmt(struct astnode *stmt) {
 				emit_quads(RET_OC, gen_rvalue(stmt->returnstmt.statement, NULL, NULL), NULL, NULL);
 				break;
 			case AST_NODE_TYPE_UNOP:
-					if(stmt->unop.operator == POSTINC || stmt->unop.operator == POSTDEC ) {
+					if(stmt->unop.operator == POSTINC || stmt->unop.operator == POSTDEC || stmt->unop.operator == SIZEOF) {
 						gen_rvalue(stmt, NULL, NULL);
 
 					}
@@ -214,12 +215,13 @@ struct generic_node *function_call(struct astnode *functioncall) {
 					//check return type
 					astwalk_impl(functype->fndcl.next, 0);
 					if(functype->fndcl.next->nodetype == AST_NODE_TYPE_DECLSPEC) {
-						if (functype->fndcl.next->declspec.typespecif_res == VOID || functype->fndcl.next->declspec.typespecif_res ==  INT ) {
+						if (functype->fndcl.next->declspec.typespecif_res == VOID || functype->fndcl.next->declspec.typespecif_res ==  INT  || functype->fndcl.next->declspec.typespecif_res ==  0  ) {
 							declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
 							declspecs->declspec.typespecif_res = functype->fndcl.next->declspec.typespecif_res;
 							target->declspec = declspecs;
 						} else {
-							fprintf(stderr, "Error function call of '%s' has a return type that is not supported \n", funcname->ident.string);
+						
+							fprintf(stderr, "Error function call of '%s' has a return type that is not supported %d\n", funcname->ident.string);
 						}
 					}
 
@@ -230,6 +232,7 @@ struct generic_node *function_call(struct astnode *functioncall) {
 			}
 
 		} else {
+			fprintf(stderr, "Warning: implicit function call of '%s'.\n", funcname->ident.string);
 			declspecs->nodetype = AST_NODE_TYPE_DECLSPEC;
 			declspecs->declspec.typespecif_res = INT;
 			target->declspec = declspecs;
@@ -296,8 +299,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 				printf("undeclared variable\n");
 				//check types
 			} else {
-				//check if it is a scalar variable 
-				switch(rexpr->ident.symbol->var.type->nodetype) { //probably should check if it a function call 
+				switch(rexpr->ident.symbol->var.type->nodetype) { 
 					case AST_NODE_TYPE_DECLSPEC: {
 									     if(rexpr->ident.symbol->attr_type == SYMB_FUNCTION_NAME) {
 										     fprintf(stderr, "Error using a variable declared as a function in an expression.\n");
@@ -449,13 +451,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 								  push_bb(Bn);
 								  if(condcode) {
 
-									  *condcode = NOTEQ_OC;
+									  *condcode = EQEQ_OC;
 								  }
 
 								  return addr;
 								  break;
 
-							  case LOGOR:
+							  case LOGOR:   //!!DOES NOT REALLY WORK!!
 								  Bt = new_bb();
 								  Bf = new_bb();
 								  Bn = new_bb();
@@ -467,7 +469,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 								  link_bb(ALWAYS, Bn, NULL);
 								  push_bb(Bn);
 								  if(condcode) {
-									  *condcode = EQEQ_OC;
+									  *condcode = NOTEQ_OC;
 								  }
 								  break;
 
@@ -478,7 +480,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 								  return addr;
 							  default:
-								  fprintf(stderr, "Error with binop operator\n");
+								  fprintf(stderr, "Error with binop operator.\n");
 						  }
 
 
@@ -573,6 +575,23 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 							return temp;
 						return val;
 					  }
+					  if(rexpr->unop.operator == SIZEOF) {
+						struct Num size;
+						
+						if(rexpr->unop.right->nodetype == AST_NODE_TYPE_DECLSPEC) {
+							 resolve_type(rexpr->unop.right);
+							size.integer = sizeof_ast(rexpr->unop.right);
+						}
+						if(rexpr->unop.right->nodetype== AST_NODE_TYPE_IDENT ) {
+							size.integer = sizeof_ast(rexpr->unop.right->ident.symbol->var.type) ;
+						}
+					  if(rexpr->unop.right->nodetype == AST_NODE_TYPE_STRING) {
+						size.integer = rexpr->unop.right->string.string->len + 1; //for null terminator
+					  }
+						size.type = INT_SIGNED;
+						return gen_rvalue(newNum(AST_NODE_TYPE_NUM, size), addr, NULL);
+					  }
+					
 					  break;
 		case AST_NODE_TYPE_STRING:
 					  target->types = STRING_TYPE;
@@ -714,8 +733,9 @@ void print_genericnode(struct generic_node *generic_node) {
 
 				printf(".BB%d.%d", generic_node->value.bb->bb_fn, generic_node->value.bb->bb_no); break;
 			case STRING_TYPE: 
-				printf("\""); stringprinter(generic_node->value.string, stdout); printf("\"\n"); break;
+				printf("\""); stringprinter(generic_node->value.string, stdout); printf("\""); break;
 			default:
+				printf("Error withgeneric node\n");
 		}
 	}
 }

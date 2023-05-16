@@ -1,25 +1,383 @@
 	.comm grid, 324, 4
+	.global isSafe
+	.type isSafe, @function
+isSafe:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $64, %esp
+.BB00:
+	movl $0, %eax
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	cmpl $8, %eax
+	jg .BB03
+	jmp .BB01
+.BB01:
+	leal grid, %eax
+	movl %eax, -32(%ebp)
+	movl 8(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -36(%ebp)
+	movl -32(%ebp), %eax
+	movl -36(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -40(%ebp)
+	movl -4(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -44(%ebp)
+	movl -40(%ebp), %eax
+	movl -44(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -48(%ebp)
+	movl -48(%ebp), %eax
+	movl (%eax), %edx
+	movl %edx, -52(%ebp)
+	movl -52(%ebp), %eax
+	cmpl 16(%ebp), %eax
+	jne .BB05
+	jmp .BB04
+.BB04:
+	movl $0, %eax
+	jmp .BB06
+	jmp .BB05
+.BB05:
+	jmp .BB02
+.BB02:
+	movl -4(%ebp), %eax
+	movl %eax, -32(%ebp)
+	movl -4(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -4(%ebp)
+	movl -4(%ebp), %eax
+	cmpl $8, %eax
+	jle .BB01
+	jmp .BB03
+.BB03:
+	movl $0, %eax
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	cmpl $8, %eax
+	jg .BB09
+	jmp .BB07
+.BB07:
+	leal grid, %eax
+	movl %eax, -32(%ebp)
+	movl -8(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -36(%ebp)
+	movl -32(%ebp), %eax
+	movl -36(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -40(%ebp)
+	movl 12(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -44(%ebp)
+	movl -40(%ebp), %eax
+	movl -44(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -48(%ebp)
+	movl -48(%ebp), %eax
+	movl (%eax), %edx
+	movl %edx, -52(%ebp)
+	movl -52(%ebp), %eax
+	cmpl 16(%ebp), %eax
+	jne .BB011
+	jmp .BB010
+.BB010:
+	movl $0, %eax
+	jmp .BB06
+	jmp .BB011
+.BB011:
+	jmp .BB08
+.BB08:
+	movl -8(%ebp), %eax
+	movl %eax, -32(%ebp)
+	movl -8(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	cmpl $8, %eax
+	jle .BB07
+	jmp .BB09
+.BB09:
+	movl $0, %eax
+	movl %eax, -20(%ebp)
+	movl -20(%ebp), %eax
+	cmpl $3, %eax
+	jge .BB014
+	jmp .BB012
+.BB012:
+	movl $0, %eax
+	movl %eax, -24(%ebp)
+	movl -24(%ebp), %eax
+	cmpl $3, %eax
+	jge .BB017
+	jmp .BB015
+.BB015:
+	leal grid, %eax
+	movl %eax, -32(%ebp)
+	movl -20(%ebp), %eax
+	movl -12(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -36(%ebp)
+	movl -36(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -40(%ebp)
+	movl -32(%ebp), %eax
+	movl -40(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -44(%ebp)
+	movl -24(%ebp), %eax
+	movl -16(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -48(%ebp)
+	movl -48(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -52(%ebp)
+	movl -44(%ebp), %eax
+	movl -52(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -56(%ebp)
+	movl -56(%ebp), %eax
+	movl (%eax), %edx
+	movl %edx, -28(%ebp)
+	jmp .BB016
+.BB016:
+	movl -24(%ebp), %eax
+	movl %eax, -32(%ebp)
+	movl -24(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -24(%ebp)
+	movl -24(%ebp), %eax
+	cmpl $3, %eax
+	jl .BB015
+	jmp .BB017
+.BB017:
+	jmp .BB013
+.BB013:
+	movl -20(%ebp), %eax
+	movl %eax, -32(%ebp)
+	movl -20(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -20(%ebp)
+	movl -20(%ebp), %eax
+	cmpl $3, %eax
+	jl .BB012
+	jmp .BB014
+.BB014:
+	movl -28(%ebp), %eax
+	cmpl 16(%ebp), %eax
+	jne .BB019
+	jmp .BB018
+.BB018:
+	movl $0, %eax
+	jmp .BB06
+	jmp .BB019
+.BB019:
+	movl $1, %eax
+	jmp .BB06
+.BB06:
+	leave
+	ret
+	.global solveSudoku
+	.type solveSudoku, @function
+solveSudoku:
+	pushl %ebp
+	movl %esp, %ebp
+	subl $48, %esp
+.BB10:
+	movl 8(%ebp), %eax
+	cmpl $8, %eax
+	jne .BB12
+	jmp .BB11
+.BB11:
+	movl $1, %eax
+	jmp .BB13
+	jmp .BB12
+.BB12:
+	movl 12(%ebp), %eax
+	cmpl $9, %eax
+	jne .BB15
+	jmp .BB14
+.BB14:
+	movl 8(%ebp), %eax
+	movl %eax, -20(%ebp)
+	movl 8(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, 8(%ebp)
+	movl $0, %eax
+	movl %eax, 12(%ebp)
+	jmp .BB15
+.BB15:
+	leal grid, %eax
+	movl %eax, -20(%ebp)
+	movl 8(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -24(%ebp)
+	movl -20(%ebp), %eax
+	movl -24(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -28(%ebp)
+	movl 12(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -32(%ebp)
+	movl -28(%ebp), %eax
+	movl -32(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -36(%ebp)
+	movl -36(%ebp), %eax
+	movl (%eax), %edx
+	movl %edx, -4(%ebp)
+	movl -4(%ebp), %eax
+	cmpl $0, %eax
+	jle .BB17
+	jmp .BB16
+.BB16:
+	movl 12(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -24(%ebp)
+	pushl -24(%ebp)
+	pushl 8(%ebp)
+	call solveSudoku
+	addl $8, %esp
+	movl %eax, -20(%ebp)
+	movl -20(%ebp), %eax
+	jmp .BB13
+	jmp .BB17
+.BB17:
+	movl $1, %eax
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	cmpl $9, %eax
+	jg .BB110
+	jmp .BB18
+.BB18:
+	pushl -8(%ebp)
+	pushl 12(%ebp)
+	pushl 8(%ebp)
+	call isSafe
+	addl $12, %esp
+	movl %eax, -12(%ebp)
+	movl -12(%ebp), %eax
+	cmpl $0, %eax
+	je .BB112
+	jmp .BB111
+.BB111:
+	leal grid, %eax
+	movl %eax, -20(%ebp)
+	movl 8(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -24(%ebp)
+	movl -20(%ebp), %eax
+	movl -24(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -28(%ebp)
+	movl 12(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -32(%ebp)
+	movl -28(%ebp), %eax
+	movl -32(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -36(%ebp)
+	movl -8(%ebp), %eax
+	movl -36(%ebp), %edx
+	movl %eax, (%edx)
+	movl 12(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -40(%ebp)
+	pushl -40(%ebp)
+	pushl 8(%ebp)
+	call solveSudoku
+	addl $8, %esp
+	movl %eax, -16(%ebp)
+	movl -16(%ebp), %eax
+	cmpl $0, %eax
+	je .BB114
+	jmp .BB113
+.BB113:
+	movl $1, %eax
+	jmp .BB13
+	jmp .BB114
+.BB114:
+	jmp .BB112
+.BB112:
+	leal grid, %eax
+	movl %eax, -20(%ebp)
+	movl 8(%ebp), %eax
+	movl $36, %edx
+	imull %edx, %eax
+	movl %eax, -24(%ebp)
+	movl -20(%ebp), %eax
+	movl -24(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -28(%ebp)
+	movl 12(%ebp), %eax
+	movl $4, %edx
+	imull %edx, %eax
+	movl %eax, -32(%ebp)
+	movl -28(%ebp), %eax
+	movl -32(%ebp), %edx
+	addl %edx, %eax
+	movl %eax, -36(%ebp)
+	movl $0, %eax
+	movl -36(%ebp), %edx
+	movl %eax, (%edx)
+	jmp .BB19
+.BB19:
+	movl -8(%ebp), %eax
+	movl %eax, -20(%ebp)
+	movl -8(%ebp), %eax
+	movl $1, %edx
+	addl %edx, %eax
+	movl %eax, -8(%ebp)
+	movl -8(%ebp), %eax
+	cmpl $9, %eax
+	jle .BB18
+	jmp .BB110
+.BB110:
+	movl $0, %eax
+	jmp .BB13
+.BB13:
+	leave
+	ret
 	.global printgrid
 	.type printgrid, @function
 printgrid:
 	pushl %ebp
 	movl %esp, %ebp
 	subl $32, %esp
-.BB00:
+.BB20:
 	movl $0, %eax
 	movl %eax, -4(%ebp)
 	movl -4(%ebp), %eax
 	cmpl $9, %eax
-	jge .BB03
-	jmp .BB01
-.BB01:
+	jge .BB23
+	jmp .BB21
+.BB21:
 	movl $0, %eax
 	movl %eax, -8(%ebp)
 	movl -8(%ebp), %eax
 	cmpl $9, %eax
-	jge .BB06
-	jmp .BB04
-.BB04:
+	jge .BB26
+	jmp .BB24
+.BB24:
 	leal grid, %eax
 	movl %eax, -12(%ebp)
 	movl -4(%ebp), %eax
@@ -49,8 +407,8 @@ printgrid:
 	pushl $.LC0
 	call printf
 	addl $8, %esp
-	jmp .BB05
-.BB05:
+	jmp .BB25
+.BB25:
 	movl -8(%ebp), %eax
 	movl %eax, -12(%ebp)
 	movl -8(%ebp), %eax
@@ -59,9 +417,9 @@ printgrid:
 	movl %eax, -8(%ebp)
 	movl -8(%ebp), %eax
 	cmpl $9, %eax
-	jl .BB04
-	jmp .BB06
-.BB06:
+	jl .BB24
+	jmp .BB26
+.BB26:
 	.section .rodata
 .LC1:
 	.string "\n"
@@ -69,8 +427,8 @@ printgrid:
 	pushl $.LC1
 	call printf
 	addl $4, %esp
-	jmp .BB02
-.BB02:
+	jmp .BB22
+.BB22:
 	movl -4(%ebp), %eax
 	movl %eax, -12(%ebp)
 	movl -4(%ebp), %eax
@@ -79,9 +437,9 @@ printgrid:
 	movl %eax, -4(%ebp)
 	movl -4(%ebp), %eax
 	cmpl $9, %eax
-	jl .BB01
-	jmp .BB03
-.BB03:
+	jl .BB21
+	jmp .BB23
+.BB23:
 	leave
 	ret
 	.global main
@@ -90,7 +448,7 @@ main:
 	pushl %ebp
 	movl %esp, %ebp
 	subl $1632, %esp
-.BB10:
+.BB30:
 	leal grid, %eax
 	movl %eax, -8(%ebp)
 	movl $0, %eax
@@ -1792,8 +2150,14 @@ main:
 	movl $0, %eax
 	movl -1624(%ebp), %edx
 	movl %eax, (%edx)
+	pushl $0
+	pushl $0
+	call solveSudoku
+	addl $8, %esp
 	call printgrid
 	addl $0, %esp
 	movl $0, %eax
+	jmp .BB31
+.BB31:
 	leave
 	ret

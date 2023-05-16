@@ -21,6 +21,7 @@ int bbnocount;
 struct basic_block *break_bb, *continue_bb; // for loops continue points
 struct basic_block *head_bb; //head of linked list of basic block 
 			     //struct basic_block *truestuff, *falsestuff;
+struct basic_block *ret_block;
 int max_regid;
 int fn_no;
 void set_max(int input) {
@@ -46,6 +47,9 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
 
 		llstmtlist = llstmtlist->ll.next;
 	}
+	if(ret_block) {
+		push_bb(ret_block);
+	}
 	print_func(head_bb);
     code_generation(head_bb);
         fn_no++;
@@ -54,6 +58,7 @@ struct basic_block *gen_quads(struct astnode *stmtlist){
     head_bb = NULL;
 	break_bb = NULL;
 	continue_bb = NULL;
+	ret_block = NULL;
 }
 void gen_stmt(struct astnode *stmt) {
 	if(stmt) {
@@ -102,6 +107,10 @@ void gen_stmt(struct astnode *stmt) {
 			case AST_NODE_TYPE_RETURN:
 				//probably should check if return matches some where
 				emit_quads(RET_OC, gen_rvalue(stmt->returnstmt.statement, NULL, NULL), NULL, NULL);
+				if(ret_block == NULL) {
+					ret_block = new_bb();
+				}
+				link_bb(ALWAYS, ret_block, NULL);
 				break;
 			case AST_NODE_TYPE_UNOP:
 					if(stmt->unop.operator == POSTINC || stmt->unop.operator == POSTDEC || stmt->unop.operator == SIZEOF) {

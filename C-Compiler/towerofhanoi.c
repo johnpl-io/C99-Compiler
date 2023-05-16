@@ -6,11 +6,11 @@ int towerOfHanoi(int n, int from_rod, int to_rod,
     if (n == 0) {
         return 0;
     }
-    else {
+  
         towerOfHanoi(n - 1, from_rod, aux_rod, to_rod);
         printf("Move disk %d from rod %d to rod %d\n", n, from_rod, to_rod);
         towerOfHanoi(n - 1, aux_rod, to_rod, from_rod);
-    }
+    
 }
 
 int main()

@@ -35,4 +35,4 @@ recursively solves tower of hanoi
 The ast dump of function and basic block are automatically printed be default but can be stopped by commenting out ```astwalk_impl($4,0);``` on line 527 in parser/parser.y and ```print_func(head_bb)``
 quads/quads.c
 
-There are some known issues such as logor not working and return statements do not "short circuit" as they do in C. This is something we did not realize until generating assembly. In test files we mititaged this by including flags  and breaks. Also some of the error checking is to be desired. Also there are a good amount of warnings.
+There are some known issues such as logor not working and  <del> return statements do not "leave function immediately" as they do in C.This is something we did not realize until generating assembly.  </del> (This was fixed Tuesday Morning in an efficient way) <del> In test files we mititaged this by including flags  and breaks.</del> Also some of the error checking is to be desired. Also there are a good amount of warnings.

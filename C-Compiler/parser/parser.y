@@ -400,7 +400,7 @@ type-qualifier:  CONST {    $$ = newType(AST_NODE_TYPE_QUALIFIER, CONST); }
     
     /* 6.7.6 */
     type-name: specifier-qualifier-list { $$ = $1; }
-        | specifier-qualifier-list abstract-declarator { $$ = sizeofresolve($1, $2, lineno, filename_buf); astwalk_impl($$, 0); }
+        | specifier-qualifier-list abstract-declarator { $$ = sizeofresolve($1, $2, lineno, filename_buf);  }
         ;
     
     abstract-declarator: pointer { $$ = insertElement(AST_NODE_TYPE_DECL, newDeclar(AST_NODE_TYPE_DECL, NULL), $1);  }

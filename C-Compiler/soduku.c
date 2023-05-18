@@ -118,7 +118,7 @@ grid[8][0] = 0; grid[8][1] = 0; grid[8][2] = 5; grid[8][3] = 2; grid[8][4] = 0; 
 
 
 
-solveSudoku(0, 0);
+solveSudoku(2, 2);
 printgrid();
 
 return 0;

@@ -2150,8 +2150,8 @@ main:
 	movl $0, %eax
 	movl -1624(%ebp), %edx
 	movl %eax, (%edx)
-	pushl $0
-	pushl $0
+	pushl $2
+	pushl $2
 	call solveSudoku
 	addl $8, %esp
 	call printgrid

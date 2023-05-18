@@ -61,6 +61,7 @@ void code_generation(struct basic_block *head){
 }
 
 void translate_quad(struct quad *quad) {
+    print_quads(quad);
     struct generic_node *result = quad->result;
     struct generic_node *src1 = quad->src1;
     struct generic_node *src2 = quad->src2;

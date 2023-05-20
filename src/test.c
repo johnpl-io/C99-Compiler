@@ -1,4 +1,7 @@
 int main() {
 	int x;
-	printf("hi");
+	x = 5;
+	return x;
 }
+
+

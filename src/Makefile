@@ -1,4 +1,4 @@
-CC = clang -O3
+CC = gcc
 CFLAGS = -Wall -std=c11
 
 PARSER_DIR = parser

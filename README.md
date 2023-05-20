@@ -81,4 +81,3 @@ recursively solves the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_H
 
 ### Notes
 Error checking is present but is to be desired there are many things the compiler will let you do that it should check and will let you do anyway. To hit the target of x86-32 bit there are some design decisions in the frontend that are designed to keep this in mind (such as computing stack offsets) which is not the best if one wants drop-in another backend. 
-

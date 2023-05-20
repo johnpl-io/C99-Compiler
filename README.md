@@ -25,11 +25,11 @@ There are testfiles included in the tesfile directory with their respective gene
 prints  prime numbers up to 100 using a [primality test](https://en.wikipedia.org/wiki/Primality_test)
 
 ```grid.c```  
-2d
+assigns values to a 2d array and prints them out 
 
 ```matrix.c```
 
-computes a 2x2 determinant
+computes 3x3 derminant
 
 ```gcd.c```
 

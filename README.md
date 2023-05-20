@@ -1,20 +1,17 @@
 # C 99  x86-32 Bit Compiler
 This is the source code for a basic unoptimized C compiler that is based off of the c99 standard. It was made using [flex](https://github.com/westes/flex) and [bison](https://www.gnu.org/software/bison/) for the frotend. The backend consists of the generatation of three-address code IR (quads) and code generation to x86-32 bit assembly. 
 ## Installation
-### Dependencies
-
 ### Building on a Unix-like system
-
+Run ```make``` in ```src/``` to allow for an executable binary called ```jcc``` to be created. There is also a linux precombiled binary in ```bin/```. 
 ### Dependencies
+- ```git```
+- ```bison``` 
+- ```flex```
+- ```make```
 
 ## How to Use
-there is also a precomplied binary called ```jcc```.
-To run you can envoke ```gcc -E [filename.c] | ./jcc -o [optional.s] ```.
+To run the compiler you can envoke ```gcc -E [filename.c] | ./jcc -o [optional.s] ```. This allows for gcc to output the preprocesor into the compiler. If ```optional.s``` is not specified output.s will be generated. 
 ## Test Files
-## Features
-If optional is not specified output.s will be generated. The output assembly is x86-32 bit. There are test files in this directory with [testfile].s as there respective assembly. 
-testfiles
-
 ```misc.c```  
 miscelleneous testing
 
@@ -36,6 +33,10 @@ take two user integers and computes gcd using Euclids Algorithm
 ```towerofhanoi.c``` 
 
 recursively solves tower of hanoi
+## Features
+
+
+
 
 The ast dump of function and basic block are automatically printed be default but can be stopped by commenting out ```astwalk_impl($4,0);``` on line 527 in parser/parser.y and ```print_func(head_bb)```
 quads/quads.c

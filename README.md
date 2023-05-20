@@ -69,7 +69,7 @@ recursively solves the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_H
 * char values
     * again supported in backend but would require bit-extension on the frontend so it is not yet implemented 
 - Logical OR 
-    - Is in their but in an effort to produce fall out there are some bugs. 
+    - It is in quad and codegen but in an effort to produce fall out there are some bugs. 
 ### Not supported
 - Initializers
 - K & R syntax for functions

@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc 
 CFLAGS = -Wall
 
 PARSER_DIR = parser

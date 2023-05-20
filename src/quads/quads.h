@@ -59,6 +59,8 @@ struct generic_node *gen_lvalue(struct astnode *lexpr, int *mode);
 struct generic_node *gen_assign(struct astnode *expr);
 struct basic_block *gen_quads(struct astnode *stmtlist);
 void gen_stmt(struct astnode *stmt);
+void gen_while(struct astnode *while_loop);
+void gen_if(struct astnode *if_node);
 //this function creates a new quad and appends it to the current list of quads 
 void emit_quads(int opcode, struct generic_node *result, struct generic_node *src1, struct generic_node *src2);
 void print_quads(struct quad *quad);
@@ -74,4 +76,7 @@ struct generic_node *function_call(struct astnode *functioncall);
  void print_quads(struct quad *quad);
  void print_genericnode(struct generic_node *generic_node);
  char* opcode_to_string(enum opcode op);
+ void print_func(struct basic_block *basic_block);
+ void push_bb(struct basic_block *new_bb);
+void gen_condexpr(struct astnode *expr, struct basic_block *Bt, struct basic_block *Bf, int flipcond);
 #endif

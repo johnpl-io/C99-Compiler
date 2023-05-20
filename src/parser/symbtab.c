@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "symbtab.h"
 #include "ast.h"
+char *strdup(const char *s);
 
 // extern char filename_buf[255];
 // extern int lineno;

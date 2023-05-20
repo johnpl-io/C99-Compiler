@@ -1,5 +1,5 @@
-CC = gcc 
-CFLAGS = -Wall
+CC = clang -O3
+CFLAGS = -Wall -std=c11
 
 PARSER_DIR = parser
 LEXER_DIR = lexer

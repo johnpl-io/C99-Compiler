@@ -9,6 +9,7 @@
 #include "../parser/symbtab.h"
 #include "sizeof.h"
 #include "../codegen/codegen.h"
+char *strdup(const char *s);
 extern char *current_fn;
 extern int stack_offset;
 #define DIRECT 1
@@ -69,7 +70,7 @@ void gen_stmt(struct astnode *stmt) {
 					gen_assign(stmt);
 				}
 				break;
-			case AST_NODE_TYPE_LL: 
+			case AST_NODE_TYPE_LL: ;
 				struct astnode *ll_nodell = stmt->ll.head;
 
 
@@ -100,7 +101,7 @@ void gen_stmt(struct astnode *stmt) {
 				}
 				emit_quads(BR_OC, newbb_node(continue_bb), NULL, NULL);
 				break;
-			case AST_NODE_TYPE_FN:
+			case AST_NODE_TYPE_FN: ;
 				struct generic_node *target = function_call(stmt);
 				emit_quads(CALL_OC, target, NULL, NULL);
 				break;
@@ -399,7 +400,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 							  case '/':
 							  case '*':
 							  case '-':
-							  case '%':
+							  case '%': ;
 
 								  struct generic_node *left = gen_rvalue(rexpr->binop.left, NULL, NULL);
 
@@ -446,7 +447,7 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 								  break;
 							  case AST_NODE_TYPE_FNDCL:
 								  break;
-							  case LOGAND:
+							  case LOGAND: ;
 
 								  struct basic_block *Bt = new_bb();
 								  struct basic_block *Bf = new_bb();

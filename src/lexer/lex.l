@@ -6,8 +6,10 @@
    #include <stdio.h>
    #include <ctype.h>
    #include "../parser/parser.tab.h"
+   #include <string.h>
    int get_line_info();
    int handle_error();
+   char *strdup(const char *s);
    int lineno = 1;
    /*  enum type {
         INT_SIGNED,

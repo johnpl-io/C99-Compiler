@@ -168,7 +168,7 @@ void translate_quad(struct quad *quad) {
         case ARG:
             fprintf(outputfile, "\tpushl %s\n", checkGenericNode(src2));
             break;
-        case CALL_OC:
+        case CALL_OC: ;
         int num_args = pop_num_args();
             fprintf(outputfile, "\tcall %s\n", checkGenericNode(src1));
               fprintf(outputfile, "\taddl $%d, %%esp\n", 4*num_args);

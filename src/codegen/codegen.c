@@ -17,7 +17,6 @@ extern int max_regid;
 #define MAX_NUM_ARGS 100
 int num_args_stack[MAX_NUM_ARGS];
 int num_args_top = -1;
-
 void push_num_args(int num_args) {
     if (num_args_top < MAX_NUM_ARGS - 1) {
         num_args_stack[++num_args_top] = num_args;
@@ -34,6 +33,7 @@ int pop_num_args() {
        return 0;
     }
 }
+
 void code_generation(struct basic_block *head){
     fprintf(outputfile, "\t.global %s\n", current_fn);
     fprintf(outputfile, "\t.type %s, @function\n", current_fn);
@@ -61,7 +61,6 @@ void code_generation(struct basic_block *head){
 }
 
 void translate_quad(struct quad *quad) {
-    print_quads(quad);
     struct generic_node *result = quad->result;
     struct generic_node *src1 = quad->src1;
     struct generic_node *src2 = quad->src2;
@@ -164,13 +163,13 @@ void translate_quad(struct quad *quad) {
             break;
         case ARGBEGIN:
             num_arg = src1->value.immediate;
-            push_num_args(num_arg);
+             push_num_args(num_arg);
             break;
         case ARG:
             fprintf(outputfile, "\tpushl %s\n", checkGenericNode(src2));
             break;
         case CALL_OC:
-            int num_args = pop_num_args();
+        int num_args = pop_num_args();
             fprintf(outputfile, "\tcall %s\n", checkGenericNode(src1));
               fprintf(outputfile, "\taddl $%d, %%esp\n", 4*num_args);
             if (src2){

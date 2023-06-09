@@ -248,7 +248,7 @@ struct astnode_for {
 };
 
 struct astnode {
-int nodetype;int type;
+int nodetype;
 union {
     struct astnode_binop binop;
     struct astnode_tenop tenop;

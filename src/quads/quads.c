@@ -380,10 +380,13 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 				addr = new_temporary(); 
 
 			} 
-			//should prob check before as well 
+			//should prob check before as well
 			target = function_call(rexpr);
 			emit_quads(CALL_OC, target, addr, NULL);
 			addr->declspec = target->declspec;
+			if(condcode) {
+				*condcode = UNSPECIFIED;
+			}
 			return addr;
 
 			break;

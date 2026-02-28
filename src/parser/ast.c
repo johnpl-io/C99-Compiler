@@ -4,6 +4,7 @@
 #include "parser.tab.h"
 #include "symbtab.h"
 #include <ctype.h>
+#include <string.h>
 extern int lineno;
 extern struct symbtab *current_scope;
 extern struct symbtab *current_functionscope;
@@ -55,7 +56,7 @@ const char* qualifier_types_string(int qualifier_types) {
 void charhelper(char val, FILE *fp) {
     switch(val) {
         case '\a': fprintf(fp, "\\a"); break;
-        case '\b': printf(fp, "\\b"); break;
+        case '\b': fprintf(fp, "\\b"); break;
         case '\f': fprintf(fp, "\\f"); break;
         case '\n': fprintf(fp, "\\n"); break;
         case '\r': fprintf(fp, "\\r"); break;

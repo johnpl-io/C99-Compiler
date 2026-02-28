@@ -7,9 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "../parser/symbtab.h"
+#include "../parser/symbtabinsert.h"
 #include "sizeof.h"
 #include "../codegen/codegen.h"
 char *strdup(const char *s);
+int get_set_opcode(struct astnode *opcode);
 extern char *current_fn;
 extern int stack_offset;
 #define DIRECT 1

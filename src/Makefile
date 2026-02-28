@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -std=c11
+CFLAGS = -Wall -std=c11 -D_POSIX_C_SOURCE=200809L
 
 PARSER_DIR = parser
 LEXER_DIR = lexer

@@ -491,6 +491,9 @@ struct generic_node *gen_rvalue(struct astnode *rexpr, struct generic_node *addr
 
 
 								  return addr;
+							  case ',':
+								  gen_rvalue(rexpr->binop.left, NULL, NULL);
+								  return gen_rvalue(rexpr->binop.right, addr, NULL);
 							  default:
 								  fprintf(stderr, "Error with binop operator.\n");
 						  }
